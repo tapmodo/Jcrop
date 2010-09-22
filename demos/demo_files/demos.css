@@ -1,0 +1,36 @@
+body
+{
+	margin: 0;
+	padding: 0;
+	background: #eee;
+	font-family: Calibri, sans-serif;
+}
+
+.article h1
+{
+	color: #333;
+	font-size: 2.2em;
+	margin-top: .2em;
+}
+
+.jcropper-holder { border: 1px black solid; }
+
+#outer { text-align: center; }
+
+.jcExample
+{
+	text-align: left;
+	background: white;
+	width: 700px;
+	font-size: 80%;
+	margin: 1.5em auto 2em auto;
+	border: 1px #999 solid;
+	padding: 1em 2em 2em;
+}
+
+.jcExample .article { width: 565px; }
+
+form { margin: 1.5em 0; }
+form.coords label { margin-right: 1em; font-weight: bold; color: #900; }
+form.coords input { width: 3em; }
+

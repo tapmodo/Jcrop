@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+		<title>Jcrop &raquo; Tutorials &raquo; aspectRatio w/ Preview</title>
+		<script src="../js/jquery.min.js"></script>
+		<script src="../js/jquery.Jcrop.js"></script>
+		<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+		<script type="text/javascript">
+
+		(function($) {
+
+			$(function(){
+
+				var jcrop_api;
+				var bounds, boundx, boundy;
+				
+				$('#cropbox').Jcrop({
+					onChange: showPreview,
+					onSelect: showPreview,
+					aspectRatio: 1
+				},function(){
+					jcrop_api = this;
+					bounds = jcrop_api.getBounds();
+					boundx = bounds[0];
+					boundy = bounds[1];
+				});
+
+				function showPreview(coords)
+				{
+					if (parseInt(coords.w) > 0)
+					{
+						var rx = 100 / coords.w;
+						var ry = 100 / coords.h;
+
+						$('#preview').css({
+							width: Math.round(rx * boundx) + 'px',
+							height: Math.round(ry * boundy) + 'px',
+							marginLeft: '-' + Math.round(rx * coords.x) + 'px',
+							marginTop: '-' + Math.round(ry * coords.y) + 'px'
+						});
+					}
+				};
+
+			});
+
+		}(jQuery));
+
+		</script>
+
+	</head>
+
+	<body>
+
+	<div id="outer">
+	<div class="jcExample">
+	<div class="article">
+
+		<h1>Jcrop - Aspect ratio w/ preview pane</h1>
+
+		<table>
+			<tr>
+				<td>
+					<img src="demo_files/flowers.jpg" id="cropbox" />
+				</td>
+				<td>
+					<div style="width:100px;height:100px;overflow:hidden;">
+						<img src="demo_files/flowers.jpg" id="preview" />
+					</div>
+				</td>
+			</tr>
+		</table>
+
+		<p>
+			<b>An example implementing a preview pane.</b>
+				Obviously the most visual demo, the preview pane is accomplished
+				entirely outside of Jcrop with a simple jQuery-flavored callback.
+				This type of interface could be useful for creating a thumbnail
+				or avatar. The onChange event handler is used to update the
+				view in the preview pane.
+		</p>
+
+		<div id="dl_links">
+			<a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+			<a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+		</div>
+
+
+	</div>
+	</div>
+	</div>
+	</body>
+
+</html>
