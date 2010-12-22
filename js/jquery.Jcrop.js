@@ -376,10 +376,10 @@ $.Jcrop = function(obj,opt)
 			if (ylimit && (Math.abs(ysize) > ylimit))
 				y2 = (ysize > 0) ? (y1 + ylimit) : (y1 - ylimit);
 
-			if (ymin && (Math.abs(ysize) < ymin))
-				y2 = (ysize > 0) ? (y1 + ymin) : (y1 - ymin);
-			if (xmin && (Math.abs(xsize) < xmin))
-				x2 = (xsize > 0) ? (x1 + xmin) : (x1 - xmin);
+			if (ymin/yscale && (Math.abs(ysize) < ymin/yscale))
+				y2 = (ysize > 0) ? (y1 + ymin/yscale) : (y1 - ymin/yscale);
+			if (xmin/xscale && (Math.abs(xsize) < xmin/xscale))
+				x2 = (xsize > 0) ? (x1 + xmin/xscale) : (x1 - xmin/xscale);
 
 			if (x1 < 0) { x2 -= x1; x1 -= x1; }
 			if (y1 < 0) { y2 -= y1; y1 -= y1; }
