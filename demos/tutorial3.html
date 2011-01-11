@@ -9,43 +9,39 @@
 		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
 		<script type="text/javascript">
 
-		(function($) {
+    jQuery(function($){
 
-			$(function(){
+      var jcrop_api, boundx, boundy;
+      
+      $('#target').Jcrop({
+        onChange: updatePreview,
+        onSelect: updatePreview,
+        aspectRatio: 1
+      },function(){
+        var bounds = this.getBounds();
+        jcrop_api = this;
+        boundx = bounds[0];
+        boundy = bounds[1];
+      });
 
-				var jcrop_api;
-				var bounds, boundx, boundy;
-				
-				$('#cropbox').Jcrop({
-					onChange: showPreview,
-					onSelect: showPreview,
-					aspectRatio: 1
-				},function(){
-					jcrop_api = this;
-					bounds = jcrop_api.getBounds();
-					boundx = bounds[0];
-					boundy = bounds[1];
-				});
+      var $preview = $('#preview');
+      function updatePreview(c)
+      {
+        if (parseInt(c.w) > 0)
+        {
+          var rx = 100 / c.w;
+          var ry = 100 / c.h;
 
-				function showPreview(coords)
-				{
-					if (parseInt(coords.w) > 0)
-					{
-						var rx = 100 / coords.w;
-						var ry = 100 / coords.h;
+          $preview.css({
+            width: Math.round(rx * boundx) + 'px',
+            height: Math.round(ry * boundy) + 'px',
+            marginLeft: '-' + Math.round(rx * c.x) + 'px',
+            marginTop: '-' + Math.round(ry * c.y) + 'px'
+          });
+        }
+      };
 
-						$('#preview').css({
-							width: Math.round(rx * boundx) + 'px',
-							height: Math.round(ry * boundy) + 'px',
-							marginLeft: '-' + Math.round(rx * coords.x) + 'px',
-							marginTop: '-' + Math.round(ry * coords.y) + 'px'
-						});
-					}
-				};
-
-			});
-
-		}(jQuery));
+    });
 
 		</script>
 
@@ -62,7 +58,7 @@
 		<table>
 			<tr>
 				<td>
-					<img src="demo_files/flowers.jpg" id="cropbox" />
+					<img src="demo_files/flowers.jpg" id="target" />
 				</td>
 				<td>
 					<div style="width:100px;height:100px;overflow:hidden;">

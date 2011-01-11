@@ -14,15 +14,15 @@
 
 			jQuery(function($){
 
-				var api;
+				var jcrop_api;
 
-				var jc_opts = {
+				$('#target').Jcrop({
 					bgOpacity: .85,
 					outerImage: 'demo_files/sagomod.jpg',
 					setSelect: [ 60, 70, 540, 330 ]
-				};
-
-				$('#cropbox').Jcrop(jc_opts,function(){ api = this; });
+				},function(){
+          jcrop_api = this;
+        });
 
 				// Define page sections
 				var sections = {
@@ -89,21 +89,25 @@
 					return function() {
 						var opt = { };
 						opt[k] = v;
-						api.setOptions(opt);
+						jcrop_api.setOptions(opt);
 						return false;
 					};
 				};
 				// Handler for animation buttons
 				function animHandler(v) {
 					return function() {
-						api.animateTo(v);
+						jcrop_api.animateTo(v);
 						return false;
 					};
 				};
 
 				$('#anim_buttons').append(
 					$('<button></button>').append('Bye!').click(function(){
-						api.animateTo([300,200,300,200],function(){ this.release(); });
+						jcrop_api.animateTo(
+              [300,200,300,200],
+              function(){ this.release(); }
+            );
+            return false;
 					})
 				);
 
@@ -121,7 +125,7 @@
 		<div class="article">
 
 			<h1>Jcrop - Animations/Transitions</h1>
-			<img src="demo_files/sago.jpg" id="cropbox" />
+			<img src="demo_files/sago.jpg" id="target" />
 
 			<div id="interface" style="margin: 1em 0;"></div>
 

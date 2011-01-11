@@ -9,26 +9,26 @@
 		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
 		<script type="text/javascript">
 
-			jQuery(document).ready(function(){
+		jQuery(function($){
 
-				jQuery('#cropbox').Jcrop({
-					onChange: showCoords,
-					onSelect: showCoords
-				});
+      $('#target').Jcrop({
+        onChange: showCoords,
+        onSelect: showCoords
+      });
 
-			});
+    });
 
-			// Simple event handler, called from onChange and onSelect
-			// event handlers, as per the Jcrop invocation above
-			function showCoords(c)
-			{
-				jQuery('#x1').val(c.x);
-				jQuery('#y1').val(c.y);
-				jQuery('#x2').val(c.x2);
-				jQuery('#y2').val(c.y2);
-				jQuery('#w').val(c.w);
-				jQuery('#h').val(c.h);
-			};
+    // Simple event handler, called from onChange and onSelect
+    // event handlers, as per the Jcrop invocation above
+    function showCoords(c)
+    {
+      $('#x1').val(c.x);
+      $('#y1').val(c.y);
+      $('#x2').val(c.x2);
+      $('#y2').val(c.y2);
+      $('#w').val(c.w);
+      $('#h').val(c.h);
+    };
 
 		</script>
 	</head>
@@ -40,7 +40,7 @@
 		<h1>Jcrop - Event Handlers</h1>
 
 		<!-- This is the image we're attaching Jcrop to -->
-		<img src="demo_files/flowers.jpg" id="cropbox" />
+		<img src="demo_files/flowers.jpg" id="target" />
 
 		<!-- This is the form that our event handler fills -->
 		<form onsubmit="return false;" class="coords">
@@ -56,7 +56,7 @@
 			<b>An example with a basic event handler.</b> Here we've tied
 			several form values together with a simple event handler invocation.
 			The result is that the form values are updated in real-time as
-			the selection is changed, thanks to Jcrop's <em>onChange</em> event handler.
+			the selection is changed using Jcrop's <em>onChange</em> handler.
 		</p>
 
 		<p>

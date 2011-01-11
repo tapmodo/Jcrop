@@ -9,10 +9,8 @@
 		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
 		<script type="text/javascript">
 
-		jQuery(function(){
-			jQuery('#cropbox').Jcrop({
-				trackDocument: true
-			});
+		jQuery(function($){
+			$('#target').Jcrop();
 		});
 
 		</script>
@@ -24,10 +22,10 @@
 		<div class="article">
 
 			<h1>Jcrop - Hello World</h1>
-			<img src="demo_files/flowers.jpg" id="cropbox" />
+			<img src="demo_files/flowers.jpg" id="target" />
 
 			<p>
-				<b>This example is provided as a demo of the default behavior of Jcrop.</b>
+				<b>This example demonstrates the default behavior of Jcrop.</b>
 				Since no event handlers have been attached it only performs
 				the cropping behavior.
 			</p>

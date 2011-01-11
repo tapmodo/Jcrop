@@ -15,7 +15,7 @@
 		</style>
 		<script type="text/javascript">
 
-			$(function($){
+      jQuery(function($){
 
 				var jcrop_api; // Holder for the API
 				initJcrop();
@@ -24,7 +24,7 @@
 				{
 					$('.requiresjcrop').hide();
 
-					$('#cropbox').Jcrop({},function(){
+					$('#target').Jcrop({},function(){
 
 						$('.requiresjcrop').show();
 
@@ -134,7 +134,8 @@
 					jcrop_api.focus();
 				});
 				$('#ar_lock').change(function(e) {
-					jcrop_api.setOptions(this.checked? { aspectRatio: 4/3 }: { aspectRatio: 0 });
+					jcrop_api.setOptions(this.checked?
+            { aspectRatio: 4/3 }: { aspectRatio: 0 });
 					jcrop_api.focus();
 				});
 				$('#size_lock').change(function(e) {
@@ -160,7 +161,7 @@
 		<div class="article">
 
 			<h1>Jcrop - API Demo</h1>
-			<img src="demo_files/sago.jpg" id="cropbox" />
+			<img src="demo_files/sago.jpg" id="target" />
 
 			<div style="margin: .8em 0 .5em;">
 				<span class="requiresjcrop">
