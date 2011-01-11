@@ -35,8 +35,9 @@ $.Jcrop = function(obj,opt)
 	// Initialization {{{
 
 	// Sanitize some options 
-	var obj = obj, opt = opt;
-	var myself = this;
+	var obj = obj, opt = opt,
+      options = $.extend({},$.Jcrop.defaults),
+      myself = this;
 
 	if (typeof(obj) !== 'object') obj = $(obj)[0];
 	if (typeof(opt) !== 'object') opt = { };
@@ -44,7 +45,6 @@ $.Jcrop = function(obj,opt)
 	if (!('trackDocument' in opt))
     opt.trackDocument = true;
 		
-	var options = $.extend({},$.Jcrop.defaults);
 	setOptions(opt);
 
 	// Initialize some jQuery objects {{{
@@ -372,7 +372,6 @@ $.Jcrop = function(obj,opt)
 		if (options.drawBorders) {
 			borders = {
 					top: insertBorder('hline'),
-						//.css('top',$.browser.msie?px(-1):px(0)),
 					bottom: insertBorder('hline'),
 					left: insertBorder('vline'),
 					right: insertBorder('vline')
@@ -939,8 +938,7 @@ $.Jcrop = function(obj,opt)
 		var trk = $('<div></div>').addClass(cssClass('tracker'));
 
 		if ($.browser.msie)
-      trk.css({ opacity: 0, backgroundColor: 'white' })
-        .bind('selectstart',function(){ return false; });
+      trk.css({ opacity: 0, backgroundColor: 'white' });
 
 		return trk;
 	};
@@ -1217,10 +1215,16 @@ $.fn.Jcrop = function(options,callback)/*{{{*/
 		var loadsrc = opt.useImg || from.src;
 		var img = new Image();
 		img.onload = function() {
-			var api = $.Jcrop(from,opt);
-
-			(typeof(callback) == 'function') &&
-				callback.call(api);
+      function attachJcrop() {
+        var api = $.Jcrop(from,opt);
+        (typeof(callback) == 'function') &&
+          callback.call(api);
+      };
+      function attachAttempt() {
+        if (!img.width || !img.height) window.setTimeout(attachAttempt,50);
+          else attachJcrop();
+      };
+      window.setTimeout(attachAttempt,50);
 		};
 		img.src = loadsrc;
 	};
