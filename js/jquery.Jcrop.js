@@ -2,7 +2,7 @@
  * jquery.Jcrop.js v0.9.9
  * jQuery Image Cropping Plugin
  * @author Kelly Hallman <khallman@gmail.com>
- * Copyright (c) 2008-2010 Kelly Hallman - released under MIT License {{{
+ * Copyright (c) 2008-2011 Kelly Hallman - released under MIT License {{{
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -519,7 +519,11 @@ $.Jcrop = function(obj,opt)
 		function show()/*{{{*/
 		{
 			$sel.show();
-			$img.css('opacity',bgopacity);
+
+      if (options.bgFade)
+        $img.fadeTo(options.fadeTime,bgopacity);
+          else $img.css('opacity',bgopacity);
+
 			awake = true;
 		};
 		/*}}}*/
@@ -527,7 +531,11 @@ $.Jcrop = function(obj,opt)
 		{
 			disableHandles();
 			$sel.hide();
-			$img.css('opacity',1);
+
+      if (options.bgFade)
+        $img.fadeTo(options.fadeTime,1);
+          else $img.css('opacity',1);
+
 			awake = false;
       options.onRelease.call(api);
 		};
@@ -1249,6 +1257,8 @@ $.Jcrop.defaults = {
   // Styling Options
   bgColor:		  	'black',
   bgOpacity:			.6,
+  bgFade:         false,
+
   borderOpacity:	.4,
   handleOpacity:	.5,
 
@@ -1265,13 +1275,13 @@ $.Jcrop.defaults = {
   boxWidth:			  0,
   boxHeight:		  0,
   boundary:			  2,
+  fadeTime:		  	400,
   animationDelay:	20,
   swingSpeed:			3,
 
   allowSelect:		true,
   allowMove:			true,
   allowResize:		true,
-  fadeTime:		  	400,
 
   minSelect:			[ 0, 0 ],
   maxSize:	  		[ 0, 0 ],
