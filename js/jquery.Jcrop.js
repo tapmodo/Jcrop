@@ -532,6 +532,7 @@ $.Jcrop = function(obj,opt)
 			$sel.hide();
 			$img.css('opacity',1);
 			awake = false;
+      options.onRelease.call(api);
 		};
 		/*}}}*/
 		function showHandles()//{{{
@@ -1029,6 +1030,8 @@ $.Jcrop = function(obj,opt)
 		if (typeof(options.onSelect)!=='function')
 			options.onSelect = function() { };
 
+		if (typeof(options.onRelease)!=='function')
+			options.onRelease = function() { };
 	};
 	/*}}}*/
 	function tellSelect()/*{{{*/
@@ -1274,7 +1277,8 @@ $.Jcrop.defaults = {
 
   // Callbacks / Event Handlers
   onChange:       function() { },
-  onSelect:       function() { }
+  onSelect:       function() { },
+  onRelease:      function() { }
 };
 
 // }}}
