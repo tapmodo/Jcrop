@@ -43,9 +43,6 @@ $.Jcrop = function(obj,opt)
 
 	if (!('trackDocument' in opt))
     opt.trackDocument = true;
-
-	if (!('keySupport' in opt))
-			opt.keySupport = $.browser.msie ? false : true;
 		
 	var options = $.extend({},$.Jcrop.defaults);
 	setOptions(opt);
@@ -680,11 +677,15 @@ $.Jcrop = function(obj,opt)
 		};
 	}();
 	/*}}}*/
-	var KeyManager = function()/*{{{*/
+	var KeyManager = (function()/*{{{*/
 	{
 		var $keymgr = $('<input type="radio" />')
-				.css({ position: 'absolute', left: '-30px' })
-				.keypress(parseKey)
+				.css({
+          position: 'fixed',
+          left: '-120px',
+          width: '12px'
+        })
+				.keydown(parseKey)
 				.blur(onBlur),
 
 			$keywrap = $('<div />')
@@ -724,15 +725,14 @@ $.Jcrop = function(obj,opt)
 			if (e.ctrlKey) return true;
 			shift_down = e.shiftKey ? true : false;
 			var nudge = shift_down ? 10 : 1;
+
 			switch(e.keyCode)
 			{
 				case 37: doNudge(e,-nudge,0); break;
 				case 39: doNudge(e,nudge,0); break;
 				case 38: doNudge(e,0,-nudge); break;
 				case 40: doNudge(e,0,nudge); break;
-
 				case 27: Selection.release(); break;
-
 				case 9: return true;
 			}
 
@@ -740,11 +740,13 @@ $.Jcrop = function(obj,opt)
 		};
 		/*}}}*/
 		
-		if (options.keySupport) $keywrap.insertBefore($img);
+		if (options.keySupport)
+      $keymgr.insertBefore($img);
+
 		return {
 			watchKeys: watchKeys
 		};
-	}();
+	})();
 	/*}}}*/
 
 	// }}}
