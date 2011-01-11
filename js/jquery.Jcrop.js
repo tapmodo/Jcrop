@@ -34,73 +34,22 @@ $.Jcrop = function(obj,opt)
 {
 	// Initialization {{{
 
-	// Sanitize some options {{{
+	// Sanitize some options 
 	var obj = obj, opt = opt;
 	var myself = this;
 
 	if (typeof(obj) !== 'object') obj = $(obj)[0];
 	if (typeof(opt) !== 'object') opt = { };
 
-	// Some on-the-fly fixes for MSIE...sigh
 	if (!('trackDocument' in opt))
-	{
-		opt.trackDocument = $.browser.msie ? false : true;
-		if ($.browser.msie && $.browser.version.split('.')[0] == '8')
-			opt.trackDocument = true;
-	}
+    opt.trackDocument = true;
 
 	if (!('keySupport' in opt))
 			opt.keySupport = $.browser.msie ? false : true;
 		
-	// }}}
-	// Extend the default options {{{
-	var defaults = {
-
-		// Basic Settings
-		trackDocument:		false,
-		baseClass:			'jcrop',
-		addClass:			null,
-
-		// Styling Options
-		bgColor:			'black',
-		bgOpacity:			.6,
-		borderOpacity:		.4,
-		handleOpacity:		.5,
-
-		handleSize:			9,
-		handleOffset:		5,
-
-		aspectRatio:		0,
-		keySupport:			true,
-		cornerHandles:		true,
-		sideHandles:		true,
-		drawBorders:		true,
-		dragEdges:			true,
-
-		boxWidth:			0,
-		boxHeight:			0,
-		boundary:			3,
-		animationDelay:		20,
-		swingSpeed:			3,
-
-		allowSelect:		true,
-		allowMove:			true,
-		allowResize:		true,
-		fadeTime:			400,
-
-		minSelect:			[ 0, 0 ],
-		maxSize:			[ 0, 0 ],
-		minSize:			[ 0, 0 ],
-
-		// Callbacks / Event Handlers
-		onChange: function() { },
-		onSelect: function() { }
-
-	};
-	var options = defaults;
+	var options = $.extend({},$.Jcrop.defaults);
 	setOptions(opt);
 
-	// }}}
 	// Initialize some jQuery objects {{{
 
 	// The values are SET on the image(s) for the interface
@@ -183,7 +132,7 @@ $.Jcrop = function(obj,opt)
 
 	// }}}
 
-		// }}}
+  // }}}
 	// Internal Modules {{{
 
 	var Coords = function()/*{{{*/
@@ -654,7 +603,7 @@ $.Jcrop = function(obj,opt)
 
 		if (!trackDoc)
 		{
-			$trk
+			$(window)
 				.mousemove(trackMove)
 				.mouseup(trackUp)
 				.mouseout(trackUp)
@@ -977,7 +926,11 @@ $.Jcrop = function(obj,opt)
 	function newTracker()/*{{{*/
 	{
 		var trk = $('<div></div>').addClass(cssClass('tracker'));
-		$.browser.msie && trk.css({ opacity: 0, backgroundColor: 'white' });
+
+		if ($.browser.msie)
+      trk.css({ opacity: 0, backgroundColor: 'white' })
+        .bind('selectstart',function(){ return false; });
+
 		return trk;
 	};
 	/*}}}*/
@@ -1210,7 +1163,6 @@ $.Jcrop = function(obj,opt)
 	interfaceUpdate(true);
 	
 	var api = {
-
 		setImage: setImage,
 		animateTo: animateTo,
 		setSelect: setSelect,
@@ -1235,13 +1187,14 @@ $.Jcrop = function(obj,opt)
 			holder: $div,
 			selection: $sel
 		}
-
 	};
+
+  if ($.browser.msie)
+    $div.bind('selectstart',function(){ return false; });
 
 	$origimg.data('Jcrop',api);
 	return api;
 };
-
 $.fn.Jcrop = function(options,callback)/*{{{*/
 {
 
@@ -1279,5 +1232,51 @@ $.fn.Jcrop = function(options,callback)/*{{{*/
 	return this;
 };
 /*}}}*/
+// Global Defaults {{{
+
+$.Jcrop.defaults = {
+
+  // Basic Settings
+  trackDocument:	false,
+  baseClass:			'jcrop',
+  addClass:			  null,
+
+  // Styling Options
+  bgColor:		  	'black',
+  bgOpacity:			.6,
+  borderOpacity:	.4,
+  handleOpacity:	.5,
+
+  handleSize:			9,
+  handleOffset:		5,
+
+  aspectRatio:		0,
+  keySupport:			true,
+  cornerHandles:	true,
+  sideHandles:		true,
+  drawBorders:		true,
+  dragEdges:			true,
+
+  boxWidth:			  0,
+  boxHeight:		  0,
+  boundary:			  2,
+  animationDelay:	20,
+  swingSpeed:			3,
+
+  allowSelect:		true,
+  allowMove:			true,
+  allowResize:		true,
+  fadeTime:		  	400,
+
+  minSelect:			[ 0, 0 ],
+  maxSize:	  		[ 0, 0 ],
+  minSize:		  	[ 0, 0 ],
+
+  // Callbacks / Event Handlers
+  onChange:       function() { },
+  onSelect:       function() { }
+};
+
+// }}}
 
 })(jQuery);
