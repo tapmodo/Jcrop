@@ -12,8 +12,9 @@
 		jQuery(function($){
 
       $('#target').Jcrop({
-        onChange: showCoords,
-        onSelect: showCoords
+        onChange:   showCoords,
+        onSelect:   showCoords,
+        onRelease:  clearCoords
       });
 
     });
@@ -30,6 +31,11 @@
       $('#h').val(c.h);
     };
 
+    function clearCoords()
+    {
+      $('#coords input').val('');
+    };
+
 		</script>
 	</head>
 	<body>
@@ -43,7 +49,7 @@
 		<img src="demo_files/flowers.jpg" id="target" />
 
 		<!-- This is the form that our event handler fills -->
-		<form onsubmit="return false;" class="coords">
+		<form onsubmit="return false;" class="coords" id="coords">
 			<label>X1 <input type="text" size="4" id="x1" name="x1" /></label>
 			<label>Y1 <input type="text" size="4" id="y1" name="y1" /></label>
 			<label>X2 <input type="text" size="4" id="x2" name="x2" /></label>

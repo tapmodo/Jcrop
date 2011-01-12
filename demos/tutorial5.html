@@ -17,22 +17,33 @@
 
       jQuery(function($){
 
-				var jcrop_api; // Holder for the API
+        // The variable jcrop_api will hold a reference to the
+        // Jcrop API once Jcrop is instantiated.
+				var jcrop_api;
+
+        // In this example, since Jcrop may be attached or detached
+        // at the whim of the user, I've wrapped the call into a function
 				initJcrop();
 				
+        // The function is pretty simple
 				function initJcrop()//{{{
 				{
+          // Hide any interface elements that require Jcrop
+          // (This is for the local user interface portion.)
 					$('.requiresjcrop').hide();
 
-					$('#target').Jcrop({},function(){
-
-						$('.requiresjcrop').show();
+          // Invoke Jcrop in typical fashion
+					$('#target').Jcrop({
+            onRelease: releaseCheck
+          },function(){
 
 						jcrop_api = this;
 						jcrop_api.animateTo([100,100,400,300]);
 
+            // Setup and dipslay the interface for "enabled"
 						$('#can_click,#can_move,#can_size').attr('checked','checked');
 						$('#ar_lock,#size_lock,#bg_swap').attr('checked',false);
+						$('.requiresjcrop').show();
 
 					});
 
@@ -53,6 +64,19 @@
 					];
 				};
 
+        // This function is bound to the onRelease handler...
+        // In certain circumstances (such as if you set minSize
+        // and aspectRatio together), you can inadvertently lose
+        // the selection. This callback re-enables creating selections
+        // in such a case. Although the need to do this is based on a
+        // buggy behavior, it's recommended that you in some way trap
+        // the onRelease callback if you use allowSelect: false
+        function releaseCheck()
+        {
+					jcrop_api.setOptions({ allowSelect: true });
+          $('#can_click').attr('checked',false);
+        };
+
 				// Attach interface buttons
 				// This may appear to be a lot of code but it's simple stuff
 				$('#setSelect').click(function(e) {
@@ -68,26 +92,31 @@
 					jcrop_api.release();
 				});
 				$('#disable').click(function(e) {
+          // Disable Jcrop instance
 					jcrop_api.disable();
-
+          // Update the interface to reflect disabled state
 					$('#enable').show();
 					$('.requiresjcrop').hide();
 				});
 				$('#enable').click(function(e) {
+          // Re-enable Jcrop instance
 					jcrop_api.enable();
-
+          // Update the interface to reflect enabled state
 					$('#enable').hide();
 					$('.requiresjcrop').show();
 				});
 				$('#rehook').click(function(e) {
+          // This button is visible when Jcrop has been destroyed
+          // It performs the re-attachment and updates the UI
 					$('#rehook,#enable').hide();
 					initJcrop();
 					$('#unhook,.requiresjcrop').show();
 					return false;
 				});
 				$('#unhook').click(function(e) {
+          // Destroy Jcrop widget, restore original state
 					jcrop_api.destroy();
-
+          // Update the interface to reflect un-attached state
 					$('#unhook,#enable,.requiresjcrop').hide();
 					$('#rehook').show();
 					return false;
