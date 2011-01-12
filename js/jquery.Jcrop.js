@@ -512,7 +512,7 @@ $.Jcrop = function(obj,opt)
 			seehandles && moveHandles(c);
 			awake || show();
 
-			options.onChange.call(api,unscale(c));
+      options.onChange.call(api,unscale(c));
 		};
 		/*}}}*/
 		function show()/*{{{*/
@@ -654,8 +654,10 @@ $.Jcrop = function(obj,opt)
 				btndown = false;
 
 				onDone(mouseAbs(e));
-				//options.onSelect(unscale(Coords.getFixed()));
-				options.onSelect.call(api,unscale(Coords.getFixed()));
+
+				if (Selection.isAwake())
+          options.onSelect.call(api,unscale(Coords.getFixed()));
+
 				toBack();
 				onMove = function() { };
 				onDone = function() { };
