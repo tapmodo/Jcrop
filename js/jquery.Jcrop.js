@@ -705,6 +705,19 @@ $.Jcrop = function(obj,opt)
 				.append($keymgr)
 		;
 
+		if (options.keySupport)
+    {
+      if (($.browser.msie && 
+        $.browser.version.split('.')[0] == '6') ||
+          !options.fixedSupport)
+        {
+          $keymgr.css({position:'absolute',left:'-20px'});
+          $keywrap.append($keymgr).insertBefore($img);
+        }
+      else
+        { $keymgr.insertBefore($img); }
+    }
+
 		function watchKeys()/*{{{*/
 		{
 			if (options.keySupport)
@@ -748,9 +761,6 @@ $.Jcrop = function(obj,opt)
 			return false;
 		};
 		/*}}}*/
-		
-		if (options.keySupport)
-      $keymgr.insertBefore($img);
 
 		return {
 			watchKeys: watchKeys
@@ -1256,18 +1266,20 @@ $.fn.Jcrop = function(options,callback)/*{{{*/
 $.Jcrop.defaults = {
 
   // Basic Settings
+  allowSelect:		true,
+  allowMove:			true,
+  allowResize:		true,
+
   trackDocument:	false,
-  baseClass:			'jcrop',
-  addClass:			  null,
 
   // Styling Options
+  baseClass:			'jcrop',
+  addClass:			  null,
   bgColor:		  	'black',
   bgOpacity:			.6,
   bgFade:         false,
-
   borderOpacity:	.4,
   handleOpacity:	.5,
-
   handleSize:			9,
   handleOffset:		5,
 
@@ -1277,6 +1289,7 @@ $.Jcrop.defaults = {
   sideHandles:		true,
   drawBorders:		true,
   dragEdges:			true,
+  fixedSupport:   true,
 
   boxWidth:			  0,
   boxHeight:		  0,
@@ -1284,10 +1297,6 @@ $.Jcrop.defaults = {
   fadeTime:		  	400,
   animationDelay:	20,
   swingSpeed:			3,
-
-  allowSelect:		true,
-  allowMove:			true,
-  allowResize:		true,
 
   minSelect:			[ 0, 0 ],
   maxSize:	  		[ 0, 0 ],
