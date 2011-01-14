@@ -1,5 +1,5 @@
 /**
- * jquery.Jcrop.js v0.9.9
+ * jquery.Jcrop.js v0.9.9-RC1
  * jQuery Image Cropping Plugin
  * @author Kelly Hallman <khallman@gmail.com>
  * Copyright (c) 2008-2011 Kelly Hallman - released under MIT License {{{
@@ -372,9 +372,9 @@ $.Jcrop = function(obj,opt)
 		if (options.drawBorders) {
 			borders = {
 					top: insertBorder('hline'),
-					bottom: insertBorder('hline'),
+					bottom: insertBorder('hline bottom'),
 					left: insertBorder('vline'),
-					right: insertBorder('vline')
+					right: insertBorder('vline right')
 			};
 		}
 
@@ -505,9 +505,11 @@ $.Jcrop = function(obj,opt)
 			resize(c.w,c.h);
 			moveto(c.x,c.y);
 
+      /*
 			options.drawBorders &&
-				borders['right'].css({ left: px(c.w-1) }) &&
-					borders['bottom'].css({ top: px(c.h-1) });
+				borders.right.css({ left: px(c.w-1) }) &&
+					borders.bottom.css({ top: px(c.h-1) });
+      */
 
 			seehandles && moveHandles(c);
 			awake || show();
