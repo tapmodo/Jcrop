@@ -41,6 +41,9 @@ $.Jcrop = function(obj,opt)
       myself    = this,
       ie6mode   = false;
 
+  if ($.browser.msie && $.browser.version.split('.')[0] == '6')
+    ie6mode = true;
+
 	if (typeof(obj) !== 'object') obj = $(obj)[0];
 	if (typeof(opt) !== 'object') opt = { };
 
@@ -113,6 +116,8 @@ $.Jcrop = function(obj,opt)
 		.append($img_holder,$hdl_holder)
 	;/*}}}*/
 
+  ie6mode && $sel.css({overflowY:'hidden'});
+
 	var bound = options.boundary;
 	var $trk = newTracker().width(boundx+(bound*2)).height(boundy+(bound*2))
 		.css({ position: 'absolute', top: px(-bound), left: px(-bound), zIndex: 290 })
@@ -130,9 +135,6 @@ $.Jcrop = function(obj,opt)
 		shift_down;
 
 	// }}}
-
-  if ($.browser.msie && $.browser.version.split('.')[0] == '6')
-    ie6mode = true;
 
   // }}}
 	// Internal Modules {{{
@@ -583,26 +585,6 @@ $.Jcrop = function(obj,opt)
 			refresh();
 		};
 		/*}}}*/
-    function ie6fix()
-    {
-      var w = $sel.width(),
-          h = $sel.height(),
-          p = $sel.position(),
-          x = p.left,
-          y = p.top;
-
-      var c = Coords.getFixed();
-
-			Coords.setPressed([c.x,c.y]);
-			Coords.setCurrent([c.x2-1,c.y2]);
-      Selection.update();
-
-      window.setTimeout(function(){
-        Coords.setPressed([c.x,c.y]);
-        Coords.setCurrent([c.x2,c.y2]);
-        Selection.update();
-      },50);
-    };
 
 		var $track = newTracker()
 				.mousedown(createDragger('move'))
@@ -623,7 +605,6 @@ $.Jcrop = function(obj,opt)
 			showHandles:    showHandles,
 			disableHandles: disableHandles,
 			animMode:       animMode,
-      ie6fix:         ie6fix,
 			done:           done
 		};
 	}();
@@ -936,7 +917,6 @@ $.Jcrop = function(obj,opt)
 		var c = Coords.getFixed();
 		if ((c.w > options.minSelect[0]) && (c.h > options.minSelect[1]))
 		{
-      ie6mode && Selection.ie6fix();
 			Selection.enableHandles();
 			Selection.done();
 		}
