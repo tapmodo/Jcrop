@@ -35,9 +35,11 @@ $.Jcrop = function(obj,opt)
 	// Initialization {{{
 
 	// Sanitize some options 
-	var obj = obj, opt = opt,
-      options = $.extend({},$.Jcrop.defaults),
-      myself = this;
+	var obj       = obj,
+      opt       = opt,
+      options   = $.extend({},$.Jcrop.defaults),
+      myself    = this,
+      ie6mode   = false;
 
 	if (typeof(obj) !== 'object') obj = $(obj)[0];
 	if (typeof(opt) !== 'object') opt = { };
@@ -128,6 +130,9 @@ $.Jcrop = function(obj,opt)
 		shift_down;
 
 	// }}}
+
+  if ($.browser.msie && $.browser.version.split('.')[0] == '6')
+    ie6mode = true;
 
   // }}}
 	// Internal Modules {{{
@@ -578,6 +583,26 @@ $.Jcrop = function(obj,opt)
 			refresh();
 		};
 		/*}}}*/
+    function ie6fix()
+    {
+      var w = $sel.width(),
+          h = $sel.height(),
+          p = $sel.position(),
+          x = p.left,
+          y = p.top;
+
+      var c = Coords.getFixed();
+
+			Coords.setPressed([c.x,c.y]);
+			Coords.setCurrent([c.x2-1,c.y2]);
+      Selection.update();
+
+      window.setTimeout(function(){
+        Coords.setPressed([c.x,c.y]);
+        Coords.setCurrent([c.x2,c.y2]);
+        Selection.update();
+      },50);
+    };
 
 		var $track = newTracker()
 				.mousedown(createDragger('move'))
@@ -587,26 +612,27 @@ $.Jcrop = function(obj,opt)
 		disableHandles();
 
 		return {
-			updateVisible: updateVisible,
-			update: update,
-			release: release,
-			refresh: refresh,
-			isAwake: function() { return awake; },
-			setCursor: function (cursor) { $track.css('cursor',cursor); },
-			enableHandles: enableHandles,
-			enableOnly: function() { seehandles = true; },
-			showHandles: showHandles,
+			updateVisible:  updateVisible,
+			update:         update,
+			release:        release,
+			refresh:        refresh,
+			isAwake:        function() { return awake; },
+			setCursor:      function (cursor) { $track.css('cursor',cursor); },
+			enableHandles:  enableHandles,
+			enableOnly:     function() { seehandles = true; },
+			showHandles:    showHandles,
 			disableHandles: disableHandles,
-			animMode: animMode,
-			done: done
+			animMode:       animMode,
+      ie6fix:         ie6fix,
+			done:           done
 		};
 	}();
 	/*}}}*/
 	var Tracker = function()/*{{{*/
 	{
 		var onMove		= function() { },
-			onDone		= function() { },
-			trackDoc	= options.trackDocument;
+        onDone		= function() { },
+        trackDoc	= options.trackDocument;
 
 		if (!trackDoc)
 		{
@@ -709,9 +735,7 @@ $.Jcrop = function(obj,opt)
 
 		if (options.keySupport)
     {
-      if (($.browser.msie && 
-        $.browser.version.split('.')[0] == '6') ||
-          !options.fixedSupport)
+      if (ie6mode || !options.fixedSupport)
         {
           $keymgr.css({position:'absolute',left:'-20px'});
           $keywrap.append($keymgr).insertBefore($img);
@@ -910,8 +934,9 @@ $.Jcrop = function(obj,opt)
 	function doneSelect(pos)/*{{{*/
 	{
 		var c = Coords.getFixed();
-		if (c.w > options.minSelect[0] && c.h > options.minSelect[1])
+		if ((c.w > options.minSelect[0]) && (c.h > options.minSelect[1]))
 		{
+      ie6mode && Selection.ie6fix();
 			Selection.enableHandles();
 			Selection.done();
 		}
