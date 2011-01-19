@@ -1,5 +1,5 @@
 /**
- * jquery.Jcrop.js v0.9.9-RC1
+ * jquery.Jcrop.js v0.9.9-RC2
  * jQuery Image Cropping Plugin
  * @author Kelly Hallman <khallman@gmail.com>
  * Copyright (c) 2008-2011 Kelly Hallman - released under MIT License {{{
