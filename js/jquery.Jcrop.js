@@ -458,7 +458,8 @@ $.Jcrop = function(obj,opt)
 		{
 			var midvert  = Math.round((c.h / 2) - hhs),
 				midhoriz = Math.round((c.w / 2) - hhs),
-				north = west = -hhs+1,
+				north = -hhs+1,
+        west = -hhs+1,
 				east = c.w - hhs,
 				south = c.h - hhs,
 				x, y;
