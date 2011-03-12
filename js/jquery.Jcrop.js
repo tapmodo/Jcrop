@@ -1038,6 +1038,7 @@ $.Jcrop = function(obj,opt)
 			parseInt(rect[2])/xscale,
 			parseInt(rect[3])/yscale
 		]);
+    Selection.enableHandles();
 	};
 	//}}}
 	function setSelectRaw(l) /*{{{*/
