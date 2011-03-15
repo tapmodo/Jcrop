@@ -24,7 +24,11 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
-
+ *
+ * ----------
+ * Includes touch support detection code adapted from cody by
+ * Jeffrey Sambells - under MIT License - http://github.com/iamamused/
+ *
  * }}}
  */
 
@@ -313,7 +317,7 @@ $.Jcrop = function(obj,opt)
 	var $trk = newTracker().width(boundx+(bound*2)).height(boundy+(bound*2))
 		.css({ position: 'absolute', top: px(-bound), left: px(-bound), zIndex: 290 })
 		.mousedown(newSelection);	
-	
+
 	/* }}} */
 	// Set more variables {{{
 
@@ -329,6 +333,59 @@ $.Jcrop = function(obj,opt)
   // }}}
 	// Internal Modules {{{
 
+  // Touch Module {{{ 
+  var Touch = (function()
+  {
+    function hasTouchSupport()
+    {
+      var support = {},
+          events = [ 'touchstart', 'touchmove', 'touchend' ],
+          el = document.createElement('div');
+
+      for( i in events ) {
+        var eventName = events[i];
+        eventName = 'on' + eventName;
+        var isSupported = (eventName in el);
+        if (!isSupported) {
+          el.setAttribute(eventName, 'return;');
+          isSupported = typeof el[eventName] == 'function';
+        }
+        support[events[i]] = isSupported;
+      }
+      return support.touchstart && support.touchend && support.touchmove;
+    }
+    function detectSupport()
+    {
+      if ((options.touchSupport===true) || (options.touchSupport===false))
+        return options.touchSupport;
+          else return hasTouchSupport();
+    }
+    return {
+      createDragger: function(ord)
+      {
+        return function(e) {
+          e.pageX = e.originalEvent.changedTouches[0].pageX;
+          e.pageY = e.originalEvent.changedTouches[0].pageY;
+          if (options.disabled) { return false; }
+          if ((ord==='move') && !options.allowMove) { return false; }
+          btndown = true;
+          startDragMode(ord,mouseAbs(e));
+          e.stopPropagation();
+          e.preventDefault();
+          return false;
+        };
+      },
+      newSelection: function(e)
+      {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return newSelection(e);
+      },
+      isSupported: hasTouchSupport,
+      support: detectSupport()
+    };
+  }());
+  // }}}
 	var Coords = (function()/*{{{*/
 	{
 		var x1 = 0, y1 = 0, x2 = 0, y2 = 0, ox, oy;
@@ -584,6 +641,10 @@ $.Jcrop = function(obj,opt)
 					zIndex: zi 
 				});
 
+      if (Touch.support) {
+        jq.bind('touchstart',Touch.createDragger(ord));
+      }
+
 			$hdl_holder.append(jq);
 			return jq;
 		}
@@ -781,6 +842,10 @@ $.Jcrop = function(obj,opt)
 				.mousedown(createDragger('move'))
 				.css({ cursor: 'move', position: 'absolute', zIndex: 360 });
 
+    if (Touch.support) {
+      $track.bind('touchstart',Touch.createDragger('move'));
+    }
+
 		$img_holder.append($track);
 		disableHandles();
 
@@ -865,20 +930,37 @@ $.Jcrop = function(obj,opt)
 			return false;
 		}
 		/* }}} */
+    function trackTouchMove(e)
+    {
+      e.pageX = e.originalEvent.changedTouches[0].pageX;
+      e.pageY = e.originalEvent.changedTouches[0].pageY;
+      return trackMove(e);
+    }
+    function trackTouchEnd(e)
+    {
+      e.pageX = e.originalEvent.changedTouches[0].pageX;
+      e.pageY = e.originalEvent.changedTouches[0].pageY;
+      return trackUp(e);
+    }
 		function setCursor(t) { $trk.css('cursor',t); }
+
+    if (Touch.support) {
+      $(window).bind('touchmove',trackTouchMove)
+        .bind('touchend',trackTouchEnd);
+    }
 
 		if (!trackDoc)
 		{
-			$(window)
-				.mousemove(trackMove)
-				.mouseup(trackUp)
-				.mouseout(trackUp);
+      $(window)
+        .mousemove(trackMove)
+        .mouseup(trackUp)
+        .mouseout(trackUp);
 		}
 
 		$img.before($trk);
 		return {
 			activateHandlers: activateHandlers,
-			setCursor: setCursor
+			setCursor:        setCursor
 		};
 	}());
 	/*}}}*/
@@ -1176,6 +1258,10 @@ $.Jcrop = function(obj,opt)
 
 	// }}}
 
+  if (Touch.support) {
+    $trk.bind('touchstart',Touch.newSelection);
+  }
+	
 	$hdl_holder.hide();
 	interfaceUpdate(true);
 	
@@ -1282,6 +1368,7 @@ $.Jcrop.defaults = {
   drawBorders:		true,
   dragEdges:			true,
   fixedSupport:   true,
+  touchSupport:   null,
 
   boxWidth:			  0,
   boxHeight:		  0,
