@@ -638,12 +638,10 @@ $.Jcrop = function(obj,opt)
 				.css({
 					cursor: ord+'-resize',
 					position: 'absolute',
-					zIndex: zi 
+					zIndex: zi
 				});
 
-      if (Touch.support) {
-        jq.bind('touchstart',Touch.createDragger(ord));
-      }
+      if (Touch.support) { jq.bind('touchstart',Touch.createDragger(ord)); }
 
 			$hdl_holder.append(jq);
 			return jq;
