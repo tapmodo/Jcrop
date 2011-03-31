@@ -290,9 +290,6 @@
     if (typeof(opt) !== 'object') {
       opt = {};
     }
-    if (!opt.hasOwnProperty('trackDocument')) {
-      opt.trackDocument = true;
-    }
     // }}}
     setOptions(opt);
     // Initialize some jQuery objects {{{
@@ -380,19 +377,24 @@
       function hasTouchSupport() {
         var support = {},
             events = ['touchstart', 'touchmove', 'touchend'],
-            el = document.createElement('div');
+            el = document.createElement('div'), i;
 
-        for (i in events) {
-          var eventName = events[i];
-          eventName = 'on' + eventName;
-          var isSupported = (eventName in el);
-          if (!isSupported) {
-            el.setAttribute(eventName, 'return;');
-            isSupported = typeof el[eventName] == 'function';
+        try {
+          for(i=0; i<events.length; i++) {
+            var eventName = events[i];
+            eventName = 'on' + eventName;
+            var isSupported = (eventName in el);
+            if (!isSupported) {
+              el.setAttribute(eventName, 'return;');
+              isSupported = typeof el[eventName] == 'function';
+            }
+            support[events[i]] = isSupported;
           }
-          support[events[i]] = isSupported;
+          return support.touchstart && support.touchend && support.touchmove;
         }
-        return support.touchstart && support.touchend && support.touchmove;
+        catch(err) {
+          return false;
+        }
       }
 
       function detectSupport() {
@@ -1005,7 +1007,7 @@
       });
 
       if (Touch.support) {
-        $track.bind('touchstart', Touch.createDragger('move'));
+        $track.bind('touchstart.jcrop', Touch.createDragger('move'));
       }
 
       $img_holder.append($track);
@@ -1046,7 +1048,9 @@
           zIndex: 450
         });
         if (trackDoc) {
-          $(document).mousemove(trackMove).mouseup(trackUp);
+          $(document)
+            .bind('mousemove',trackMove)
+            .bind('mouseup',trackUp);
         }
       } 
       //}}}
@@ -1056,7 +1060,9 @@
           zIndex: 290
         });
         if (trackDoc) {
-          $(document).unbind('mousemove', trackMove).unbind('mouseup', trackUp);
+          $(document)
+            .unbind('mousemove', trackMove)
+            .unbind('mouseup', trackUp);
         }
       } 
       //}}}
@@ -1117,11 +1123,13 @@
       //}}}
 
       if (Touch.support) {
-        $(window).bind('touchmove', trackTouchMove).bind('touchend', trackTouchEnd);
+        $(document)
+          .bind('touchmove', trackTouchMove)
+          .bind('touchend', trackTouchEnd);
       }
 
       if (!trackDoc) {
-        $(window).mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
+        $trk.mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
       }
 
       $img.before($trk);
@@ -1548,7 +1556,7 @@
     allowMove: true,
     allowResize: true,
 
-    trackDocument: false,
+    trackDocument: true,
 
     // Styling Options
     baseClass: 'jcrop',
