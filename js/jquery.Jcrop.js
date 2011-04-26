@@ -1069,6 +1069,7 @@
       function trackMove(e) //{{{
       {
         onMove(mouseAbs(e));
+        return false;
       } 
       //}}}
       function trackUp(e) //{{{
