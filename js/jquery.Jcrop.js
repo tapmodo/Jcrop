@@ -1415,7 +1415,7 @@
             duration: options.fadeTime
           });
         } else {
-          div.css('backgroundColor', options.bgColor);
+          $div.css('backgroundColor', options.bgColor);
         }
 
         delete(options.bgColor);
