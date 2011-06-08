@@ -718,6 +718,111 @@
     }());
 
     //}}}
+    // Tracker Module {{{
+    var Tracker = (function () {
+      var onMove = function () {},
+          onDone = function () {},
+          trackDoc = options.trackDocument;
+
+      function toFront() //{{{
+      {
+        $trk.css({
+          zIndex: 450
+        });
+        if (trackDoc) {
+          $(document)
+            .bind('mousemove',trackMove)
+            .bind('mouseup',trackUp);
+        }
+      } 
+      //}}}
+      function toBack() //{{{
+      {
+        $trk.css({
+          zIndex: 290
+        });
+        if (trackDoc) {
+          $(document)
+            .unbind('mousemove', trackMove)
+            .unbind('mouseup', trackUp);
+        }
+      } 
+      //}}}
+      function trackMove(e) //{{{
+      {
+        onMove(mouseAbs(e));
+        return false;
+      } 
+      //}}}
+      function trackUp(e) //{{{
+      {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (btndown) {
+          btndown = false;
+
+          onDone(mouseAbs(e));
+
+          if (Selection.isAwake()) {
+            options.onSelect.call(api, unscale(Coords.getFixed()));
+          }
+
+          toBack();
+          onMove = function () {};
+          onDone = function () {};
+        }
+
+        return false;
+      }
+      //}}}
+      function activateHandlers(move, done) //{{{
+      {
+        btndown = true;
+        onMove = move;
+        onDone = done;
+        toFront();
+        return false;
+      }
+      //}}}
+      function trackTouchMove(e) //{{{
+      {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return trackMove(e);
+      }
+      //}}}
+      function trackTouchEnd(e) //{{{
+      {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return trackUp(e);
+      }
+      //}}}
+      function setCursor(t) //{{{
+      {
+        $trk.css('cursor', t);
+      }
+      //}}}
+
+      if (Touch.support) {
+        $trk
+          .bind('touchmove', trackTouchMove)
+          .bind('touchend', trackTouchEnd);
+      }
+
+      if (!trackDoc) {
+        $trk.mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
+      }
+
+      $img.before($trk);
+      return {
+        trackTouchMove: trackTouchMove,
+        activateHandlers: activateHandlers,
+        setCursor: setCursor
+      };
+    }());
+    //}}}
     // Selection Module {{{
     var Selection = (function () {
       var awake, hdep = 370;
@@ -746,7 +851,9 @@
         });
 
         if (Touch.support) {
-          jq.bind('touchstart', Touch.createDragger(ord));
+          jq.bind('touchstart', Touch.createDragger(ord))
+            .bind('touchmove', Tracker.trackTouchMove)
+            .bind('touchend', Tracker.trackTouchEnd);
         }
 
         $hdl_holder.append(jq);
@@ -1007,7 +1114,9 @@
       });
 
       if (Touch.support) {
-        $track.bind('touchstart.jcrop', Touch.createDragger('move'));
+        $track.bind('touchstart.jcrop', Touch.createDragger('move'))
+            .bind('touchmove', Tracker.trackTouchMove)
+            .bind('touchend', Tracker.trackTouchEnd);
       }
 
       $img_holder.append($track);
@@ -1035,110 +1144,6 @@
       };
     }());
     
-    //}}}
-    // Tracker Module {{{
-    var Tracker = (function () {
-      var onMove = function () {},
-          onDone = function () {},
-          trackDoc = options.trackDocument;
-
-      function toFront() //{{{
-      {
-        $trk.css({
-          zIndex: 450
-        });
-        if (trackDoc) {
-          $(document)
-            .bind('mousemove',trackMove)
-            .bind('mouseup',trackUp);
-        }
-      } 
-      //}}}
-      function toBack() //{{{
-      {
-        $trk.css({
-          zIndex: 290
-        });
-        if (trackDoc) {
-          $(document)
-            .unbind('mousemove', trackMove)
-            .unbind('mouseup', trackUp);
-        }
-      } 
-      //}}}
-      function trackMove(e) //{{{
-      {
-        onMove(mouseAbs(e));
-        return false;
-      } 
-      //}}}
-      function trackUp(e) //{{{
-      {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (btndown) {
-          btndown = false;
-
-          onDone(mouseAbs(e));
-
-          if (Selection.isAwake()) {
-            options.onSelect.call(api, unscale(Coords.getFixed()));
-          }
-
-          toBack();
-          onMove = function () {};
-          onDone = function () {};
-        }
-
-        return false;
-      }
-      //}}}
-      function activateHandlers(move, done) //{{{
-      {
-        btndown = true;
-        onMove = move;
-        onDone = done;
-        toFront();
-        return false;
-      }
-      //}}}
-      function trackTouchMove(e) //{{{
-      {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackMove(e);
-      }
-      //}}}
-      function trackTouchEnd(e) //{{{
-      {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackUp(e);
-      }
-      //}}}
-      function setCursor(t) //{{{
-      {
-        $trk.css('cursor', t);
-      }
-      //}}}
-
-      if (Touch.support) {
-        $(document)
-          .bind('touchmove', trackTouchMove)
-          .bind('touchend', trackTouchEnd);
-      }
-
-      if (!trackDoc) {
-        $trk.mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
-      }
-
-      $img.before($trk);
-      return {
-        activateHandlers: activateHandlers,
-        setCursor: setCursor
-      };
-    }());
     //}}}
     // KeyManager Module {{{
     var KeyManager = (function () {
