@@ -335,16 +335,26 @@
           zIndex: 310,
           position: 'absolute',
           overflow: 'hidden'
-        }).append($img2),
+        }),
 
         $hdl_holder = $('<div />') 
         .width(pct(100)).height(pct(100)).css('zIndex', 320), 
+
+        $shade_holder = $('<div />').css({
+          position: 'absolute',
+          zIndex: 240,
+          opacity: 0
+        }),
 
         $sel = $('<div />') 
         .css({
           position: 'absolute',
           zIndex: 300
         }).insertBefore($img).append($img_holder, $hdl_holder); 
+    if (!options.shade) {
+      $img_holder.append($img2);
+    }
+          else $shade_holder.insertBefore($img);
 
     if (ie6mode) {
       $sel.css({
@@ -362,7 +372,8 @@
 
     /* }}} */
     // Set more variables {{{
-    var bgopacity = options.bgOpacity,
+    var bgcolor = options.bgColor,
+        bgopacity = options.bgOpacity,
         xlimit, ylimit, xmin, ymin, xscale, yscale, enabled = true,
         btndown, animating, shift_down;
 
@@ -826,6 +837,7 @@
     // Selection Module {{{
     var Selection = (function () {
       var awake, hdep = 370;
+      var shades = {};
       var borders = {};
       var handle = {};
       var seehandles = false;
@@ -950,12 +962,20 @@
         }
       }
       //}}}
+      function createShade() {
+        return $('<div><!-- // --></div>').css({
+          position: 'absolute',
+          backgroundColor: options.shadeColor
+        }).appendTo($shade_holder);
+      }
       function moveto(x, y) //{{{
       {
-        $img2.css({
-          top: px(-y),
-          left: px(-x)
-        });
+        if (!options.shade) {
+          $img2.css({
+            top: px(-y),
+            left: px(-x)
+          });
+        }
         $sel.css({
           top: px(y),
           left: px(x)
@@ -986,17 +1006,39 @@
         }
       }
       //}}}
+      function updateShade(c)
+      {
+        shades.top.css({
+          left: px(c.x),
+          width: px(c.w),
+          height: px(c.y)
+        });
+        shades.bottom.css({
+          top: px(c.y2),
+          left: px(c.x),
+          width: px(c.w),
+          height: px(boundy-c.y2)
+        });
+        shades.right.css({
+          left: px(c.x2),
+          width: px(boundx-c.x2)
+        });
+        shades.left.css({
+          width: px(c.x)
+        });
+      }
       function update() //{{{
       {
         var c = Coords.getFixed();
 
         resize(c.w, c.h);
         moveto(c.x, c.y);
+        if (options.shade) updateShade(c);
 
 /*
-			options.drawBorders &&
-				borders.right.css({ left: px(c.w-1) }) &&
-					borders.bottom.css({ top: px(c.h-1) });
+      options.drawBorders &&
+        borders.right.css({ left: px(c.w-1) }) &&
+          borders.bottom.css({ top: px(c.h-1) });
       */
 
         if (seehandles) {
@@ -1014,9 +1056,19 @@
         $sel.show();
 
         if (options.bgFade) {
-          $img.fadeTo(options.fadeTime, bgopacity);
+          if (options.shade) {
+            $shade_holder.fadeTo(options.fadeTime, bgopacity);
+          }
+          else {
+            $img.fadeTo(options.fadeTime, bgopacity);
+          }
         } else {
-          $img.css('opacity', bgopacity);
+          if (options.shade) {
+            $shade_holder.css({opacity:bgopacity});
+          }
+          else {
+            $img.css('opacity', bgopacity);
+          }
         }
 
         awake = true;
@@ -1028,9 +1080,19 @@
         $sel.hide();
 
         if (options.bgFade) {
-          $img.fadeTo(options.fadeTime, 1);
+          if (options.shade) {
+            $shade_holder.fadeTo(options.fadeTime, 0);
+          }
+          else {
+            $img.fadeTo(options.fadeTime, 1);
+          }
         } else {
-          $img.css('opacity', 1);
+          if (options.shade) {
+            $shade_holder.css({opacity:0});
+          }
+          else {
+            $img.css('opacity', 1);
+          }
         }
 
         awake = false;
@@ -1087,6 +1149,12 @@
           right: insertBorder('vline right')
         };
       }
+      function resizeShades(w,h) {
+        if (options.shade) {
+          shades.left.css({ height: px(h) });
+          shades.right.css({ height: px(h) });
+        }
+      }
 
       // Insert handles on edges
       if (options.dragEdges) {
@@ -1102,6 +1170,14 @@
       }
       if (options.cornerHandles) {
         createHandles(['sw', 'nw', 'ne', 'se']);
+      }
+      if (options.shade) {
+        shades = {
+          top: createShade(),
+          left: createShade().height(boundy),
+          right: createShade().height(boundy),
+          bottom: createShade()
+        };
       }
 
       
@@ -1137,6 +1213,7 @@
         enableOnly: function () {
           seehandles = true;
         },
+        resizeShades: resizeShades,
         showHandles: showHandles,
         disableHandles: disableHandles,
         animMode: animMode,
@@ -1373,6 +1450,7 @@
         $img2.width(boundx).height(boundy);
         $trk.width(boundx + (bound * 2)).height(boundy + (bound * 2));
         $div.width(boundx).height(boundy);
+        Selection.resizeShades(boundx,boundy);
         enableCrop();
 
         if (typeof(callback) === 'function') {
@@ -1423,16 +1501,25 @@
           $div.css('backgroundColor', options.bgColor);
         }
 
+        bgcolor = options.bgColor;
         delete(options.bgColor);
       }
       if (options.hasOwnProperty('bgOpacity')) {
         bgopacity = options.bgOpacity;
 
         if (Selection.isAwake()) {
-          if (options.fadeTime) {
-            $img.fadeTo(options.fadeTime, bgopacity);
+          if (options.shade) {
+            if (options.bgFade) {
+              $shade_holder.fadeTo(options.fadeTime, bgopacity);
+            } else {
+              $shade_holder.css({opacity: bgopacity});
+            }
           } else {
-            $div.css('opacity', options.opacity);
+            if (options.bgFade) {
+              $img.fadeTo(options.fadeTime, bgopacity);
+            } else {
+              $img.css({opacity: options.opacity});
+            }
           }
         }
         delete(options.bgOpacity);
@@ -1583,6 +1670,9 @@
     dragEdges: true,
     fixedSupport: true,
     touchSupport: null,
+
+    shade: false,
+    shadeColor: 'black',
 
     boxWidth: 0,
     boxHeight: 0,
