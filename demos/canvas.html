@@ -1,0 +1,60 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+    <title>Jcrop &raquo; Tutorials &raquo; Canvas Example</title>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="jcrop-canvas.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.0/themes/base/jquery-ui.css" type="text/css" />
+    <style type="text/css">
+      .myholder { position: relative; }
+      .slider { position: absolute; height: 160px; border: 1px gray solid; background-color: #ccc; }
+      .slider.rotation { left: 610px; }
+      .slider.sizer { left: 610px; top: 175px; }
+      .ui-dialog { font-size: 80%; }
+    </style>
+  </head>
+
+  <body>
+    <div id="outer">
+    <div class="jcExample">
+    <div class="article">
+
+      <h1>Jcrop - Canvas Example</h1>
+      <div class="myholder" style="height:410px;">
+      <div class="slider rotation" id="rotslider"></div>
+      <div class="slider sizer" id="sizeslider"></div>
+      <canvas style="position: absolute;" id="myCanvas" width="602" height="400">
+        Your browser does not support canvas elements.
+      </canvas>
+      <div style="position:absolute;">
+      <img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" width="602" height="400" id="croptarg" />
+      </div>
+      </div>
+
+      <div><button id="grabButton">Grab!</button></div>
+
+      <p>
+        <b>This example is a hack of Jcrop over a canvas object.</b>
+        Use the sliders to the right of the image to control the zoom
+        and rotation. The grab button will open a dialog with a new
+        canvas, showing the area you cropped. This data could then be
+        sent via AJAX for server-side storage.
+      </p>
+
+      <div id="dl_links">
+        <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+        <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+      </div>
+
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
+
