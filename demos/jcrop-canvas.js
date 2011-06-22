@@ -76,9 +76,13 @@ $(function(){
     $('#croptarg').Jcrop({
       shade: true,
       shadeColor: 'black',
+      borderOpacity: .2,
+      bgOpacity: .5,
+      handleOpacity: .4,
+      handleSize: 7,
       boundary: 0,
       bgFade: true,
-      setSelect: [ 20, 20, 480, 350 ],
+      setSelect: [ 60, 40, 542, 360 ],
       bgColor: 'transparent'
     },function(){
       jcrop_api = this;
