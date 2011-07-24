@@ -1313,7 +1313,7 @@
           doNudge(e, 0, nudge);
           break;
         case 27:
-          Selection.release();
+          if (options.allowSelect) Selection.release();
           break;
         case 9:
           return true;
