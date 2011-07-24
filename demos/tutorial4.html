@@ -20,11 +20,24 @@
         $('#target').Jcrop({
           bgFade:     true,
           bgOpacity: .3,
-          outerImage: 'demo_files/sagomod.jpg',
           setSelect: [ 60, 70, 540, 330 ]
         },function(){
           jcrop_api = this;
         });
+
+        $('#fadetog').change(function(){
+          jcrop_api.setOptions({
+            bgFade: this.checked
+          });
+        }).attr('checked','checked');
+
+        $('#shadetog').change(function(){
+          if (this.checked) $('#shadetxt').slideDown();
+            else $('#shadetxt').slideUp();
+          jcrop_api.setOptions({
+            shade: this.checked
+          });
+        }).attr('checked',false);
 
         // Define page sections
         var sections = {
@@ -75,7 +88,10 @@
         // Create bgColor buttons
         for(i in bgc) {
           $('#bgc_buttons').append(
-            $('<button />').append(i).click(setoptHandler('bgColor',bgc[i])), ' '
+            $('<button />').append(i).css({
+              backgroundColor: bgc[i],
+              color: ((i == 'Black') || (i == 'Red'))?'white':'black'
+            }).click(setoptHandler('bgColor',bgc[i])), ' '
           );
         }
         // Function to insert named sections into interface
@@ -130,6 +146,16 @@
       <img src="demo_files/sago.jpg" id="target" alt="Flowers" />
 
       <div id="interface" style="margin: 1em 0;"></div>
+      <div><label><input type="checkbox" id="fadetog" /> Enable fading (bgFade: true)</label></div>
+      <div><label><input type="checkbox" id="shadetog" /> Use experimental shader (shade: true)</label></div>
+
+      <p id="shadetxt" style="display:none; color:#900;">
+        <b>Experimental shader active.</b>
+        Jcrop now includes a shading mode that facilitates building
+        better transparent Jcrop instances. The experimental shader is less
+        robust than Jcrop's default shading method and should only be
+        used if you require this functionality. 
+      </p>
 
       <p>
         <b>Animation/Transitions.</b>
@@ -137,7 +163,6 @@
         and bgOpacity options. Color fading requires inclusion of John Resig's
         jQuery <a href="http://plugins.jquery.com/project/color">Color 
         Animations</a> plugin. If it is not included, colors will not fade.
-        This demo also uses an alternate outerImage.
       </p>
 
     <div id="dl_links">
