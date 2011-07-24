@@ -1,8 +1,12 @@
 /**
- * jquery.Jcrop.js v0.9.9
- * jQuery Image Cropping Plugin
- * @author Kelly Hallman <khallman@gmail.com>
- * Copyright (c) 2008-2011 Kelly Hallman - released under MIT License {{{
+ * jquery.Jcrop.js v0.9.9 {{{
+ *
+ * jQuery Image Cropping Plugin - released under MIT License 
+ * Author: Kelly Hallman <khallman@gmail.com>
+ * http://github.com/tapmodo/Jcrop
+ *
+ * }}}
+ * Copyright (c) 2008-2011 Tapmodo Interactive LLC {{{
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -60,9 +64,9 @@
       if (typeof(opt) !== 'object') opt = {};
       options = $.extend(options, opt);
 
-			$.each(['onChange','onSelect','onRelease','onDblClick'],function(i,e) {
-				if (typeof(options[e]) !== 'function') options[e] = function () {};
-			});
+      $.each(['onChange','onSelect','onRelease','onDblClick'],function(i,e) {
+        if (typeof(options[e]) !== 'function') options[e] = function () {};
+      });
     }
     //}}}
     function startDragMode(mode, pos) //{{{
@@ -319,23 +323,17 @@
         $hdl_holder = $('<div />') 
         .width('100%').height('100%').css('zIndex', 320), 
 
-        $shade_holder = $('<div />').css({
-          position: 'absolute',
-          zIndex: 240,
-          opacity: 0
-        }),
-
         $sel = $('<div />') 
         .css({
           position: 'absolute',
           zIndex: 600
         }).dblclick(function(){
-					var c = Coords.getFixed();
-					options.onDblClick.call(api,c);
-				}).insertBefore($img).append($img_holder, $hdl_holder); 
+          var c = Coords.getFixed();
+          options.onDblClick.call(api,c);
+        }).insertBefore($img).append($img_holder, $hdl_holder); 
 
-    if (!options.shade) $img_holder.append($img2);
-			else $shade_holder.insertBefore($img);
+    $img_holder.append($img2);
+    //Shade.refresh();
 
     if (ie6mode) {
       $sel.css({
@@ -710,10 +708,113 @@
     }());
 
     //}}}
+    // Shade Module {{{
+    var Shade = (function() {
+      var enabled = false,
+          holder = $('<div />').css({
+            position: 'absolute',
+            zIndex: 240,
+            opacity: 0
+          }),
+          shades = {
+            top: createShade(),
+            left: createShade().height(boundy),
+            right: createShade().height(boundy),
+            bottom: createShade()
+          };
+
+      function resizeShades(w,h) {
+        shades.left.css({ height: px(h) });
+        shades.right.css({ height: px(h) });
+      }
+      function updateAuto()
+      {
+        return updateShade(Coords.getFixed());
+      }
+      function updateShade(c)
+      {
+        shades.top.css({
+          left: px(c.x),
+          width: px(c.w),
+          height: px(c.y)
+        });
+        shades.bottom.css({
+          top: px(c.y2),
+          left: px(c.x),
+          width: px(c.w),
+          height: px(boundy-c.y2)
+        });
+        shades.right.css({
+          left: px(c.x2),
+          width: px(boundx-c.x2)
+        });
+        shades.left.css({
+          width: px(c.x)
+        });
+      }
+      function createShade() {
+        return $('<div><!-- // --></div>').css({
+          position: 'absolute',
+          backgroundColor: options.bgColor
+        }).appendTo(holder);
+      }
+      function enableShade() {
+        if (!enabled) {
+          enabled = true;
+          holder.insertBefore($img);
+          updateAuto();
+          Selection.setBgOpacity(1,true);
+          $img2.hide();
+          if (Selection.isAwake())
+            setOpacity(options.bgOpacity);
+              else setOpacity(1);
+        }
+      }
+      function setBgColor() {
+      }
+      function disableShade() {
+        if (enabled) {
+          holder.remove();
+          enabled = false;
+          $img2.show();
+          Selection.setBgOpacity(options.bgOpacity);
+        }
+      }
+      function setOpacity(opacity) {
+        if (enabled) {
+          if (options.bgFade) {
+            holder.animate({
+              opacity: 1-opacity
+            },{
+              queue: false,
+              duration: options.fadeTime
+            });
+          }
+          else holder.css({opacity:1-opacity});
+        }
+      }
+      function refreshAll() {
+        options.shade ? enableShade() : disableShade();
+      }
+      function getShades() {
+        return holder.children();
+      }
+
+      return {
+        update: updateAuto,
+        updateRaw: updateShade,
+        getShades: getShades,
+        enable: enableShade,
+        disable: disableShade,
+        resize: resizeShades,
+        refresh: refreshAll,
+        opacity: setOpacity
+      };
+    }());
+    // }}}
     // Selection Module {{{
     var Selection = (function () {
       var awake, hdep = 370;
-      var shades = {};
       var borders = {};
       var handle = {};
       var seehandles = false;
@@ -837,12 +938,6 @@
         }
       }
       //}}}
-      function createShade() {
-        return $('<div><!-- // --></div>').css({
-          position: 'absolute',
-          backgroundColor: options.bgColor
-        }).appendTo($shade_holder);
-      }
       function moveto(x, y) //{{{
       {
         if (!options.shade) {
@@ -881,34 +976,13 @@
         }
       }
       //}}}
-      function updateShade(c)
-      {
-        shades.top.css({
-          left: px(c.x),
-          width: px(c.w),
-          height: px(c.y)
-        });
-        shades.bottom.css({
-          top: px(c.y2),
-          left: px(c.x),
-          width: px(c.w),
-          height: px(boundy-c.y2)
-        });
-        shades.right.css({
-          left: px(c.x2),
-          width: px(boundx-c.x2)
-        });
-        shades.left.css({
-          width: px(c.x)
-        });
-      }
       function update() //{{{
       {
         var c = Coords.getFixed();
 
         resize(c.w, c.h);
         moveto(c.x, c.y);
-        if (options.shade) updateShade(c);
+        if (options.shade) Shade.updateRaw(c);
 
         if (seehandles) {
           moveHandles(c);
@@ -920,25 +994,26 @@
         options.onChange.call(api, unscale(c));
       }
       //}}}
+      function setBgOpacity(opacity,force)
+      {
+        if (!awake && !force) return;
+        if (options.bgFade) {
+          $img.animate({
+            opacity: opacity
+          },{
+            queue: false,
+            duration: options.fadeTime
+          });
+        } else {
+          $img.css('opacity', opacity);
+        }
+      }
       function show() //{{{
       {
         $sel.show();
 
-        if (options.bgFade) {
-          if (options.shade) {
-            $shade_holder.fadeTo(options.fadeTime, bgopacity);
-          }
-          else {
-            $img.fadeTo(options.fadeTime, bgopacity);
-          }
-        } else {
-          if (options.shade) {
-            $shade_holder.css({opacity:bgopacity});
-          }
-          else {
-            $img.css('opacity', bgopacity);
-          }
-        }
+        if (options.shade) Shade.opacity(bgopacity);
+          else setBgOpacity(bgopacity,true);
 
         awake = true;
       }
@@ -948,21 +1023,8 @@
         disableHandles();
         $sel.hide();
 
-        if (options.bgFade) {
-          if (options.shade) {
-            $shade_holder.fadeTo(options.fadeTime, 0);
-          }
-          else {
-            $img.fadeTo(options.fadeTime, 1);
-          }
-        } else {
-          if (options.shade) {
-            $shade_holder.css({opacity:0});
-          }
-          else {
-            $img.css('opacity', 1);
-          }
-        }
+        if (options.shade) Shade.opacity(1);
+          else setBgOpacity(1);
 
         awake = false;
         options.onRelease.call(api);
@@ -1018,12 +1080,6 @@
           right: insertBorder('vline right')
         };
       }
-      function resizeShades(w,h) {
-        if (options.shade) {
-          shades.left.css({ height: px(h) });
-          shades.right.css({ height: px(h) });
-        }
-      }
 
       // Insert handles on edges
       if (options.dragEdges) {
@@ -1040,16 +1096,6 @@
       if (options.cornerHandles) {
         createHandles(['sw', 'nw', 'ne', 'se']);
       }
-      if (options.shade) {
-        shades = {
-          top: createShade(),
-          left: createShade().height(boundy),
-          right: createShade().height(boundy),
-          bottom: createShade()
-        };
-      }
-
-      
       //}}}
 
       var $track = newTracker().mousedown(createDragger('move')).css({
@@ -1080,10 +1126,10 @@
         enableOnly: function () {
           seehandles = true;
         },
-        resizeShades: resizeShades,
         showHandles: showHandles,
         disableHandles: disableHandles,
         animMode: animMode,
+        setBgOpacity: setBgOpacity,
         done: done
       };
     }());
@@ -1100,11 +1146,11 @@
         $trk.css({
           zIndex: 450
         });
-				if (Touch.support) {
-					$(document)
-						.bind('touchmove', trackTouchMove)
-						.bind('touchend', trackTouchEnd);
-				}
+        if (Touch.support) {
+          $(document)
+            .bind('touchmove', trackTouchMove)
+            .bind('touchend', trackTouchEnd);
+        }
         if (trackDoc) {
           $(document)
             .bind('mousemove',trackMove)
@@ -1117,11 +1163,11 @@
         $trk.css({
           zIndex: 290
         });
-				if (Touch.support) {
-					$(document)
-						.unbind('touchmove', trackTouchMove)
-						.unbind('touchend', trackTouchEnd);
-				}
+        if (Touch.support) {
+          $(document)
+            .unbind('touchmove', trackTouchMove)
+            .unbind('touchend', trackTouchEnd);
+        }
         if (trackDoc) {
           $(document)
             .unbind('mousemove', trackMove)
@@ -1425,7 +1471,7 @@
         $img2.width(boundx).height(boundy);
         $trk.width(boundx + (bound * 2)).height(boundy + (bound * 2));
         $div.width(boundx).height(boundy);
-        Selection.resizeShades(boundx,boundy);
+        Shade.resize(boundx,boundy);
         enableCrop();
 
         if (typeof(callback) === 'function') {
@@ -1435,6 +1481,18 @@
       img.src = src;
     }
     //}}}
+    function colorChangeMacro($obj) {
+      if (supportsColorFade() && options.fadeTime) {
+        $obj.animate({
+          backgroundColor: options.bgColor
+        }, {
+          queue: false,
+          duration: options.fadeTime
+        });
+      } else {
+        $obj.css('backgroundColor', options.bgColor);
+      }
+    }
     function interfaceUpdate(alt) //{{{
     // This method tweaks the interface based on options object.
     // Called when options are changed and at end of initialization.
@@ -1452,7 +1510,6 @@
       Tracker.setCursor(options.allowSelect ? 'crosshair' : 'default');
       Selection.setCursor(options.allowMove ? 'move' : 'default');
 
-
       if (options.hasOwnProperty('setSelect')) {
         setSelect(options.setSelect);
         Selection.done();
@@ -1463,41 +1520,19 @@
         xscale = options.trueSize[0] / boundx;
         yscale = options.trueSize[1] / boundy;
       }
+
+      Shade.refresh();
+
       if (options.bgColor != bgcolor) {
-				var $obj = options.shade? $shade_holder.children(): $div;
-        if (supportsColorFade() && options.fadeTime) {
-          $obj.animate({
-            backgroundColor: options.bgColor
-          }, {
-            queue: false,
-            duration: options.fadeTime
-          });
-        } else {
-          $obj.css('backgroundColor', options.bgColor);
-        }
+        colorChangeMacro(options.shade? Shade.getShades(): $div);
         bgcolor = options.bgColor;
       }
+
       if (bgopacity !== options.bgOpacity) {
         bgopacity = options.bgOpacity;
         if (Selection.isAwake()) {
-          if (options.shade) {
-            if (options.bgFade) {
-              $shade_holder.animate({
-								opacity: bgopacity
-							},{
-								queue: false,
-								duration: options.fadeTime
-							});
-            } else {
-              $shade_holder.css({opacity: bgopacity});
-            }
-          } else {
-            if (options.bgFade) {
-              $img.fadeTo(options.fadeTime, bgopacity);
-            } else {
-              $img.css({opacity: options.opacity});
-            }
-          }
+          if (options.shade) Shade.refresh();
+            else Selection.setBgOpacity(bgopacity);
         }
       }
 
@@ -1646,7 +1681,6 @@
     touchSupport: null,
 
     shade: false,
-    shadeColor: 'black',
 
     boxWidth: 0,
     boxHeight: 0,
