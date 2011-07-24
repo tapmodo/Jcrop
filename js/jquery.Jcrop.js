@@ -753,9 +753,9 @@
         });
       }
       function createShade() {
-        return $('<div><!-- // --></div>').css({
+        return $('<div />').css({
           position: 'absolute',
-          backgroundColor: options.bgColor
+          backgroundColor: options.shadeColor||options.bgColor
         }).appendTo(holder);
       }
       function enableShade() {
@@ -763,26 +763,37 @@
           enabled = true;
           holder.insertBefore($img);
           updateAuto();
-          Selection.setBgOpacity(1,true);
+          Selection.setBgOpacity(1,0,1);
           $img2.hide();
+
+          setBgColor(options.shadeColor||options.bgColor,1);
           if (Selection.isAwake())
-            setOpacity(options.bgOpacity);
-              else setOpacity(1);
+          {
+            setOpacity(options.bgOpacity,1);
+          }
+            else setOpacity(1,1);
         }
       }
-      function setBgColor() {
+      function setBgColor(color,now) {
+        colorChangeMacro(getShades(),color,now);
       }
       function disableShade() {
         if (enabled) {
           holder.remove();
-          enabled = false;
           $img2.show();
-          Selection.setBgOpacity(options.bgOpacity);
+          enabled = false;
+          if (Selection.isAwake()) {
+            Selection.setBgOpacity(options.bgOpacity,1,1);
+          } else {
+            Selection.setBgOpacity(1,1,1);
+            Selection.disableHandles();
+          }
+          colorChangeMacro($div,0,1);
         }
       }
-      function setOpacity(opacity) {
+      function setOpacity(opacity,now) {
         if (enabled) {
-          if (options.bgFade) {
+          if (options.bgFade && !now) {
             holder.animate({
               opacity: 1-opacity
             },{
@@ -795,6 +806,7 @@
       }
       function refreshAll() {
         options.shade ? enableShade() : disableShade();
+        if (Selection.isAwake()) setOpacity(options.bgOpacity);
       }
       function getShades() {
         return holder.children();
@@ -804,6 +816,7 @@
         update: updateAuto,
         updateRaw: updateShade,
         getShades: getShades,
+        setBgColor: setBgColor,
         enable: enableShade,
         disable: disableShade,
         resize: resizeShades,
@@ -994,10 +1007,10 @@
         options.onChange.call(api, unscale(c));
       }
       //}}}
-      function setBgOpacity(opacity,force)
+      function setBgOpacity(opacity,force,now)
       {
         if (!awake && !force) return;
-        if (options.bgFade) {
+        if (options.bgFade && !now) {
           $img.animate({
             opacity: opacity
           },{
@@ -1481,16 +1494,17 @@
       img.src = src;
     }
     //}}}
-    function colorChangeMacro($obj) {
-      if (supportsColorFade() && options.fadeTime) {
+    function colorChangeMacro($obj,color,now) {
+      var mycolor = color || options.bgColor;
+      if (options.bgFade && supportsColorFade() && options.fadeTime && !now) {
         $obj.animate({
-          backgroundColor: options.bgColor
+          backgroundColor: mycolor
         }, {
           queue: false,
           duration: options.fadeTime
         });
       } else {
-        $obj.css('backgroundColor', options.bgColor);
+        $obj.css('backgroundColor', mycolor);
       }
     }
     function interfaceUpdate(alt) //{{{
@@ -1524,16 +1538,19 @@
       Shade.refresh();
 
       if (options.bgColor != bgcolor) {
-        colorChangeMacro(options.shade? Shade.getShades(): $div);
+        colorChangeMacro(
+          options.shade? Shade.getShades(): $div,
+          options.shade?
+            (options.shadeColor || options.bgColor):
+            options.bgColor
+        );
         bgcolor = options.bgColor;
       }
 
-      if (bgopacity !== options.bgOpacity) {
+      if (bgopacity != options.bgOpacity) {
         bgopacity = options.bgOpacity;
-        if (Selection.isAwake()) {
-          if (options.shade) Shade.refresh();
-            else Selection.setBgOpacity(bgopacity);
-        }
+        if (options.shade) Shade.refresh();
+          else Selection.setBgOpacity(bgopacity);
       }
 
       xlimit = options.maxSize[0] || 0;
