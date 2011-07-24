@@ -1,154 +1,153 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-		<title>Jcrop &raquo; Tutorials &raquo; Animations / Transitions</title>
-		<script src="../js/jquery.min.js" type="text/javascript"></script>
-		<script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
-		<script src="../js/jquery.color.js" type="text/javascript"></script>
-		<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
-		<link rel="stylesheet" href="../css/jquery.Jcrop.extras.css" type="text/css" />
-		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+    <title>Jcrop &raquo; Tutorials &raquo; Animations / Transitions</title>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
+    <script src="../js/jquery.color.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+    <link rel="stylesheet" href="../css/jquery.Jcrop.extras.css" type="text/css" />
+    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
 
-		<script type="text/javascript">
+    <script type="text/javascript">
 
-			jQuery(function($){
+      jQuery(function($){
 
-				var jcrop_api;
+        var jcrop_api;
 
-				$('#target').Jcrop({
+        $('#target').Jcrop({
           bgFade:     true,
-					bgOpacity: .3,
-					outerImage: 'demo_files/sagomod.jpg',
-					setSelect: [ 60, 70, 540, 330 ]
-				},function(){
+          bgOpacity: .3,
+          outerImage: 'demo_files/sagomod.jpg',
+          setSelect: [ 60, 70, 540, 330 ]
+        },function(){
           jcrop_api = this;
         });
 
-				// Define page sections
-				var sections = {
-					anim_buttons: 'Animate Selection',
-					bgo_buttons: 'Change bgOpacity',
-					bgc_buttons: 'Change bgColor'
-				};
-				// Define animation buttons
-				var ac = {
-					anim1: [217,122,382,284],
-					anim2: [20,20,580,380],
-					anim3: [24,24,176,376],
-					anim4: [347,165,550,355],
-					anim5: [136,55,472,183]
-				};
-				// Define bgOpacity buttons
-				var bgo = {
-					Low: .2,
-					Mid: .5,
-					High: .8,
-					Full: 1
-				};
-				// Define bgColor buttons
-				var bgc = {
-					Red: '#900',
-					Blue: '#4BB6F0',
-					Yellow: '#F0B207',
-					Green: '#46B81C',
-					White: 'white',
-					Black: 'black'
-				};
-				// Create fieldset targets for buttons
-				for(i in sections)
-					insertSection(i,sections[i]);
+        // Define page sections
+        var sections = {
+          anim_buttons: 'Animate Selection',
+          bgo_buttons: 'Change bgOpacity',
+          bgc_buttons: 'Change bgColor'
+        };
+        // Define animation buttons
+        var ac = {
+          anim1: [217,122,382,284],
+          anim2: [20,20,580,380],
+          anim3: [24,24,176,376],
+          anim4: [347,165,550,355],
+          anim5: [136,55,472,183]
+        };
+        // Define bgOpacity buttons
+        var bgo = {
+          Low: .2,
+          Mid: .5,
+          High: .8,
+          Full: 1
+        };
+        // Define bgColor buttons
+        var bgc = {
+          Red: '#900',
+          Blue: '#4BB6F0',
+          Yellow: '#F0B207',
+          Green: '#46B81C',
+          White: 'white',
+          Black: 'black'
+        };
+        // Create fieldset targets for buttons
+        for(i in sections)
+          insertSection(i,sections[i]);
 
-				// Create animation buttons
-				for(i in ac) {
-					$('#anim_buttons').append(
-						$('<button />').append(i).click(animHandler(ac[i])), ' '
-					);
-				}
-				// Create bgOpacity buttons
-				for(i in bgo) {
-					$('#bgo_buttons').append(
-						$('<button />').append(i).click(setoptHandler('bgOpacity',bgo[i])), ' '
-					);
-				}
-				// Create bgColor buttons
-				for(i in bgc) {
-					$('#bgc_buttons').append(
-						$('<button />').append(i).click(setoptHandler('bgColor',bgc[i])), ' '
-					);
-				}
-				// Function to insert named sections into interface
-				function insertSection(k,v) {
-					$('#interface').append(
-						$('<fieldset></fieldset>').attr('id',k).append(
-							$('<legend></legend>').append(v)
-						)
-					);
-				};
-				// Handler for option-setting buttons
-				function setoptHandler(k,v) {
-					return function() {
-						var opt = { };
-						opt[k] = v;
-						jcrop_api.setOptions(opt);
-						return false;
-					};
-				};
-				// Handler for animation buttons
-				function animHandler(v) {
-					return function() {
-						jcrop_api.animateTo(v);
-						return false;
-					};
-				};
+        // Create animation buttons
+        for(i in ac) {
+          $('#anim_buttons').append(
+            $('<button />').append(i).click(animHandler(ac[i])), ' '
+          );
+        }
+        // Create bgOpacity buttons
+        for(i in bgo) {
+          $('#bgo_buttons').append(
+            $('<button />').append(i).click(setoptHandler('bgOpacity',bgo[i])), ' '
+          );
+        }
+        // Create bgColor buttons
+        for(i in bgc) {
+          $('#bgc_buttons').append(
+            $('<button />').append(i).click(setoptHandler('bgColor',bgc[i])), ' '
+          );
+        }
+        // Function to insert named sections into interface
+        function insertSection(k,v) {
+          $('#interface').append(
+            $('<fieldset></fieldset>').attr('id',k).append(
+              $('<legend></legend>').append(v)
+            )
+          );
+        };
+        // Handler for option-setting buttons
+        function setoptHandler(k,v) {
+          return function() {
+            var opt = { };
+            opt[k] = v;
+            jcrop_api.setOptions(opt);
+            return false;
+          };
+        };
+        // Handler for animation buttons
+        function animHandler(v) {
+          return function() {
+            jcrop_api.animateTo(v);
+            return false;
+          };
+        };
 
-				$('#anim_buttons').append(
-					$('<button></button>').append('Bye!').click(function(){
-						jcrop_api.animateTo(
+        $('#anim_buttons').append(
+          $('<button></button>').append('Bye!').click(function(){
+            jcrop_api.animateTo(
               [300,200,300,200],
               function(){ this.release(); }
             );
             return false;
-					})
-				);
+          })
+        );
 
-				$('#interface').show();
+        $('#interface').show();
 
-			});
+      });
 
-		</script>
+    </script>
 
-	</head>
+  </head>
 
-	<body>
-		<div id="outer">
-		<div class="jcExample">
-		<div class="article">
+  <body>
+    <div id="outer">
+    <div class="jcExample">
+    <div class="article">
 
-			<h1>Jcrop - Animations/Transitions</h1>
-			<img src="demo_files/sago.jpg" id="target" alt="Flowers" />
+      <h1>Jcrop - Animations/Transitions</h1>
+      <img src="demo_files/sago.jpg" id="target" alt="Flowers" />
 
-			<div id="interface" style="margin: 1em 0;"></div>
+      <div id="interface" style="margin: 1em 0;"></div>
 
-			<p>
-				<b>Animation/Transitions.</b>
-				Demonstration of animateTo API method and transitions for bgColor
-				and bgOpacity options. Color fading requires inclusion of John Resig's
-				jQuery <a href="http://plugins.jquery.com/project/color">Color 
-				Animations</a> plugin. If it is not included, colors will not fade.
-				This demo also uses an alternate outerImage, and creating new selections is
-				disabled.
-			</p>
+      <p>
+        <b>Animation/Transitions.</b>
+        Demonstration of animateTo API method and transitions for bgColor
+        and bgOpacity options. Color fading requires inclusion of John Resig's
+        jQuery <a href="http://plugins.jquery.com/project/color">Color 
+        Animations</a> plugin. If it is not included, colors will not fade.
+        This demo also uses an alternate outerImage.
+      </p>
 
-		<div id="dl_links">
-			<a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
-			<a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
-		</div>
+    <div id="dl_links">
+      <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+      <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+    </div>
 
-		</div>
-		</div>
-		</div>
-	</body>
+    </div>
+    </div>
+    </div>
+  </body>
 </html>
 

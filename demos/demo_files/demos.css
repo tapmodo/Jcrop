@@ -1,16 +1,21 @@
+/* Jcrop Demo CSS
+ * Not required to run Jcrop
+ * Just makes the demo pages look less ugly
+ */
+
 body
 {
-	margin: 0;
-	padding: 0;
-	background: #eee;
-	font-family: Calibri, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #eee;
+  font-family: Calibri, sans-serif;
 }
 
 .article h1
 {
-	color: #333;
-	font-size: 2.2em;
-	margin-top: .2em;
+  color: #333;
+  font-size: 2.2em;
+  margin-top: .2em;
 }
 
 .jcropper-holder { border: 1px black solid; }
@@ -19,13 +24,13 @@ body
 
 .jcExample
 {
-	text-align: left;
-	background: white;
-	width: 700px;
-	font-size: 80%;
-	margin: 1.5em auto 2em auto;
-	border: 1px #999 solid;
-	padding: 1em 2em 2em;
+  text-align: left;
+  background: white;
+  width: 700px;
+  font-size: 80%;
+  margin: 1.5em auto 2em auto;
+  border: 1px #999 solid;
+  padding: 1em 2em 2em;
 }
 
 .jcExample .article { width: 565px; }

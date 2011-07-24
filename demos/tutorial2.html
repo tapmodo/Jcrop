@@ -1,16 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-		<title>Jcrop &raquo; Tutorials &raquo; Event Handler</title>
-		<script src="../js/jquery.min.js" type="text/javascript"></script>
-		<script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
-		<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
-		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
-		<script type="text/javascript">
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+    <title>Jcrop &raquo; Tutorials &raquo; Event Handler</title>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+    <script type="text/javascript">
 
-		jQuery(function($){
+    jQuery(function($){
 
       $('#target').Jcrop({
         onChange:   showCoords,
@@ -41,54 +41,54 @@
       },500);
     };
 
-		</script>
-	</head>
-	<body>
-	<div id="outer">
-	<div class="jcExample">
-	<div class="article">
+    </script>
+  </head>
+  <body>
+  <div id="outer">
+  <div class="jcExample">
+  <div class="article">
 
-		<h1>Jcrop - Event Handlers</h1>
+    <h1>Jcrop - Event Handlers</h1>
 
-		<!-- This is the image we're attaching Jcrop to -->
-		<img src="demo_files/flowers.jpg" id="target" alt="Flowers" />
+    <!-- This is the image we're attaching Jcrop to -->
+    <img src="demo_files/flowers.jpg" id="target" alt="Flowers" />
 
-		<!-- This is the form that our event handler fills -->
-		<form id="coords"
+    <!-- This is the form that our event handler fills -->
+    <form id="coords"
       class="coords"
       onsubmit="return false;"
       action="http://example.com/post.php">
 
       <div>
-			<label>X1 <input type="text" size="4" id="x1" name="x1" /></label>
-			<label>Y1 <input type="text" size="4" id="y1" name="y1" /></label>
-			<label>X2 <input type="text" size="4" id="x2" name="x2" /></label>
-			<label>Y2 <input type="text" size="4" id="y2" name="y2" /></label>
-			<label>W <input type="text" size="4" id="w" name="w" /></label>
-			<label>H <input type="text" size="4" id="h" name="h" /></label>
+      <label>X1 <input type="text" size="4" id="x1" name="x1" /></label>
+      <label>Y1 <input type="text" size="4" id="y1" name="y1" /></label>
+      <label>X2 <input type="text" size="4" id="x2" name="x2" /></label>
+      <label>Y2 <input type="text" size="4" id="y2" name="y2" /></label>
+      <label>W <input type="text" size="4" id="w" name="w" /></label>
+      <label>H <input type="text" size="4" id="h" name="h" /></label>
       </div>
-		</form>
+    </form>
 
-		<p>
-			<b>An example with a basic event handler.</b> Here we've tied
-			several form values together with a simple event handler invocation.
-			The result is that the form values are updated in real-time as
-			the selection is changed using Jcrop's <em>onChange</em> handler.
-		</p>
+    <p>
+      <b>An example with a basic event handler.</b> Here we've tied
+      several form values together with a simple event handler invocation.
+      The result is that the form values are updated in real-time as
+      the selection is changed using Jcrop's <em>onChange</em> handler.
+    </p>
 
-		<p>
-			That's how easily Jcrop can be integrated into a traditional web form!
-		</p>
+    <p>
+      That's how easily Jcrop can be integrated into a traditional web form!
+    </p>
 
-		<div id="dl_links">
-			<a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
-			<a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
-		</div>
+    <div id="dl_links">
+      <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+      <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+    </div>
 
 
-	</div>
-	</div>
-	</div>
-	</body>
+  </div>
+  </div>
+  </div>
+  </body>
 
 </html>
