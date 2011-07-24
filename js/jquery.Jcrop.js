@@ -38,9 +38,6 @@
     function px(n) {
       return parseInt(n, 10) + 'px';
     }
-    function pct(n) {
-      return parseInt(n, 10) + '%';
-    }
     function cssClass(cl) {
       return options.baseClass + '-' + cl;
     }
@@ -49,7 +46,6 @@
     }
     function getPos(obj) //{{{
     {
-      // Updated in v0.9.4 to use built-in dimensions plugin
       var pos = $(obj).offset();
       return [pos.left, pos.top];
     }
@@ -61,28 +57,12 @@
     //}}}
     function setOptions(opt) //{{{
     {
-      if (typeof(opt) !== 'object') {
-        opt = {};
-      }
+      if (typeof(opt) !== 'object') opt = {};
       options = $.extend(options, opt);
 
-      if (typeof(options.onChange) !== 'function') {
-        options.onChange = function () {};
-      }
-      if (typeof(options.onSelect) !== 'function') {
-        options.onSelect = function () {};
-      }
-      if (typeof(options.onRelease) !== 'function') {
-        options.onRelease = function () {};
-      }
-    }
-    //}}}
-    function myCursor(type) //{{{
-    {
-      if (type !== lastcurs) {
-        Tracker.setCursor(type);
-        lastcurs = type;
-      }
+			$.each(['onChange','onSelect','onRelease','onDblClick'],function(i,e) {
+				if (typeof(options[e]) !== 'function') options[e] = function () {};
+			});
     }
     //}}}
     function startDragMode(mode, pos) //{{{
@@ -247,7 +227,7 @@
       btndown = true;
       docOffset = getPos($img);
       Selection.disableHandles();
-      myCursor('crosshair');
+      Tracker.setCursor('crosshair');
       var pos = mouseAbs(e);
       Coords.setPressed(pos);
       Selection.update();
@@ -331,20 +311,23 @@
         .attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy),
 
         $img_holder = $('<div />') 
-        .width(pct(100)).height(pct(100)).css({
+        .width('100%').height('100%').css({
           zIndex: 310,
           position: 'absolute',
           overflow: 'hidden'
         }).append($img2),
 
         $hdl_holder = $('<div />') 
-        .width(pct(100)).height(pct(100)).css('zIndex', 320), 
+        .width('100%').height('100%').css('zIndex', 320), 
 
         $sel = $('<div />') 
         .css({
           position: 'absolute',
-          zIndex: 300
-        }).insertBefore($img).append($img_holder, $hdl_holder); 
+          zIndex: 600
+        }).dblclick(function(){
+					var c = Coords.getFixed();
+					options.onDblClick.call(api,c);
+				}).insertBefore($img).append($img_holder, $hdl_holder); 
 
     if (ie6mode) {
       $sel.css({
@@ -718,111 +701,6 @@
     }());
 
     //}}}
-    // Tracker Module {{{
-    var Tracker = (function () {
-      var onMove = function () {},
-          onDone = function () {},
-          trackDoc = options.trackDocument;
-
-      function toFront() //{{{
-      {
-        $trk.css({
-          zIndex: 450
-        });
-        if (trackDoc) {
-          $(document)
-            .bind('mousemove',trackMove)
-            .bind('mouseup',trackUp);
-        }
-      } 
-      //}}}
-      function toBack() //{{{
-      {
-        $trk.css({
-          zIndex: 290
-        });
-        if (trackDoc) {
-          $(document)
-            .unbind('mousemove', trackMove)
-            .unbind('mouseup', trackUp);
-        }
-      } 
-      //}}}
-      function trackMove(e) //{{{
-      {
-        onMove(mouseAbs(e));
-        return false;
-      } 
-      //}}}
-      function trackUp(e) //{{{
-      {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (btndown) {
-          btndown = false;
-
-          onDone(mouseAbs(e));
-
-          if (Selection.isAwake()) {
-            options.onSelect.call(api, unscale(Coords.getFixed()));
-          }
-
-          toBack();
-          onMove = function () {};
-          onDone = function () {};
-        }
-
-        return false;
-      }
-      //}}}
-      function activateHandlers(move, done) //{{{
-      {
-        btndown = true;
-        onMove = move;
-        onDone = done;
-        toFront();
-        return false;
-      }
-      //}}}
-      function trackTouchMove(e) //{{{
-      {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackMove(e);
-      }
-      //}}}
-      function trackTouchEnd(e) //{{{
-      {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackUp(e);
-      }
-      //}}}
-      function setCursor(t) //{{{
-      {
-        $trk.css('cursor', t);
-      }
-      //}}}
-
-      if (Touch.support) {
-        $trk
-          .bind('touchmove', trackTouchMove)
-          .bind('touchend', trackTouchEnd);
-      }
-
-      if (!trackDoc) {
-        $trk.mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
-      }
-
-      $img.before($trk);
-      return {
-        trackTouchMove: trackTouchMove,
-        activateHandlers: activateHandlers,
-        setCursor: setCursor
-      };
-    }());
-    //}}}
     // Selection Module {{{
     var Selection = (function () {
       var awake, hdep = 370;
@@ -851,9 +729,7 @@
         });
 
         if (Touch.support) {
-          jq.bind('touchstart', Touch.createDragger(ord))
-            .bind('touchmove', Tracker.trackTouchMove)
-            .bind('touchend', Tracker.trackTouchEnd);
+          jq.bind('touchstart', Touch.createDragger(ord));
         }
 
         $hdl_holder.append(jq);
@@ -880,11 +756,11 @@
         switch (ord) {
         case 'n':
         case 's':
-          w = pct(100);
+          w = '100%';
           break;
         case 'e':
         case 'w':
-          h = pct(100);
+          h = '100%';
           break;
         }
 
@@ -1114,9 +990,7 @@
       });
 
       if (Touch.support) {
-        $track.bind('touchstart.jcrop', Touch.createDragger('move'))
-            .bind('touchmove', Tracker.trackTouchMove)
-            .bind('touchend', Tracker.trackTouchEnd);
+        $track.bind('touchstart.jcrop', Touch.createDragger('move'));
       }
 
       $img_holder.append($track);
@@ -1144,6 +1018,114 @@
       };
     }());
     
+    //}}}
+    // Tracker Module {{{
+    var Tracker = (function () {
+      var onMove = function () {},
+          onDone = function () {},
+          trackDoc = options.trackDocument;
+
+      function toFront() //{{{
+      {
+        $trk.css({
+          zIndex: 450
+        });
+				if (Touch.support) {
+					$(document)
+						.bind('touchmove', trackTouchMove)
+						.bind('touchend', trackTouchEnd);
+				}
+        if (trackDoc) {
+          $(document)
+            .bind('mousemove',trackMove)
+            .bind('mouseup',trackUp);
+        }
+      } 
+      //}}}
+      function toBack() //{{{
+      {
+        $trk.css({
+          zIndex: 290
+        });
+				if (Touch.support) {
+					$(document)
+						.unbind('touchmove', trackTouchMove)
+						.unbind('touchend', trackTouchEnd);
+				}
+        if (trackDoc) {
+          $(document)
+            .unbind('mousemove', trackMove)
+            .unbind('mouseup', trackUp);
+        }
+      } 
+      //}}}
+      function trackMove(e) //{{{
+      {
+        onMove(mouseAbs(e));
+        return false;
+      } 
+      //}}}
+      function trackUp(e) //{{{
+      {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (btndown) {
+          btndown = false;
+
+          onDone(mouseAbs(e));
+
+          if (Selection.isAwake()) {
+            options.onSelect.call(api, unscale(Coords.getFixed()));
+          }
+
+          toBack();
+          onMove = function () {};
+          onDone = function () {};
+        }
+
+        return false;
+      }
+      //}}}
+      function activateHandlers(move, done) //{{{
+      {
+        btndown = true;
+        onMove = move;
+        onDone = done;
+        toFront();
+        return false;
+      }
+      //}}}
+      function trackTouchMove(e) //{{{
+      {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return trackMove(e);
+      }
+      //}}}
+      function trackTouchEnd(e) //{{{
+      {
+        e.pageX = e.originalEvent.changedTouches[0].pageX;
+        e.pageY = e.originalEvent.changedTouches[0].pageY;
+        return trackUp(e);
+      }
+      //}}}
+      function setCursor(t) //{{{
+      {
+        $trk.css('cursor', t);
+      }
+      //}}}
+
+      if (!trackDoc) {
+        $trk.mousemove(trackMove).mouseup(trackUp).mouseout(trackUp);
+      }
+
+      $img.before($trk);
+      return {
+        activateHandlers: activateHandlers,
+        setCursor: setCursor
+      };
+    }());
     //}}}
     // KeyManager Module {{{
     var KeyManager = (function () {
@@ -1453,9 +1435,7 @@
     //}}}
     //}}}
 
-    if (Touch.support) {
-      $trk.bind('touchstart', Touch.newSelection);
-    }
+    if (Touch.support) $trk.bind('touchstart', Touch.newSelection);
 
     $hdl_holder.hide();
     interfaceUpdate(true);
@@ -1598,6 +1578,7 @@
     // Callbacks / Event Handlers
     onChange: function () {},
     onSelect: function () {},
+    onDblClick: function () {},
     onRelease: function () {}
   };
 
