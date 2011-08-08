@@ -285,7 +285,9 @@
       border: 'none',
       margin: 0,
       padding: 0,
-      position: 'absolute'
+      position: 'absolute',
+      top: 0,
+      left: 0
     };
 
     var $origimg = $(obj);
