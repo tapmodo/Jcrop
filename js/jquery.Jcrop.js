@@ -355,7 +355,7 @@
     // Set more variables {{{
     var bgcolor = options.bgColor,
         bgopacity = options.bgOpacity,
-        xlimit, ylimit, xmin, ymin, altxmin, altymin, xscale, yscale, enabled = true,
+        xlimit, ylimit, xmin, ymin, altxlimit, altylimit, altxmin, altymin, xscale, yscale, enabled = true,
         btndown, animating, shift_down;
 
     docOffset = getPos($img);
@@ -643,6 +643,14 @@
         }
         if (xmin / xscale && (Math.abs(xsize) < xmin / xscale)) {
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
+        }
+
+        if (altxlimit && altylimit && (Math.abs(xsize) > altxlimit) && (Math.abs(ysize) > altylimit)) {
+          if ((Math.abs(xsize) - altxlimit) < (Math.abs(ysize) - altylimit)) {
+            x2 = (xsize > 0) ? (x1 + altxlimit) : (x1 - altxlimit);
+          } else {
+            y2 = (ysize > 0) ? (y1 + altylimit) : (y1 - altylimit);
+          }
         }
 
         if (altxmin / xscale && altymin / yscale && (Math.abs(xsize) < altxmin / xscale) && (Math.abs(ysize) < altymin / yscale)) {
@@ -1567,6 +1575,8 @@
       ylimit = options.maxSize[1] || 0;
       xmin = options.minSize[0] || 0;
       ymin = options.minSize[1] || 0;
+      altxlimit = options.altMaxSize[0] || 0;
+      altylimit = options.altMaxSize[1] || 0;
       altxmin = options.altMinSize[0] || 0;
       altymin = options.altMinSize[1] || 0;
 
@@ -1722,6 +1732,7 @@
     minSelect: [0, 0],
     maxSize: [0, 0],
     minSize: [0, 0],
+    altMaxSize: [0, 0],
     altMinSize: [0, 0],
 
     // Callbacks / Event Handlers
