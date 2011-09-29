@@ -355,7 +355,7 @@
     // Set more variables {{{
     var bgcolor = options.bgColor,
         bgopacity = options.bgOpacity,
-        xlimit, ylimit, xmin, ymin, xscale, yscale, enabled = true,
+        xlimit, ylimit, xmin, ymin, altxmin, altymin, xscale, yscale, enabled = true,
         btndown, animating, shift_down;
 
     docOffset = getPos($img);
@@ -643,6 +643,14 @@
         }
         if (xmin / xscale && (Math.abs(xsize) < xmin / xscale)) {
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
+        }
+
+        if (altxmin / xscale && altymin / yscale && (Math.abs(xsize) < altxmin / xscale) && (Math.abs(ysize) < altymin / yscale)) {
+          if ((altxmin / xscale - Math.abs(xsize)) < (altymin / yscale - Math.abs(ysize))) {
+            x2 = (xsize > 0) ? (x1 + altxmin / xscale) : (x1 - altxmin / xscale);
+          } else {
+            y2 = (ysize > 0) ? (y1 + altymin / yscale) : (y1 - altymin / yscale);
+          }
         }
 
         if (x1 < 0) {
@@ -1559,6 +1567,9 @@
       ylimit = options.maxSize[1] || 0;
       xmin = options.minSize[0] || 0;
       ymin = options.minSize[1] || 0;
+      altxmin = options.altMinSize[0] || 0;
+      altymin = options.altMinSize[1] || 0;
+
 
       if (options.hasOwnProperty('outerImage')) {
         $img.attr('src', options.outerImage);
@@ -1711,6 +1722,7 @@
     minSelect: [0, 0],
     maxSize: [0, 0],
     minSize: [0, 0],
+    altMinSize: [0, 0],
 
     // Callbacks / Event Handlers
     onChange: function () {},

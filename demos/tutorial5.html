@@ -43,7 +43,7 @@
 
             // Setup and dipslay the interface for "enabled"
             $('#can_click,#can_move,#can_size').attr('checked','checked');
-            $('#ar_lock,#size_lock,#bg_swap').attr('checked',false);
+            $('#ar_lock,#size_lock,#alt_size_lock,#bg_swap').attr('checked',false);
             $('.requiresjcrop').show();
 
           });
@@ -178,6 +178,14 @@
           });
           jcrop_api.focus();
         });
+        $('#alt_size_lock').change(function(e) {
+          jcrop_api.setOptions(this.checked? {
+            altMinSize: [ 150, 150 ]
+          }: {
+            altMinSize: [ 0, 0 ]
+          });
+          jcrop_api.focus();
+        });
 
       });
 
@@ -210,6 +218,7 @@
         <div class="optlist offset">
           <label><input type="checkbox" id="ar_lock" />Aspect ratio</label>
           <label><input type="checkbox" id="size_lock" />minSize/maxSize setting</label>
+          <label><input type="checkbox" id="alt_size_lock" />altMinSize setting</label>
         </div>
         <div class="optlist">
           <label><input type="checkbox" id="can_click" />Allow new selections</label>
