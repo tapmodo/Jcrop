@@ -497,12 +497,8 @@
         }
         // This function could use some optimization I think...
         var aspect = options.aspectRatio,
-            min_x = options.minSize[0] / xscale,
-            
-            
-            //min_y = options.minSize[1]/yscale,
-            max_x = options.maxSize[0] / xscale,
-            max_y = options.maxSize[1] / yscale,
+            min_x = xmin / xscale,
+            max_x = xlimit / xscale,
             rw = x2 - x1,
             rh = y2 - y1,
             rwa = Math.abs(rw),
@@ -512,9 +508,6 @@
 
         if (max_x === 0) {
           max_x = boundx * 10;
-        }
-        if (max_y === 0) {
-          max_y = boundy * 10;
         }
         if (real_ratio < aspect) {
           yy = y2;
