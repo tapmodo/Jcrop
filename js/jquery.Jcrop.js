@@ -355,7 +355,7 @@
     // Set more variables {{{
     var bgcolor = options.bgColor,
         bgopacity = options.bgOpacity,
-        xlimit, ylimit, xmin, ymin, xscale, yscale, enabled = true,
+        xmax, ymax, xmin, ymin, xscale, yscale, enabled = true,
         btndown, animating, shift_down;
 
     docOffset = getPos($img);
@@ -498,7 +498,7 @@
         // This function could use some optimization I think...
         var aspect = options.aspectRatio,
             min_x = xmin / xscale,
-            max_x = xlimit / xscale,
+            max_x = xmax / xscale,
             rw = x2 - x1,
             rh = y2 - y1,
             rwa = Math.abs(rw),
@@ -624,11 +624,11 @@
             ysize = y2 - y1,
             delta;
 
-        if (xlimit && (Math.abs(xsize) > xlimit / xscale)) {
-          x2 = (xsize > 0) ? (x1 + xlimit / xscale) : (x1 - xlimit / xscale);
+        if (xmax && (Math.abs(xsize) > xmax / xscale)) {
+          x2 = (xsize > 0) ? (x1 + xmax / xscale) : (x1 - xmax / xscale);
         }
-        if (ylimit && (Math.abs(ysize) > ylimit / yscale)) {
-          y2 = (ysize > 0) ? (y1 + ylimit / yscale) : (y1 - ylimit / yscale);
+        if (ymax && (Math.abs(ysize) > ymax / yscale)) {
+          y2 = (ysize > 0) ? (y1 + ymax / yscale) : (y1 - ymax / yscale);
         }
 
         if (ymin / yscale && (Math.abs(ysize) < ymin / yscale)) {
@@ -1548,8 +1548,8 @@
           else Selection.setBgOpacity(bgopacity);
       }
 
-      xlimit = options.maxSize[0] || 0;
-      ylimit = options.maxSize[1] || 0;
+      xmax = options.maxSize[0] || 0;
+      ymax = options.maxSize[1] || 0;
       xmin = options.minSize[0] || 0;
       ymin = options.minSize[1] || 0;
 
