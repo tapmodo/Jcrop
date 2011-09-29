@@ -638,11 +638,11 @@
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
         }
 
-        if (altxmax && altymax && (Math.abs(xsize) > altxmax) && (Math.abs(ysize) > altymax)) {
-          if ((Math.abs(xsize) - altxmax) < (Math.abs(ysize) - altymax)) {
-            x2 = (xsize > 0) ? (x1 + altxmax) : (x1 - altxmax);
+        if (altxmax && altymax && (Math.abs(xsize) > altxmax / xscale) && (Math.abs(ysize) > altymax / yscale)) {
+          if ((Math.abs(xsize) - altxmax / xscale) < (Math.abs(ysize) - altymax / xscale)) {
+            x2 = (xsize > 0) ? (x1 + altxmax / xscale) : (x1 - altxmax / xscale);
           } else {
-            y2 = (ysize > 0) ? (y1 + altymax) : (y1 - altymax);
+            y2 = (ysize > 0) ? (y1 + altymax / yscale) : (y1 - altymax / yscale);
           }
         }
 
