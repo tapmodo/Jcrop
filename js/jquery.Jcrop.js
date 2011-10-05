@@ -286,13 +286,12 @@
       margin: 0,
       padding: 0,
       position: 'absolute',
-      display: 'block',
       top: 0,
       left: 0
     };
 
     var $origimg = $(obj);
-    var $img = $origimg.clone().removeAttr('id').css(img_css);
+    var $img = $origimg.clone().removeAttr('id').css(img_css).show();
 
     $img.width($origimg.width());
     $img.height($origimg.height());
