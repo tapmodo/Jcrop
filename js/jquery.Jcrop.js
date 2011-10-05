@@ -286,6 +286,7 @@
       margin: 0,
       padding: 0,
       position: 'absolute',
+      display: 'block',
       top: 0,
       left: 0
     };
