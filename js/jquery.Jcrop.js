@@ -291,7 +291,7 @@
     };
 
     var $origimg = $(obj);
-    var $img = $origimg.clone().removeAttr('id').css(img_css);
+    var $img = $origimg.clone().removeAttr('id').css(img_css).show();
 
     $img.width($origimg.width());
     $img.height($origimg.height());
