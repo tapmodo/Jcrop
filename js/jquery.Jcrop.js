@@ -1526,15 +1526,15 @@
       Tracker.setCursor(options.allowSelect ? 'crosshair' : 'default');
       Selection.setCursor(options.allowMove ? 'move' : 'default');
 
+      if (options.hasOwnProperty('trueSize')) {
+        xscale = options.trueSize[0] / boundx;
+        yscale = options.trueSize[1] / boundy;
+      }
+
       if (options.hasOwnProperty('setSelect')) {
         setSelect(options.setSelect);
         Selection.done();
         delete(options.setSelect);
-      }
-
-      if (options.hasOwnProperty('trueSize')) {
-        xscale = options.trueSize[0] / boundx;
-        yscale = options.trueSize[1] / boundy;
       }
 
       Shade.refresh();
