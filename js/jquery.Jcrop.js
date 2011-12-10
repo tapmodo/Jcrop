@@ -171,6 +171,11 @@
         if ((ord === 'move') && !options.allowMove) {
           return false;
         }
+        
+        // Fix position of crop area when dragged the very first time.
+        // Necessary when crop image is in a hidden element when page is loaded.
+        docOffset = getPos($img);
+
         btndown = true;
         startDragMode(ord, mouseAbs(e));
         e.stopPropagation();
@@ -291,6 +296,21 @@
     };
 
     var $origimg = $(obj);
+    
+    // Fix size of crop image.
+    // Necessary when crop image is within a hidden element when page is loaded.
+    if ($origimg[0].width != 0 && $origimg[0].height != 0) {
+      // Obtain dimensions from contained img element.
+      $origimg.width($origimg[0].width);
+      $origimg.height($origimg[0].height);
+    } else {
+      // Obtain dimensions from temporary image in case the original is not loaded yet (e.g. IE 7.0). 
+      var tempImage = new Image();
+      tempImage.src = $origimg[0].src;
+      $origimg.width(tempImage.width);
+      $origimg.height(tempImage.height);
+    } 
+
     var $img = $origimg.clone().removeAttr('id').css(img_css).show();
 
     $img.width($origimg.width());
