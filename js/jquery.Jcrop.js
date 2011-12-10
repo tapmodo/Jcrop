@@ -1133,6 +1133,11 @@
       }
       //}}}
 
+      // This is a hack for iOS5 to support drag/move touch functionality
+      $(document).bind('touchstart',function(e) {
+        if ($(e.currentTarget).hasClass('jcrop-tracker')) e.stopPropagation();
+      });
+
       var $track = newTracker().mousedown(createDragger('move')).css({
         cursor: 'move',
         position: 'absolute',
@@ -1140,7 +1145,7 @@
       });
 
       if (Touch.support) {
-        $track.bind('touchstart.jcrop', Touch.createDragger('move'));
+        $track.bind('touchstart', Touch.createDragger('move'));
       }
 
       $img_holder.append($track);
