@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	$targ_w = $targ_h = 150;
 	$jpeg_quality = 90;
 
-	$src = 'demo_files/flowers.jpg';
+	$src = 'demo_files/pool.jpg';
 	$img_r = imagecreatefromjpeg($src);
 	$dst_r = ImageCreateTrueColor( $targ_w, $targ_h );
 
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 		<h1>Jcrop - Crop Behavior</h1>
 
 		<!-- This is the image we're attaching Jcrop to -->
-		<img src="demo_files/flowers.jpg" id="cropbox" />
+		<img src="demo_files/pool.jpg" id="cropbox" />
 
 		<!-- This is the form that our event handler fills -->
 		<form action="crop.php" method="post" onsubmit="return checkCoords();">
