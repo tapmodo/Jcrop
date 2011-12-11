@@ -872,7 +872,7 @@
           cursor: ord + '-resize',
           position: 'absolute',
           zIndex: zi
-        });
+        }).addClass('ord-'+ord);
 
         if (Touch.support) {
           jq.bind('touchstart', Touch.createDragger(ord));
