@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+    <title>Jcrop &raquo; Tutorials &raquo; Styling Example</title>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.color.js" type="text/javascript"></script>
+    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/vader/jquery-ui.css" type="text/css" />
+    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+    <script type="text/javascript">
+
+    jQuery(function($){
+
+      var api;
+
+      $('#target').Jcrop({
+        // start off with jcrop-light class
+        bgOpacity: 0.5,
+        bgColor: 'white',
+        addClass: 'jcrop-light'
+      },function(){
+        api = this;
+        api.setSelect([130,65,130+350,65+285]);
+        api.setOptions({ bgFade: true });
+        api.ui.selection.addClass('jcrop-selection');
+      });
+
+      // Attach some button handlers
+      $('#radio2').click(function(){
+        api.ui.holder.removeClass('jcrop-light');
+        api.ui.holder.addClass('jcrop-dark');
+        api.setOptions({ bgColor: 'black', bgOpacity: 0.4 });
+        return false;
+      });
+      $('#radio1').click(function(){
+        api.ui.holder.removeClass('jcrop-dark');
+        api.ui.holder.addClass('jcrop-light');
+        api.setOptions({ bgColor: 'white', bgOpacity: 0.5 });
+        return false;
+      });
+      $('#radio3').click(function(){
+        api.ui.holder.removeClass('jcrop-dark');
+        api.ui.holder.removeClass('jcrop-light');
+        api.setOptions({ bgColor: 'black', bgOpacity: 0.6 });
+        return false;
+      });
+
+      $('#radioset').buttonset();
+
+    });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="outer">
+    <div class="jcExample">
+    <div class="article">
+
+      <h1>Jcrop - Styling Example</h1>
+      <img src="demo_files/pool.jpg" id="target" alt="Flowers" />
+
+      <div style="margin-top:1em; width:500px;">
+      <fieldset>
+      <legend>Manipulate classes</legend>
+        <div id="radioset">
+          <input type="radio" id="radio1" name="radio" checked="checked" /><label for="radio1">jcrop-light</label>
+          <input type="radio" id="radio2" name="radio" /><label for="radio2">jcrop-dark</label>
+          <input type="radio" id="radio3" name="radio" /><label for="radio3">normal</label>
+        </div>
+      </fieldset>
+      </div>
+
+      <p>
+        <b>Example styling tricks.</b> Click the buttons above to change the appearance of Jcrop in real-time.
+      </p>
+
+      <div id="dl_links">
+        <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+        <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+      </div>
+
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
+

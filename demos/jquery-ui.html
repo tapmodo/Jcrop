@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
+    <title>Jcrop &raquo; Tutorials &raquo; Hello World</title>
+    <script src="../js/jquery.min.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/vader/jquery-ui.css" type="text/css" />
+    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+    <script type="text/javascript">
+
+    jQuery(function($){
+
+      // How easy is this??
+      $('#jc-hidden-image').Jcrop();
+      $('button.ui-button').button();
+
+      // Attach hidden dialog button click event
+      $('#jc-hidden-btn').click(function(){
+        $('#jc-hidden-dialog').dialog({
+          modal: true,
+          width: (parseInt($('#jc-hidden-image').width())+34)+'px',
+          title: 'Jcrop in jQuery-ui Dialog (Hidden)',
+          resizable: false
+        });
+        return false;
+      });
+
+      $('#jc-dyn-btn').click(function(){
+        var jcrop_api;
+        var $dialog = $('<div><div class="jc-dialog"><img src="demo_files/sago.jpg" /></div></div>');
+        $dialog.find('img').Jcrop({},function(){
+          jcrop_api = this;
+          $dialog.dialog({
+            modal: true,
+            title: 'Jcrop in jQuery-ui Dialog (Dynamic)',
+            close: function(){ $dialog.remove(); },
+            width: jcrop_api.getBounds()[0]+34,
+            resizable: false
+          })
+        });
+        $dialog.append('<p><b>This dialog was dynamically created in Javascript.</b><br />'+
+          'Jcrop was attached to the image, and the dialog opened when Jcrop finished.</p>');
+        return false;
+      });
+
+      $('#tabs-2 img').Jcrop({
+        setSelect: [10,10,200,200]
+      });
+      $('#tabs').tabs();
+
+    });
+
+    </script>
+  </head>
+
+  <body>
+    <div id="outer">
+    <div class="jcExample">
+    <div class="article">
+
+      <h1>Jcrop - jQuery UI Example</h1>
+
+
+      <!-- Hidden dialog -->
+      <div style="display:none;" id="jc-hidden-dialog">
+      <div class="jc-dialog">
+        <img src="demo_files/sago.jpg" id="jc-hidden-image" />
+      </div>
+        <p><b>This dialog is embedded on the page in a hidden container.</b><br />
+        The container is rendered with <tt>style="display:none;"</tt> set.</p>
+      </div>
+      <!-- /Hidden dialog -->
+
+      <p>
+        <b>This example demonstrates more complex invocations of Jcrop.</b>
+        These techniques can be integrated with other libraries or more
+        complex user interfaces.
+      </p>
+
+      <div style="margin: 1em 0;">
+      <div id="tabs">
+        <ul>
+          <li><a href="#tabs-1">About jQuery-ui Demos</a></li>
+          <li><a href="#tabs-2">Jcrop in Tab</a></li>
+        </ul>
+        <div id="tabs-1">
+          <p>
+            Prior to v0.9.10 release, it was difficult to instantiate Jcrop
+            on an image unless it was visible on the page. This meant that
+            opening Jcrop in a dialog or a hidden tab was problematic, and
+            involved specific timing (e.g. attaching the Jcrop method
+            call to an "open" handler for the UI element).
+          </p>
+          <p>
+            This demo shows simple invocations of Jcrop using jQuery UI. If
+            you are using a different library to produce dialog boxes or tabs,
+            the theory of operation should be similar.
+          </p>
+          <button class="ui-button" id="jc-hidden-btn">Hidden Dialog</button>
+          <button class="ui-button" id="jc-dyn-btn">Dynamic Dialog</button>
+        </div>
+        <div id="tabs-2">
+          <img src="demo_files/pool.jpg" />
+        </div>
+      </div>
+      </div>
+
+      <div id="dl_links">
+        <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
+        <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
+      </div>
+
+    </div>
+    </div>
+    </div>
+  </body>
+</html>
+
