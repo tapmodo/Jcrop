@@ -1320,7 +1320,7 @@
       //}}}
       function parseKey(e) //{{{
       {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
           return true;
         }
         shift_down = e.shiftKey ? true : false;
