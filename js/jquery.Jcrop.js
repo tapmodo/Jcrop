@@ -1004,14 +1004,14 @@
       //}}}
 
       // Internal Methods
-      function updateVisible() //{{{
+      function updateVisible(select) //{{{
       {
         if (awake) {
-          return update();
+          return update(select);
         }
       }
       //}}}
-      function update() //{{{
+      function update(select) //{{{
       {
         var c = Coords.getFixed();
 
@@ -1026,7 +1026,11 @@
           show();
         }
 
-        options.onChange.call(api, unscale(c));
+        if (select) {
+          options.onSelect.call(api, unscale(c));
+        } else {
+          options.onChange.call(api, unscale(c));
+        }
       }
       //}}}
       function setBgOpacity(opacity,force,now)
@@ -1312,7 +1316,7 @@
       {
         if (options.allowMove) {
           Coords.moveOffset([x, y]);
-          Selection.updateVisible();
+          Selection.updateVisible(true);
         }
         e.preventDefault();
         e.stopPropagation();
