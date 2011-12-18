@@ -528,7 +528,7 @@
             rwa = Math.abs(rw),
             rha = Math.abs(rh),
             real_ratio = rwa / rha,
-            xx, yy;
+            xx, yy, w, h;
 
         if (max_x === 0) {
           max_x = boundx * 10;
