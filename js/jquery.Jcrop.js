@@ -875,7 +875,7 @@
         }).addClass('ord-'+ord);
 
         if (Touch.support) {
-          jq.bind('touchstart', Touch.createDragger(ord));
+          jq.bind('touchstart.jcrop', Touch.createDragger(ord));
         }
 
         $hdl_holder.append(jq);
@@ -1138,7 +1138,7 @@
       //}}}
 
       // This is a hack for iOS5 to support drag/move touch functionality
-      $(document).bind('touchstart',function(e) {
+      $(document).bind('touchstart.jcrop-ios',function(e) {
         if ($(e.currentTarget).hasClass('jcrop-tracker')) e.stopPropagation();
       });
 
@@ -1149,7 +1149,7 @@
       });
 
       if (Touch.support) {
-        $track.bind('touchstart', Touch.createDragger('move'));
+        $track.bind('touchstart.jcrop', Touch.createDragger('move'));
       }
 
       $img_holder.append($track);
@@ -1192,13 +1192,13 @@
         });
         if (Touch.support) {
           $(document)
-            .bind('touchmove', trackTouchMove)
-            .bind('touchend', trackTouchEnd);
+            .bind('touchmove.jcrop', trackTouchMove)
+            .bind('touchend.jcrop', trackTouchEnd);
         }
         if (trackDoc) {
           $(document)
-            .bind('mousemove',trackMove)
-            .bind('mouseup',trackUp);
+            .bind('mousemove.jcrop',trackMove)
+            .bind('mouseup.jcrop',trackUp);
         }
       } 
       //}}}
@@ -1207,16 +1207,7 @@
         $trk.css({
           zIndex: 290
         });
-        if (Touch.support) {
-          $(document)
-            .unbind('touchmove', trackTouchMove)
-            .unbind('touchend', trackTouchEnd);
-        }
-        if (trackDoc) {
-          $(document)
-            .unbind('mousemove', trackMove)
-            .unbind('mouseup', trackUp);
-        }
+        $(document).unbind('.jcrop');
       } 
       //}}}
       function trackMove(e) //{{{
@@ -1600,7 +1591,7 @@
     //}}}
     //}}}
 
-    if (Touch.support) $trk.bind('touchstart', Touch.newSelection);
+    if (Touch.support) $trk.bind('touchstart.jcrop', Touch.newSelection);
 
     $hdl_holder.hide();
     interfaceUpdate(true);
