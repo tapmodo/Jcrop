@@ -186,6 +186,7 @@
     //}}}
     function presize($obj, w, h) //{{{
     {
+      $obj = $(obj);
       var nw = $obj.width(),
           nh = $obj.height();
       if ((nw > w) && w > 0) {
@@ -288,6 +289,7 @@
     // character in the DOM will be as you left it.
     var img_css = {
       border: 'none',
+      visibility: 'visible',
       margin: 0,
       padding: 0,
       position: 'absolute',
@@ -1640,55 +1642,56 @@
   };
   $.fn.Jcrop = function (options, callback) //{{{
   {
-
-    function attachWhenDone(from) //{{{
-    {
-      var opt = (typeof(options) === 'object') ? options : {};
-      var loadsrc = opt.useImg || from.src;
-      var img = new Image();
-      img.onload = function () {
-        function attachJcrop() {
-          var api = $.Jcrop(from, opt);
-          if (typeof(callback) === 'function') {
-            callback.call(api);
-          }
-        }
-
-        function attachAttempt() {
-          if (!img.width || !img.height) {
-            window.setTimeout(attachAttempt, 50);
-          } else {
-            attachJcrop();
-          }
-        }
-        window.setTimeout(attachAttempt, 50);
-      };
-      img.src = loadsrc;
-    }
-    //}}}
-
+    var api;
     // Iterate over each object, attach Jcrop
     this.each(function () {
       // If we've already attached to this object
       if ($(this).data('Jcrop')) {
         // The API can be requested this way (undocumented)
-        if (options === 'api') {
-          return $(this).data('Jcrop');
-        }
+        if (options === 'api') return $(this).data('Jcrop');
         // Otherwise, we just reset the options...
-        else {
-          $(this).data('Jcrop').setOptions(options);
-        }
+        else $(this).data('Jcrop').setOptions(options);
       }
       // If we haven't been attached, preload and attach
       else {
-        attachWhenDone(this);
+        $.Jcrop.Loader(this,function(){
+          $(this).css({display:'block',visibility:'hidden'});
+          api = $.Jcrop(this, options);
+          if ($.isFunction(callback)) callback.call(api);
+        });
       }
     });
 
     // Return "this" so the object is chainable (jQuery-style)
     return this;
   };
+  //}}}
+  // $.Jcrop.Loader - basic image loader {{{
+
+  $.Jcrop.Loader = function(imgobj,success,error){
+    var $img = $(imgobj), img = $img[0];
+
+    function completeCheck(){
+      if (img.complete) {
+        $img.unbind('.jcloader');
+        if ($.isFunction(success)) success.call(img);
+      }
+      else window.setTimeout(completeCheck,50);
+    }
+
+    $img
+      .bind('load.jcloader',completeCheck)
+      .bind('error.jcloader',function(e){
+        $img.unbind('.jcloader');
+        if ($.isFunction(error)) error.call(img);
+      });
+
+    if (img.complete && $.isFunction(success)){
+      $img.unbind('.jcloader');
+      success.call(img);
+    }
+  };
+
   //}}}
   // Global Defaults {{{
   $.Jcrop.defaults = {
@@ -1720,7 +1723,7 @@
     fixedSupport: true,
     touchSupport: null,
 
-    shade: false,
+    shade: null,
 
     boxWidth: 0,
     boxHeight: 0,
