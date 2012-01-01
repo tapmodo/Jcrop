@@ -297,27 +297,35 @@
       left: 0
     };
 
-    var $origimg = $(obj);
-    
-    // Fix size of crop image.
-    // Necessary when crop image is within a hidden element when page is loaded.
-    if ($origimg[0].width != 0 && $origimg[0].height != 0) {
-      // Obtain dimensions from contained img element.
-      $origimg.width($origimg[0].width);
-      $origimg.height($origimg[0].height);
+    var $origimg = $(obj),
+      img_mode = true;
+
+    if (obj.tagName == 'IMG') {
+      // Fix size of crop image.
+      // Necessary when crop image is within a hidden element when page is loaded.
+      if ($origimg[0].width != 0 && $origimg[0].height != 0) {
+        // Obtain dimensions from contained img element.
+        $origimg.width($origimg[0].width);
+        $origimg.height($origimg[0].height);
+      } else {
+        // Obtain dimensions from temporary image in case the original is not loaded yet (e.g. IE 7.0). 
+        var tempImage = new Image();
+        tempImage.src = $origimg[0].src;
+        $origimg.width(tempImage.width);
+        $origimg.height(tempImage.height);
+      } 
+
+      var $img = $origimg.clone().removeAttr('id').css(img_css).show();
+
+      $img.width($origimg.width());
+      $img.height($origimg.height());
+      $origimg.after($img).hide();
+
     } else {
-      // Obtain dimensions from temporary image in case the original is not loaded yet (e.g. IE 7.0). 
-      var tempImage = new Image();
-      tempImage.src = $origimg[0].src;
-      $origimg.width(tempImage.width);
-      $origimg.height(tempImage.height);
-    } 
-
-    var $img = $origimg.clone().removeAttr('id').css(img_css).show();
-
-    $img.width($origimg.width());
-    $img.height($origimg.height());
-    $origimg.after($img).hide();
+      $img = $origimg.css(img_css).show();
+      img_mode = false;
+      if (options.shade === null) { options.shade = true; }
+    }
 
     presize($img, options.boxWidth, options.boxHeight);
 
@@ -334,8 +342,7 @@
       $div.addClass(options.addClass);
     }
 
-    var $img2 = $('<img />')
-        .attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy),
+    var $img2 = $('<div />'),
 
         $img_holder = $('<div />') 
         .width('100%').height('100%').css({
@@ -356,8 +363,14 @@
           options.onDblClick.call(api,c);
         }).insertBefore($img).append($img_holder, $hdl_holder); 
 
-    $img_holder.append($img2);
-    //Shade.refresh();
+    if (img_mode) {
+
+      $img2 = $('<img />')
+          .attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy),
+
+      $img_holder.append($img2);
+
+    }
 
     if (ie6mode) {
       $sel.css({
@@ -1654,11 +1667,17 @@
       }
       // If we haven't been attached, preload and attach
       else {
-        $.Jcrop.Loader(this,function(){
+        if (this.tagName == 'IMG')
+          $.Jcrop.Loader(this,function(){
+            $(this).css({display:'block',visibility:'hidden'});
+            api = $.Jcrop(this, options);
+            if ($.isFunction(callback)) callback.call(api);
+          });
+        else {
           $(this).css({display:'block',visibility:'hidden'});
           api = $.Jcrop(this, options);
           if ($.isFunction(callback)) callback.call(api);
-        });
+        }
       }
     });
 
