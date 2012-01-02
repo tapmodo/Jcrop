@@ -186,7 +186,6 @@
     //}}}
     function presize($obj, w, h) //{{{
     {
-      $obj = $(obj);
       var nw = $obj.width(),
           nh = $obj.height();
       if ((nw > w) && w > 0) {
