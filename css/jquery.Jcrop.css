@@ -13,6 +13,10 @@
   text-align: left;
 }
 
+.jcrop-holder img {
+  max-width: none;
+}
+
 .jcrop-vline, .jcrop-hline {
 	background: white url('Jcrop.gif') top left repeat;
 	font-size: 0px;
