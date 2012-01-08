@@ -900,35 +900,13 @@
       {
         var hs = options.handleSize;
         return dragDiv(ord, hdep++).css({
-          top: px(-hhs + 1),
-          left: px(-hhs + 1),
           opacity: options.handleOpacity
         }).width(hs).height(hs).addClass(cssClass('handle'));
       }
       //}}}
       function insertDragbar(ord) //{{{
       {
-        var s = options.handleSize,
-            h = s,
-            w = s,
-            t = hhs,
-            l = hhs;
-
-        switch (ord) {
-        case 'n':
-        case 's':
-          w = '100%';
-          break;
-        case 'e':
-        case 'w':
-          h = '100%';
-          break;
-        }
-
-        return dragDiv(ord, hdep++).width(w).height(h).css({
-          top: px(-t + 1),
-          left: px(-l + 1)
-        });
+        return dragDiv(ord, hdep++).addClass('jcrop-dragbar');
       }
       //}}}
       function createHandles(li) //{{{
@@ -1033,12 +1011,7 @@
         moveto(c.x, c.y);
         if (options.shade) Shade.updateRaw(c);
 
-        if (seehandles) {
-          moveHandles(c);
-        }
-        if (!awake) {
-          show();
-        }
+        awake || show();
 
         if (select) {
           options.onSelect.call(api, unscale(c));
@@ -1086,7 +1059,6 @@
       function showHandles() //{{{
       {
         if (seehandles) {
-          moveHandles(Coords.getFixed());
           $hdl_holder.show();
         }
       }
@@ -1095,7 +1067,6 @@
       {
         seehandles = true;
         if (options.allowResize) {
-          moveHandles(Coords.getFixed());
           $hdl_holder.show();
           return true;
         }
