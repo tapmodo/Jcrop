@@ -1113,13 +1113,9 @@
         handle.l = insertDragbar('w');
       }
 
-      // Insert side and corner handles
-      if (options.sideHandles) {
-        createHandles(['n', 's', 'e', 'w']);
-      }
-      if (options.cornerHandles) {
-        createHandles(['sw', 'nw', 'ne', 'se']);
-      }
+      if ($.isArray(options.createHandles))
+        createHandles(options.createHandles);
+
       //}}}
 
       // This is a hack for iOS5 to support drag/move touch functionality
@@ -1705,8 +1701,7 @@
 
     aspectRatio: 0,
     keySupport: true,
-    cornerHandles: true,
-    sideHandles: true,
+    createHandles: ['n', 's', 'e', 'w', 'sw', 'nw', 'ne', 'se'],
     drawBorders: true,
     dragEdges: true,
     fixedSupport: true,
