@@ -1,11 +1,8 @@
 /**
- * jquery.Jcrop.js v0.9.9 {{{
- *
+ * jquery.Jcrop.js v0.9.9
  * jQuery Image Cropping Plugin - released under MIT License 
  * Author: Kelly Hallman <khallman@gmail.com>
  * http://github.com/tapmodo/Jcrop
- *
- * }}}
  * Copyright (c) 2008-2012 Tapmodo Interactive LLC {{{
  *
  * Permission is hereby granted, free of charge, to any person
@@ -1575,11 +1572,8 @@
       }
     };
 
-    if ($.browser.msie) {
-      $div.bind('selectstart', function () {
-        return false;
-      });
-    }
+    if ($.browser.msie)
+      $div.bind('selectstart', function () { return false; });
 
     $origimg.data('Jcrop', api);
     return api;
