@@ -863,11 +863,12 @@
     // }}}
     // Selection Module {{{
     var Selection = (function () {
-      var awake, hdep = 370;
-      var borders = {};
-      var handle = {};
-      var seehandles = false;
-      var hhs = options.handleOffset;
+      var awake,
+          hdep = 370,
+          borders = {},
+          handle = {},
+          dragbar = {},
+          seehandles = false;
 
       // Private Methods
       function insertBorder(type) //{{{
@@ -909,59 +910,33 @@
         return dragDiv(ord, hdep++).addClass('jcrop-dragbar');
       }
       //}}}
+      function createDragbars(li) //{{{
+      {
+        var i;
+        for (i = 0; i < li.length; i++) {
+          dragbar[li[i]] = insertDragbar(li[i]);
+        }
+      }
+      //}}}
+      function createBorders(li) //{{{
+      {
+        var cl,i;
+        for (i = 0; i < li.length; i++) {
+          switch(li[i]){
+            case'n': cl='hline'; break;
+            case's': cl='hline bottom'; break;
+            case'e': cl='vline right'; break;
+            case'w': cl='vline'; break;
+          }
+          borders[li[i]] = insertBorder(cl);
+        }
+      }
+      //}}}
       function createHandles(li) //{{{
       {
         var i;
         for (i = 0; i < li.length; i++) {
           handle[li[i]] = insertHandle(li[i]);
-        }
-      }
-      //}}}
-      function moveHandles(c) //{{{
-      {
-        var midvert = Math.round((c.h / 2) - hhs),
-            midhoriz = Math.round((c.w / 2) - hhs),
-            north = -hhs + 1,
-            west = -hhs + 1,
-            east = c.w - hhs,
-            south = c.h - hhs,
-            x, y;
-
-        if (handle.e) {
-          handle.e.css({
-            top: px(midvert),
-            left: px(east)
-          });
-          handle.w.css({
-            top: px(midvert)
-          });
-          handle.s.css({
-            top: px(south),
-            left: px(midhoriz)
-          });
-          handle.n.css({
-            left: px(midhoriz)
-          });
-        }
-        if (handle.ne) {
-          handle.ne.css({
-            left: px(east)
-          });
-          handle.se.css({
-            top: px(south),
-            left: px(east)
-          });
-          handle.sw.css({
-            top: px(south)
-          });
-        }
-        if (handle.b) {
-          handle.b.css({
-            top: px(south)
-          });
-          handle.r.css({
-            left: px(east)
-          });
         }
       }
       //}}}
@@ -1020,7 +995,7 @@
         }
       }
       //}}}
-      function setBgOpacity(opacity,force,now)
+      function setBgOpacity(opacity,force,now) //{{{
       {
         if (!awake && !force) return;
         if (options.bgFade && !now) {
@@ -1034,6 +1009,7 @@
           $img.css('opacity', opacity);
         }
       }
+      //}}}
       function show() //{{{
       {
         $sel.show();
@@ -1093,28 +1069,17 @@
         refresh();
       } 
       //}}}
-      /* Insert draggable elements {{{*/
-
+      // Insert draggable elements {{{
       // Insert border divs for outline
-      if (options.drawBorders) {
-        borders = {
-          top: insertBorder('hline'),
-          bottom: insertBorder('hline bottom'),
-          left: insertBorder('vline'),
-          right: insertBorder('vline right')
-        };
-      }
 
-      // Insert handles on edges
-      if (options.dragEdges) {
-        handle.t = insertDragbar('n');
-        handle.b = insertDragbar('s');
-        handle.r = insertDragbar('e');
-        handle.l = insertDragbar('w');
-      }
+      if (options.dragEdges && $.isArray(options.createDragbars))
+        createDragbars(options.createDragbars);
 
       if ($.isArray(options.createHandles))
         createHandles(options.createHandles);
+
+      if (options.drawBorders && $.isArray(options.createBorders))
+        createBorders(options.createBorders);
 
       //}}}
 
@@ -1697,11 +1662,12 @@
     borderOpacity: 0.4,
     handleOpacity: 0.5,
     handleSize: 7,
-    handleOffset: 5,
 
     aspectRatio: 0,
     keySupport: true,
-    createHandles: ['n', 's', 'e', 'w', 'sw', 'nw', 'ne', 'se'],
+    createHandles: ['n','s','e','w','nw','ne','se','sw'],
+    createDragbars: ['n','s','e','w'],
+    createBorders: ['n','s','e','w'],
     drawBorders: true,
     dragEdges: true,
     fixedSupport: true,
