@@ -1,11 +1,8 @@
 /**
- * jquery.Jcrop.js v0.9.9 {{{
- *
+ * jquery.Jcrop.js v0.9.9
  * jQuery Image Cropping Plugin - released under MIT License 
  * Author: Kelly Hallman <khallman@gmail.com>
  * http://github.com/tapmodo/Jcrop
- *
- * }}}
  * Copyright (c) 2008-2012 Tapmodo Interactive LLC {{{
  *
  * Permission is hereby granted, free of charge, to any person
@@ -863,11 +860,12 @@
     // }}}
     // Selection Module {{{
     var Selection = (function () {
-      var awake, hdep = 370;
-      var borders = {};
-      var handle = {};
-      var seehandles = false;
-      var hhs = options.handleOffset;
+      var awake,
+          hdep = 370,
+          borders = {},
+          handle = {},
+          dragbar = {},
+          seehandles = false;
 
       // Private Methods
       function insertBorder(type) //{{{
@@ -900,35 +898,35 @@
       {
         var hs = options.handleSize;
         return dragDiv(ord, hdep++).css({
-          top: px(-hhs + 1),
-          left: px(-hhs + 1),
           opacity: options.handleOpacity
         }).width(hs).height(hs).addClass(cssClass('handle'));
       }
       //}}}
       function insertDragbar(ord) //{{{
       {
-        var s = options.handleSize,
-            h = s,
-            w = s,
-            t = hhs,
-            l = hhs;
-
-        switch (ord) {
-        case 'n':
-        case 's':
-          w = '100%';
-          break;
-        case 'e':
-        case 'w':
-          h = '100%';
-          break;
+        return dragDiv(ord, hdep++).addClass('jcrop-dragbar');
+      }
+      //}}}
+      function createDragbars(li) //{{{
+      {
+        var i;
+        for (i = 0; i < li.length; i++) {
+          dragbar[li[i]] = insertDragbar(li[i]);
         }
-
-        return dragDiv(ord, hdep++).width(w).height(h).css({
-          top: px(-t + 1),
-          left: px(-l + 1)
-        });
+      }
+      //}}}
+      function createBorders(li) //{{{
+      {
+        var cl,i;
+        for (i = 0; i < li.length; i++) {
+          switch(li[i]){
+            case'n': cl='hline'; break;
+            case's': cl='hline bottom'; break;
+            case'e': cl='vline right'; break;
+            case'w': cl='vline'; break;
+          }
+          borders[li[i]] = insertBorder(cl);
+        }
       }
       //}}}
       function createHandles(li) //{{{
@@ -936,54 +934,6 @@
         var i;
         for (i = 0; i < li.length; i++) {
           handle[li[i]] = insertHandle(li[i]);
-        }
-      }
-      //}}}
-      function moveHandles(c) //{{{
-      {
-        var midvert = Math.round((c.h / 2) - hhs),
-            midhoriz = Math.round((c.w / 2) - hhs),
-            north = -hhs + 1,
-            west = -hhs + 1,
-            east = c.w - hhs,
-            south = c.h - hhs,
-            x, y;
-
-        if (handle.e) {
-          handle.e.css({
-            top: px(midvert),
-            left: px(east)
-          });
-          handle.w.css({
-            top: px(midvert)
-          });
-          handle.s.css({
-            top: px(south),
-            left: px(midhoriz)
-          });
-          handle.n.css({
-            left: px(midhoriz)
-          });
-        }
-        if (handle.ne) {
-          handle.ne.css({
-            left: px(east)
-          });
-          handle.se.css({
-            top: px(south),
-            left: px(east)
-          });
-          handle.sw.css({
-            top: px(south)
-          });
-        }
-        if (handle.b) {
-          handle.b.css({
-            top: px(south)
-          });
-          handle.r.css({
-            left: px(east)
-          });
         }
       }
       //}}}
@@ -1033,12 +983,7 @@
         moveto(c.x, c.y);
         if (options.shade) Shade.updateRaw(c);
 
-        if (seehandles) {
-          moveHandles(c);
-        }
-        if (!awake) {
-          show();
-        }
+        awake || show();
 
         if (select) {
           options.onSelect.call(api, unscale(c));
@@ -1047,7 +992,7 @@
         }
       }
       //}}}
-      function setBgOpacity(opacity,force,now)
+      function setBgOpacity(opacity,force,now) //{{{
       {
         if (!awake && !force) return;
         if (options.bgFade && !now) {
@@ -1061,6 +1006,7 @@
           $img.css('opacity', opacity);
         }
       }
+      //}}}
       function show() //{{{
       {
         $sel.show();
@@ -1086,7 +1032,6 @@
       function showHandles() //{{{
       {
         if (seehandles) {
-          moveHandles(Coords.getFixed());
           $hdl_holder.show();
         }
       }
@@ -1095,7 +1040,6 @@
       {
         seehandles = true;
         if (options.allowResize) {
-          moveHandles(Coords.getFixed());
           $hdl_holder.show();
           return true;
         }
@@ -1122,33 +1066,18 @@
         refresh();
       } 
       //}}}
-      /* Insert draggable elements {{{*/
-
+      // Insert draggable elements {{{
       // Insert border divs for outline
-      if (options.drawBorders) {
-        borders = {
-          top: insertBorder('hline'),
-          bottom: insertBorder('hline bottom'),
-          left: insertBorder('vline'),
-          right: insertBorder('vline right')
-        };
-      }
 
-      // Insert handles on edges
-      if (options.dragEdges) {
-        handle.t = insertDragbar('n');
-        handle.b = insertDragbar('s');
-        handle.r = insertDragbar('e');
-        handle.l = insertDragbar('w');
-      }
+      if (options.dragEdges && $.isArray(options.createDragbars))
+        createDragbars(options.createDragbars);
 
-      // Insert side and corner handles
-      if (options.sideHandles) {
-        createHandles(['n', 's', 'e', 'w']);
-      }
-      if (options.cornerHandles) {
-        createHandles(['sw', 'nw', 'ne', 'se']);
-      }
+      if ($.isArray(options.createHandles))
+        createHandles(options.createHandles);
+
+      if (options.drawBorders && $.isArray(options.createBorders))
+        createBorders(options.createBorders);
+
       //}}}
 
       // This is a hack for iOS5 to support drag/move touch functionality
@@ -1643,11 +1572,8 @@
       }
     };
 
-    if ($.browser.msie) {
-      $div.bind('selectstart', function () {
-        return false;
-      });
-    }
+    if ($.browser.msie)
+      $div.bind('selectstart', function () { return false; });
 
     $origimg.data('Jcrop', api);
     return api;
@@ -1730,12 +1656,12 @@
     borderOpacity: 0.4,
     handleOpacity: 0.5,
     handleSize: 7,
-    handleOffset: 5,
 
     aspectRatio: 0,
     keySupport: true,
-    cornerHandles: true,
-    sideHandles: true,
+    createHandles: ['n','s','e','w','nw','ne','se','sw'],
+    createDragbars: ['n','s','e','w'],
+    createBorders: ['n','s','e','w'],
     drawBorders: true,
     dragEdges: true,
     fixedSupport: true,
