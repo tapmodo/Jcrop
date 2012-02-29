@@ -1543,6 +1543,9 @@
       setImage: setImage,
       animateTo: animateTo,
       setSelect: setSelect,
+      getOptions: function () { 
+        return options; 
+      },
       setOptions: setOptionsNew,
       tellSelect: tellSelect,
       tellScaled: tellScaled,
