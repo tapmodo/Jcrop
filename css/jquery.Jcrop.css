@@ -82,3 +82,8 @@
 	border-radius:3px;
 }
 
+/* Fix for using with Bootstrap, from Twitter */
+div.jcrop-holder img, img#preview
+{
+  max-width: none;
+}
