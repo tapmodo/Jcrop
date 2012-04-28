@@ -82,3 +82,5 @@
 	border-radius:3px;
 }
 
+/* Fix for twitter bootstrap et al. */
+.jcrop-holder img,img.jcrop-preview{ max-width: none; }
