@@ -342,7 +342,7 @@
 
         $img_holder = $('<div />') 
         .width('100%').height('100%').css({
-          zIndex: 310,
+          zIndex: 330,
           position: 'absolute',
           overflow: 'hidden'
         }),
