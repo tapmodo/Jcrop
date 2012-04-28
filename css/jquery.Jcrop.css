@@ -14,6 +14,10 @@
   text-align: left;
 }
 
+.jcrop-holder img {
+  max-width: none;
+}
+
 /* These styles define the border lines */
 .jcrop-vline,.jcrop-hline{background:#FFF url(Jcrop.gif) top left repeat;font-size:0;position:absolute;}
 .jcrop-vline{height:100%;width:1px!important;}
