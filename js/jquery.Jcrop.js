@@ -1565,6 +1565,10 @@
       getScaleFactor: function () {
         return [xscale, yscale];
       },
+      getOptions: function() {
+        // careful: internal values are returned
+        return options;
+      },
 
       ui: {
         holder: $div,
