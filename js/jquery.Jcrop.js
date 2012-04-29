@@ -1,5 +1,5 @@
 /**
- * jquery.Jcrop.js v0.9.9
+ * jquery.Jcrop.js v0.9.10
  * jQuery Image Cropping Plugin - released under MIT License 
  * Author: Kelly Hallman <khallman@gmail.com>
  * http://github.com/tapmodo/Jcrop
