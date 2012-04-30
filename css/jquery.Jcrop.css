@@ -1,4 +1,4 @@
-/* jquery.Jcrop.css v0.9.9 - MIT License */
+/* jquery.Jcrop.css v0.9.10 - MIT License */
 
 /*
   The outer-most container in a typical Jcrop instance
@@ -82,3 +82,5 @@
 	border-radius:3px;
 }
 
+/* Fix for twitter bootstrap et al. */
+.jcrop-holder img,img.jcrop-preview{ max-width: none; }
