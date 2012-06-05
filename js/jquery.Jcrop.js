@@ -37,7 +37,7 @@
 
     // Internal Methods {{{
     function px(n) {
-      return n + 'px';
+      return Math.round(n) + 'px';
     }
     function cssClass(cl) {
       return options.baseClass + '-' + cl;
