@@ -953,7 +953,7 @@
       //}}}
       function resize(w, h) //{{{
       {
-        $sel.width(w).height(h);
+        $sel.width(Math.round(w)).height(Math.round(h));
       }
       //}}}
       function refresh() //{{{
