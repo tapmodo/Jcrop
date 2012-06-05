@@ -1053,9 +1053,11 @@
       //}}}
       function animMode(v) //{{{
       {
-        if (animating === v) {
+        if (v) {
+          animating = true;
           disableHandles();
         } else {
+          animating = false;
           enableHandles();
         }
       } 
@@ -1353,10 +1355,10 @@
         return function () {
           pcent += (100 - pcent) / velocity;
 
-          animat[0] = x + ((pcent / 100) * ix1);
-          animat[1] = y + ((pcent / 100) * iy1);
-          animat[2] = x2 + ((pcent / 100) * ix2);
-          animat[3] = y2 + ((pcent / 100) * iy2);
+          animat[0] = Math.round(x + ((pcent / 100) * ix1));
+          animat[1] = Math.round(y + ((pcent / 100) * iy1));
+          animat[2] = Math.round(x2 + ((pcent / 100) * ix2));
+          animat[3] = Math.round(y2 + ((pcent / 100) * iy2));
 
           if (pcent >= 99.8) {
             pcent = 100;
@@ -1366,6 +1368,7 @@
             queueAnimator();
           } else {
             Selection.done();
+            Selection.animMode(false);
             if (typeof(callback) === 'function') {
               callback.call(api);
             }
