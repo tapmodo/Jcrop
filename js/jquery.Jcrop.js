@@ -1340,8 +1340,8 @@
           pcent = 0,
           velocity = options.swingSpeed;
 
-      x = animat[0];
-      y = animat[1];
+      x1 = animat[0];
+      y1 = animat[1];
       x2 = animat[2];
       y2 = animat[3];
 
@@ -1355,8 +1355,8 @@
         return function () {
           pcent += (100 - pcent) / velocity;
 
-          animat[0] = Math.round(x + ((pcent / 100) * ix1));
-          animat[1] = Math.round(y + ((pcent / 100) * iy1));
+          animat[0] = Math.round(x1 + ((pcent / 100) * ix1));
+          animat[1] = Math.round(y1 + ((pcent / 100) * iy1));
           animat[2] = Math.round(x2 + ((pcent / 100) * ix2));
           animat[3] = Math.round(y2 + ((pcent / 100) * iy2));
 
