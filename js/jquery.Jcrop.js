@@ -1,6 +1,6 @@
 /**
  * jquery.Jcrop.js v0.9.10
- * jQuery Image Cropping Plugin - released under MIT License 
+ * jQuery Image Cropping Plugin - released under MIT License
  * Author: Kelly Hallman <khallman@gmail.com>
  * http://github.com/tapmodo/Jcrop
  * Copyright (c) 2008-2012 Tapmodo Interactive LLC {{{
@@ -168,7 +168,7 @@
         if ((ord === 'move') && !options.allowMove) {
           return false;
         }
-        
+
         // Fix position of crop area when dragged the very first time.
         // Necessary when crop image is in a hidden element when page is loaded.
         docOffset = getPos($img);
@@ -309,7 +309,7 @@
         tempImage.src = $origimg[0].src;
         $origimg.width(tempImage.width);
         $origimg.height(tempImage.height);
-      } 
+      }
 
       var $img = $origimg.clone().removeAttr('id').css(img_css).show();
 
@@ -327,8 +327,7 @@
 
     var boundx = $img.width(),
         boundy = $img.height(),
-        
-        
+
         $div = $('<div />').width(boundx).height(boundy).addClass(cssClass('holder')).css({
         position: 'relative',
         backgroundColor: options.bgColor
@@ -340,24 +339,24 @@
 
     var $img2 = $('<div />'),
 
-        $img_holder = $('<div />') 
+        $img_holder = $('<div />')
         .width('100%').height('100%').css({
           zIndex: 310,
           position: 'absolute',
           overflow: 'hidden'
         }),
 
-        $hdl_holder = $('<div />') 
-        .width('100%').height('100%').css('zIndex', 320), 
+        $hdl_holder = $('<div />')
+        .width('100%').height('100%').css('zIndex', 320),
 
-        $sel = $('<div />') 
+        $sel = $('<div />')
         .css({
           position: 'absolute',
           zIndex: 600
         }).dblclick(function(){
           var c = Coords.getFixed();
           options.onDblClick.call(api,c);
-        }).insertBefore($img).append($img_holder, $hdl_holder); 
+        }).insertBefore($img).append($img_holder, $hdl_holder);
 
     if (img_mode) {
 
@@ -529,8 +528,7 @@
         // This function could use some optimization I think...
         var aspect = options.aspectRatio,
             min_x = options.minSize[0] / xscale,
-            
-            
+
             //min_y = options.minSize[1]/yscale,
             max_x = options.maxSize[0] / xscale,
             max_y = options.maxSize[1] / yscale,
@@ -1049,7 +1047,7 @@
       {
         seehandles = false;
         $hdl_holder.hide();
-      } 
+      }
       //}}}
       function animMode(v) //{{{
       {
@@ -1060,13 +1058,13 @@
           animating = false;
           enableHandles();
         }
-      } 
+      }
       //}}}
       function done() //{{{
       {
         animMode(false);
         refresh();
-      } 
+      }
       //}}}
       // Insert draggable elements {{{
       // Insert border divs for outline
@@ -1122,7 +1120,7 @@
         done: done
       };
     }());
-    
+
     //}}}
     // Tracker Module {{{
     var Tracker = (function () {
@@ -1145,7 +1143,7 @@
             .bind('mousemove.jcrop',trackMove)
             .bind('mouseup.jcrop',trackUp);
         }
-      } 
+      }
       //}}}
       function toBack() //{{{
       {
@@ -1153,13 +1151,13 @@
           zIndex: 290
         });
         $(document).unbind('.jcrop');
-      } 
+      }
       //}}}
       function trackMove(e) //{{{
       {
         onMove(mouseAbs(e));
         return false;
-      } 
+      }
       //}}}
       function trackUp(e) //{{{
       {
@@ -1432,6 +1430,7 @@
     {
       $div.remove();
       $origimg.show();
+      if (options.isHidden) $origimg.css('visibility', 'visible');
       $(obj).removeData('Jcrop');
     }
     //}}}
@@ -1600,14 +1599,19 @@
       }
       // If we haven't been attached, preload and attach
       else {
+        var $origimg = $(this);
+        options.isHidden = $origimg.has(':hidden');
+
         if (this.tagName == 'IMG')
           $.Jcrop.Loader(this,function(){
-            $(this).css({display:'block',visibility:'hidden'});
+            if (options.isHidden)
+              $origimg.css({display:'block',visibility:'hidden'});
             api = $.Jcrop(this, options);
             if ($.isFunction(callback)) callback.call(api);
           });
         else {
-          $(this).css({display:'block',visibility:'hidden'});
+          if (options.isHidden)
+            $origimg.css({display:'block',visibility:'hidden'});
           api = $.Jcrop(this, options);
           if ($.isFunction(callback)) callback.call(api);
         }
