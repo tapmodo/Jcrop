@@ -1451,6 +1451,14 @@
         presize($img, bw, bh);
         boundx = $img.width();
         boundy = $img.height();
+        //keep the save ratio
+        if(iw > ih) {
+          boundy = boundx < iw ? boundx*ih/iw : boundx;
+        }
+        else {
+        	boundx = boundy < ih ? boundy*iw/ih : boundy;
+        }
+        $img.width(boundx).height(boundy);
         $img2.width(boundx).height(boundy);
         $trk.width(boundx + (bound * 2)).height(boundy + (bound * 2));
         $div.width(boundx).height(boundy);
