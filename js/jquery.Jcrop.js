@@ -165,16 +165,26 @@
         if (options.disabled) {
           return false;
         }
-        if ((ord === 'move') && !options.allowMove) {
+        if ((ord === 'move') && !options.allowMove && !options.allowReselect) {
           return false;
         }
-        
+
         // Fix position of crop area when dragged the very first time.
         // Necessary when crop image is in a hidden element when page is loaded.
         docOffset = getPos($img);
-
         btndown = true;
-        startDragMode(ord, mouseAbs(e));
+
+        if (ord === 'move' && !options.allowMove && options.allowReselect) {
+          Selection.disableHandles();
+          Tracker.setCursor('crosshair');
+          var pos = mouseAbs(e);
+          Coords.setPressed(pos);
+          Selection.update();
+          Tracker.activateHandlers(selectDrag, doneSelect);
+          KeyManager.watchKeys();
+        } else {
+          startDragMode(ord, mouseAbs(e));
+        } 
         e.stopPropagation();
         e.preventDefault();
         return false;
@@ -1652,6 +1662,7 @@
     allowSelect: true,
     allowMove: true,
     allowResize: true,
+    allowReselect: false,
 
     trackDocument: true,
 
