@@ -165,7 +165,7 @@
         if (options.disabled) {
           return false;
         }
-        if ((ord === 'move') && !options.allowMove && !options.allowReselect) {
+        if ((ord === 'move') && !(options.allowMove || (options.allowSelect && options.allowReselect))) {
           return false;
         }
 
@@ -174,7 +174,7 @@
         docOffset = getPos($img);
         btndown = true;
 
-        if (ord === 'move' && !options.allowMove && options.allowReselect) {
+        if (ord === 'move' && !options.allowMove && options.allowSelect && options.allowReselect) {
           Selection.disableHandles();
           Tracker.setCursor('crosshair');
           var pos = mouseAbs(e);
