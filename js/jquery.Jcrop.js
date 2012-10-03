@@ -95,19 +95,36 @@
     function dragmodeHandler(mode, f) //{{{
     {
       return function (pos) {
-        switch (mode) {
-        case 'e':
-          pos[1] = f.y2;
-          break;
-        case 'w':
-          pos[1] = f.y2;
-          break;
-        case 'n':
-          pos[0] = f.x2;
-          break;
-        case 's':
-          pos[0] = f.x2;
-          break;
+        if (!options.minAspectRatio || !options.maxAspectRatio) {
+          switch (mode) {
+          case 'e':
+            pos[1] = f.y2;
+            break;
+          case 'w':
+            pos[1] = f.y2;
+            break;
+          case 'n':
+            pos[0] = f.x2;
+            break;
+          case 's':
+            pos[0] = f.x2;
+            break;
+          }
+        } else {
+          switch (mode) {
+          case 'e':
+            pos[1] = f.y + 1;
+            break;
+          case 'w':
+            pos[1] = f.y + 1;
+            break;
+          case 'n':
+            pos[0] = f.x + 1;
+            break;
+          case 's':
+            pos[0] = f.x + 1;
+            break;
+          }
         }
         Coords.setCurrent(pos);
         Selection.update();
