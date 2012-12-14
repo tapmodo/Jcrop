@@ -1432,6 +1432,7 @@
     {
       $div.remove();
       $origimg.show();
+      $origimg.css('visibility','visible');
       $(obj).removeData('Jcrop');
     }
     //}}}
