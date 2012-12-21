@@ -255,10 +255,14 @@
     {
       var trk = $('<div></div>').addClass(cssClass('tracker'));
       if ($.browser.msie) {
-        trk.css({
+        var trkContent = $('<div></div>');
+        trkContent.css({
           opacity: 0,
-          backgroundColor: 'white'
+          backgroundColor: 'white',
+          height: '100%',
+          width: '100%'
         });
+        trk.append(trkContent);
       }
       return trk;
     }
