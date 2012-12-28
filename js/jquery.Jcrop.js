@@ -1158,11 +1158,13 @@
       function trackMove(e) //{{{
       {
          //init 4 ios...
-         var i;
-         i = e.originalEvent.changedTouches[0].clientX;
-         i = e.originalEvent.changedTouches[0].clientY;
-         i = e.originalEvent.changedTouches[0].pageX;
-         i = e.originalEvent.changedTouches[0].pageY;
+         if (e.originalEvent && e.originalEvent.changedTouches) {
+           var i;
+           i = e.originalEvent.changedTouches[0].clientX;
+           i = e.originalEvent.changedTouches[0].clientY;
+           i = e.originalEvent.changedTouches[0].pageX;
+           i = e.originalEvent.changedTouches[0].pageY;
+         }
          
         onMove(mouseAbs(e));
         return false;
