@@ -1,10 +1,21 @@
 #!/bin/bash
 
+pushd `dirname $0`
+
 echo 'Running Jcrop minimization script'
 
-MYDATE=`date +"%Y%m%d"`
-JCVER=`head js/jquery.Jcrop.js|grep Jcrop.js`
-MYBUILD=`echo "$JCVER (build:$MYDATE)"`
-cat build/LICENSE | sed -e "s/__BUILD__/$MYBUILD/" -e 's/jquery.Jcrop.js/jquery.Jcrop.min.js/' > js/jquery.Jcrop.min.js
-uglifyjs --max-line-len 1024 -nc < js/jquery.Jcrop.js >> js/jquery.Jcrop.min.js
-git add js/jquery.Jcrop.min.js
+export JCROP_VERSION=${JCROP_VERSION-`cat VERSION`}
+export JCROP_BUILD=${JCROP_BUILD-`date +"%Y%m%d"`}
+
+OUTFILE=jquery.Jcrop.min.js
+MYBUILD="${JCROP_VERSION} (build:${JCROP_BUILD})"
+
+cat LICENSE | sed \
+  -e "s/__BUILD__/${MYBUILD}/" \
+  -e "s/__OUTFILE__/${OUTFILE}/" \
+  > ../js/${OUTFILE}
+
+uglifyjs --max-line-len 1024 -nc < ../js/jquery.Jcrop.js >> ../js/${OUTFILE}
+git add ../js/${OUTFILE}
+
+popd

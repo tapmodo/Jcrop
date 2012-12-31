@@ -1,92 +1,118 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" /> 
-    <title>Jcrop &raquo; Tutorials &raquo; Styling Example</title>
-    <script src="../js/jquery.min.js" type="text/javascript"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="../js/jquery.color.js" type="text/javascript"></script>
-    <script src="../js/jquery.Jcrop.js" type="text/javascript"></script>
-    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/vader/jquery-ui.css" type="text/css" />
-    <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
-    <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
-    <script type="text/javascript">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>CSS Styling Example | Jcrop Demo</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
-    jQuery(function($){
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.Jcrop.js"></script>
+<script src="../js/jquery.color.js"></script>
+<script type="text/javascript">
+  jQuery(function($){
 
-      var api;
+    var api;
 
-      $('#target').Jcrop({
-        // start off with jcrop-light class
-        bgOpacity: 0.5,
-        bgColor: 'white',
-        addClass: 'jcrop-light'
-      },function(){
-        api = this;
-        api.setSelect([130,65,130+350,65+285]);
-        api.setOptions({ bgFade: true });
-        api.ui.selection.addClass('jcrop-selection');
-      });
-
-      // Attach some button handlers
-      $('#radio2').click(function(){
-        api.ui.holder.removeClass('jcrop-light');
-        api.ui.holder.addClass('jcrop-dark');
-        api.setOptions({ bgColor: 'black', bgOpacity: 0.4 });
-        return false;
-      });
-      $('#radio1').click(function(){
-        api.ui.holder.removeClass('jcrop-dark');
-        api.ui.holder.addClass('jcrop-light');
-        api.setOptions({ bgColor: 'white', bgOpacity: 0.5 });
-        return false;
-      });
-      $('#radio3').click(function(){
-        api.ui.holder.removeClass('jcrop-dark');
-        api.ui.holder.removeClass('jcrop-light');
-        api.setOptions({ bgColor: 'black', bgOpacity: 0.6 });
-        return false;
-      });
-
-      $('#radioset').buttonset();
-
+    $('#target').Jcrop({
+      // start off with jcrop-light class
+      bgOpacity: 0.5,
+      bgColor: 'white',
+      addClass: 'jcrop-light'
+    },function(){
+      api = this;
+      api.setSelect([130,65,130+350,65+285]);
+      api.setOptions({ bgFade: true });
+      api.ui.selection.addClass('jcrop-selection');
     });
 
-    </script>
-  </head>
+    $('#buttonbar').on('click','button',function(e){
+      var $t = $(this), $g = $t.closest('.btn-group');
+      $g.find('button.active').removeClass('active');
+      $t.addClass('active');
+      $g.find('[data-setclass]').each(function(){
+        var $th = $(this), c = $th.data('setclass'),
+          a = $th.hasClass('active');
+        if (a) {
+          api.ui.holder.addClass(c);
+          switch(c){
 
-  <body>
-    <div id="outer">
-    <div class="jcExample">
-    <div class="article">
+            case 'jcrop-light':
+              api.setOptions({ bgColor: 'white', bgOpacity: 0.5 });
+              break;
 
-      <h1>Jcrop - Styling Example</h1>
-      <img src="demo_files/pool.jpg" id="target" alt="Flowers" />
+            case 'jcrop-dark':
+              api.setOptions({ bgColor: 'black', bgOpacity: 0.4 });
+              break;
 
-      <div style="margin-top:1em; width:500px;">
-      <fieldset>
-      <legend>Manipulate classes</legend>
-        <div id="radioset">
-          <input type="radio" id="radio1" name="radio" checked="checked" /><label for="radio1">jcrop-light</label>
-          <input type="radio" id="radio2" name="radio" /><label for="radio2">jcrop-dark</label>
-          <input type="radio" id="radio3" name="radio" /><label for="radio3">normal</label>
-        </div>
-      </fieldset>
-      </div>
+            case 'jcrop-normal':
+              api.setOptions({
+                bgColor: $.Jcrop.defaults.bgColor,
+                bgOpacity: $.Jcrop.defaults.bgOpacity
+              });
+              break;
+          }
+        }
+        else api.ui.holder.removeClass(c);
+      });
+    });
 
-      <p>
-        <b>Example styling tricks.</b> Click the buttons above to change the appearance of Jcrop in real-time.
-      </p>
+  });
 
-      <div id="dl_links">
-        <a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
-        <a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
-      </div>
 
+
+</script>
+<link rel="stylesheet" href="demo_files/main.css" type="text/css" />
+<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+
+</head>
+<body>
+
+<div class="container">
+<div class="row">
+<div class="span12">
+<div class="jc-demo-box">
+
+<div class="page-header">
+<ul class="breadcrumb first">
+  <li><a href="../index.html">Jcrop</a> <span class="divider">/</span></li>
+  <li><a href="../index.html">Demos</a> <span class="divider">/</span></li>
+  <li class="active">CSS Styling Example</li>
+</ul>
+<h1>CSS Styling Example</h1>
+</div>
+
+  <img src="http://jcrop-cdn1.tapmodo.com/assets/images/market-750.jpg" id="target" alt="Flowers" />
+
+  <div style="margin-top:1em; width:500px;">
+  <fieldset>
+  <legend>Manipulate classes</legend>
+    <div class="btn-group" id="buttonbar">
+      <button id="radio1" data-setclass="jcrop-light" class="btn active" />jcrop-light</button>
+      <button id="radio2" data-setclass="jcrop-dark" class="btn" />jcrop-dark</button>
+      <button id="radio3" data-setclass="jcrop-normal" class="btn" />normal</button>
     </div>
-    </div>
-    </div>
-  </body>
+  </fieldset>
+  </div>
+
+  <p>
+    <b>Example styling tricks.</b> Click the buttons above to change the appearance of Jcrop in real-time.
+  </p>
+
+
+<div class="tapmodo-footer">
+  <a href="http://tapmodo.com" class="tapmodo-logo segment"></a>
+  <div class="segment"><b>&copy; 2008-2012 Tapmodo Interactive LLC</b><br />
+    Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a>
+  </div>
+</div>
+
+<div class="clearfix"></div>
+
+</div>
+</div>
+</div>
+</div>
+
+</body>
 </html>
 

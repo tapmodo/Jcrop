@@ -1,0 +1,4 @@
+  .optdual { position: relative; }
+  .optdual .offset { position: absolute; left: 18em; }
+  .optlist label { width: 16em; display: block; }
+  #dl_links { margin-top: .5em; }

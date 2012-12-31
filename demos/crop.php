@@ -27,53 +27,72 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 
 // If not a POST request, display page below:
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Live Cropping Demo</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+  <script src="../js/jquery.min.js"></script>
+  <script src="../js/jquery.Jcrop.js"></script>
+  <link rel="stylesheet" href="demo_files/main.css" type="text/css" />
+  <link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+  <link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
 
-		<script src="../js/jquery.min.js"></script>
-		<script src="../js/jquery.Jcrop.js"></script>
-		<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
-		<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+<script type="text/javascript">
 
-		<script language="Javascript">
+  $(function(){
 
-			$(function(){
+    $('#cropbox').Jcrop({
+      aspectRatio: 1,
+      onSelect: updateCoords
+    });
 
-				$('#cropbox').Jcrop({
-					aspectRatio: 1,
-					onSelect: updateCoords
-				});
+  });
 
-			});
+  function updateCoords(c)
+  {
+    $('#x').val(c.x);
+    $('#y').val(c.y);
+    $('#w').val(c.w);
+    $('#h').val(c.h);
+  };
 
-			function updateCoords(c)
-			{
-				$('#x').val(c.x);
-				$('#y').val(c.y);
-				$('#w').val(c.w);
-				$('#h').val(c.h);
-			};
+  function checkCoords()
+  {
+    if (parseInt($('#w').val())) return true;
+    alert('Please select a crop region then press submit.');
+    return false;
+  };
 
-			function checkCoords()
-			{
-				if (parseInt($('#w').val())) return true;
-				alert('Please select a crop region then press submit.');
-				return false;
-			};
+</script>
+<style type="text/css">
+  #target {
+    background-color: #ccc;
+    width: 500px;
+    height: 330px;
+    font-size: 24px;
+    display: block;
+  }
 
-		</script>
 
-	</head>
+</style>
 
-	<body>
+</head>
+<body>
 
-	<div id="outer">
-	<div class="jcExample">
-	<div class="article">
+<div class="container">
+<div class="row">
+<div class="span12">
+<div class="jc-demo-box">
 
-		<h1>Jcrop - Crop Behavior</h1>
+<div class="page-header">
+<ul class="breadcrumb first">
+  <li><a href="../index.html">Jcrop</a> <span class="divider">/</span></li>
+  <li><a href="../index.html">Demos</a> <span class="divider">/</span></li>
+  <li class="active">Live Demo (Requires PHP)</li>
+</ul>
+<h1>Server-based Cropping Behavior</h1>
+</div>
 
 		<!-- This is the image we're attaching Jcrop to -->
 		<img src="demo_files/pool.jpg" id="cropbox" />
@@ -84,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			<input type="hidden" id="y" name="y" />
 			<input type="hidden" id="w" name="w" />
 			<input type="hidden" id="h" name="h" />
-			<input type="submit" value="Crop Image" />
+			<input type="submit" value="Crop Image" class="btn btn-large btn-inverse" />
 		</form>
 
 		<p>
@@ -94,12 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 			dumped to the browser. Try it!
 		</p>
 
-		<div id="dl_links">
-			<a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a> |
-			<a href="http://deepliquid.com/content/Jcrop_Manual.html">Manual (Docs)</a>
-		</div>
 
-
+	</div>
 	</div>
 	</div>
 	</div>

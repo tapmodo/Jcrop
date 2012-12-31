@@ -1,0 +1,33 @@
+
+  <div class="row-fluid">
+    <div class="span9">
+    <img src="demo_files/sago.jpg" id="target" alt="Jcrop Image" />
+
+<div class="description">
+  <p id="shadetxt" style="display:none; color:#900;">
+    <b>Experimental shader active.</b>
+    Jcrop now includes a shading mode that facilitates building
+    better transparent Jcrop instances. The experimental shader is less
+    robust than Jcrop's default shading method and should only be
+    used if you require this functionality. 
+  </p>
+
+  <p>
+    <b>Animation/Transitions.</b>
+    Demonstration of animateTo API method and transitions for bgColor
+    and bgOpacity options. Color fading requires inclusion of John Resig's
+    jQuery <a href="http://plugins.jquery.com/project/color">Color 
+    Animations</a> plugin. If it is not included, colors will not fade.
+  </p>
+</div>
+
+    </div>
+    <div class="span3" id="interface">
+      <label class="checkbox">
+        <input type="checkbox" id="fadetog" /> Enable fading (bgFade: true)
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" id="shadetog" /> Use experimental shader (shade: true)
+      </label>
+    </div>
+  </div>
