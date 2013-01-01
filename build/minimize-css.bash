@@ -17,6 +17,6 @@ csstidy ../css/jquery.Jcrop.css \
   --sort_properties=true \
   >> ../css/${OUTFILE}
 
-git add ../css/${OUTFILE}
-
 popd
+
+git add css/${OUTFILE}

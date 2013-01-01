@@ -16,6 +16,7 @@ cat LICENSE | sed \
   > ../js/${OUTFILE}
 
 uglifyjs --max-line-len 1024 -nc < ../js/jquery.Jcrop.js >> ../js/${OUTFILE}
-git add ../js/${OUTFILE}
 
 popd
+
+git add js/${OUTFILE}
