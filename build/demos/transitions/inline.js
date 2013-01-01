@@ -4,7 +4,7 @@
 
     $('#target').Jcrop({
       bgFade:     true,
-      bgOpacity: .3,
+      bgOpacity: .2,
       setSelect: [ 60, 70, 540, 330 ]
     },function(){
       jcrop_api = this;
@@ -75,10 +75,14 @@
     }
 
     $('#anim_buttons .btn-group').append(
-      create_btn('Bye!').click(function(){
+      create_btn('Bye!').click(function(e){
+        $(e.target).addClass('active');
         jcrop_api.animateTo(
           [300,200,300,200],
-          function(){ this.release(); }
+          function(){
+            this.release();
+            $(e.target).closest('.btn-group').find('.active').removeClass('active');
+          }
         );
         return false;
       })
@@ -111,7 +115,9 @@
     };
     // Handler for option-setting buttons
     function setoptHandler(k,v) {
-      return function() {
+      return function(e) {
+        $(e.target).closest('.btn-group').find('.active').removeClass('active');
+        $(e.target).addClass('active');
         var opt = { };
         opt[k] = v;
         jcrop_api.setOptions(opt);
@@ -120,12 +126,16 @@
     };
     // Handler for animation buttons
     function animHandler(v) {
-      return function() {
-        jcrop_api.animateTo(v);
+      return function(e) {
+        $(e.target).addClass('active');
+        jcrop_api.animateTo(v,function(){
+          $(e.target).closest('.btn-group').find('.active').removeClass('active');
+        });
         return false;
       };
     };
 
+    $('#bgo_buttons .btn:first,#bgc_buttons .btn:last').addClass('active');
     $('#interface').show();
 
   });
