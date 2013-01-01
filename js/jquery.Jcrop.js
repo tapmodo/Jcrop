@@ -66,13 +66,13 @@
       });
     }
     //}}}
-    function startDragMode(mode, pos) //{{{
+    function startDragMode(mode, pos, touch) //{{{
     {
       docOffset = getPos($img);
       Tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
 
       if (mode === 'move') {
-        return Tracker.activateHandlers(createMover(pos), doneSelect);
+        return Tracker.activateHandlers(createMover(pos), doneSelect, touch);
       }
 
       var fc = Coords.getFixed();
@@ -82,7 +82,7 @@
       Coords.setPressed(Coords.getCorner(opp));
       Coords.setCurrent(opc);
 
-      Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect);
+      Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect, touch);
     }
     //}}}
     function dragmodeHandler(mode, f) //{{{
@@ -237,7 +237,7 @@
       var pos = mouseAbs(e);
       Coords.setPressed(pos);
       Selection.update();
-      Tracker.activateHandlers(selectDrag, doneSelect);
+      Tracker.activateHandlers(selectDrag, doneSelect, e.type.substring(0,5)==='touch');
       KeyManager.watchKeys();
 
       e.stopPropagation();
@@ -398,8 +398,7 @@
       // Touch support detection function adapted (under MIT License)
       // from code by Jeffrey Sambells - http://github.com/iamamused/
       function hasTouchSupport() {
-        var support = {},
-            events = ['touchstart', 'touchmove', 'touchend'],
+        var support = {}, events = ['touchstart', 'touchmove', 'touchend'],
             el = document.createElement('div'), i;
 
         try {
@@ -427,25 +426,27 @@
       return {
         createDragger: function (ord) {
           return function (e) {
-            e.pageX = e.originalEvent.changedTouches[0].pageX;
-            e.pageY = e.originalEvent.changedTouches[0].pageY;
             if (options.disabled) {
               return false;
             }
             if ((ord === 'move') && !options.allowMove) {
               return false;
             }
+            docOffset = getPos($img);
             btndown = true;
-            startDragMode(ord, mouseAbs(e));
+            startDragMode(ord, mouseAbs(Touch.cfilter(e)), true);
             e.stopPropagation();
             e.preventDefault();
             return false;
           };
         },
         newSelection: function (e) {
+          return newSelection(Touch.cfilter(e));
+        },
+        cfilter: function (e){
           e.pageX = e.originalEvent.changedTouches[0].pageX;
           e.pageY = e.originalEvent.changedTouches[0].pageY;
-          return newSelection(e);
+          return e;
         },
         isSupported: hasTouchSupport,
         support: detectSupport()
@@ -1130,21 +1131,21 @@
           onDone = function () {},
           trackDoc = options.trackDocument;
 
-      function toFront() //{{{
+      function toFront(touch) //{{{
       {
         $trk.css({
           zIndex: 450
         });
-        if (Touch.support) {
+
+        if (touch)
           $(document)
             .bind('touchmove.jcrop', trackTouchMove)
             .bind('touchend.jcrop', trackTouchEnd);
-        }
-        if (trackDoc) {
+
+        else if (trackDoc)
           $(document)
             .bind('mousemove.jcrop',trackMove)
             .bind('mouseup.jcrop',trackUp);
-        }
       } 
       //}}}
       function toBack() //{{{
@@ -1157,15 +1158,6 @@
       //}}}
       function trackMove(e) //{{{
       {
-         //init 4 ios...
-         if (e.originalEvent && e.originalEvent.changedTouches) {
-           var i;
-           i = e.originalEvent.changedTouches[0].clientX;
-           i = e.originalEvent.changedTouches[0].clientY;
-           i = e.originalEvent.changedTouches[0].pageX;
-           i = e.originalEvent.changedTouches[0].pageY;
-         }
-         
         onMove(mouseAbs(e));
         return false;
       } 
@@ -1192,27 +1184,24 @@
         return false;
       }
       //}}}
-      function activateHandlers(move, done) //{{{
+      function activateHandlers(move, done, touch) //{{{
       {
         btndown = true;
         onMove = move;
         onDone = done;
-        toFront();
+        toFront(touch);
         return false;
       }
       //}}}
       function trackTouchMove(e) //{{{
       {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackMove(e);
+        onMove(mouseAbs(Touch.cfilter(e)));
+        return false;
       }
       //}}}
       function trackTouchEnd(e) //{{{
       {
-        e.pageX = e.originalEvent.changedTouches[0].pageX;
-        e.pageY = e.originalEvent.changedTouches[0].pageY;
-        return trackUp(e);
+        return trackUp(Touch.cfilter(e));
       }
       //}}}
       function setCursor(t) //{{{
