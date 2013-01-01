@@ -623,21 +623,13 @@
       //}}}
       function rebound(p) //{{{
       {
-        if (p[0] < 0) {
-          p[0] = 0;
-        }
-        if (p[1] < 0) {
-          p[1] = 0;
-        }
+        if (p[0] < 0) p[0] = 0;
+        if (p[1] < 0) p[1] = 0;
 
-        if (p[0] > boundx) {
-          p[0] = boundx;
-        }
-        if (p[1] > boundy) {
-          p[1] = boundy;
-        }
+        if (p[0] > boundx) p[0] = boundx;
+        if (p[1] > boundy) p[1] = boundy;
 
-        return [p[0], p[1]];
+        return [Math.round(p[0]), Math.round(p[1])];
       }
       //}}}
       function flipCoords(x1, y1, x2, y2) //{{{
