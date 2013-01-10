@@ -933,9 +933,16 @@
       function moveto(x, y) //{{{
       {
         if (!options.shade) {
+          // rounding 0.5 results in 1, -0.5 to 0. the
+          // px method rounds the negative value, so
+          // the box will jump around if y or x is a
+          // non whole-number multiple of 0.5
+          y = Math.round(Math.abs(y));
+          x = Math.round(Math.abs(x));
+
           $img2.css({
-            top: px(-y),
-            left: px(-x)
+            top: (-y).toString() + "px",
+            left: (-x).toString() + "px"
           });
         }
         $sel.css({
