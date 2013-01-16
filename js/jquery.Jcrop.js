@@ -33,7 +33,10 @@
 
   $.Jcrop = function (obj, opt) {
     var options = $.extend({}, $.Jcrop.defaults),
-        docOffset, lastcurs, ie6mode = false;
+        docOffset, lastcurs;
+        _ua = navigator.userAgent.toLowerCase(),
+        is_msie = /msie/.test(_ua),
+        ie6mode = /msie [1-6]\./.test(_ua);
 
     // Internal Methods {{{
     function px(n) {
@@ -254,7 +257,7 @@
     function newTracker() //{{{
     {
       var trk = $('<div></div>').addClass(cssClass('tracker'));
-      if ($.browser.msie) {
+      if (is_msie) {
         trk.css({
           opacity: 0,
           backgroundColor: 'white'
@@ -267,9 +270,6 @@
     // }}}
     // Initialization {{{
     // Sanitize some options {{{
-    if ($.browser.msie && ($.browser.version.split('.')[0] === '6')) {
-      ie6mode = true;
-    }
     if (typeof(obj) !== 'object') {
       obj = $(obj)[0];
     }
@@ -1571,8 +1571,7 @@
       }
     };
 
-    if ($.browser.msie)
-      $div.bind('selectstart', function () { return false; });
+    if (is_msie) $div.bind('selectstart', function () { return false; });
 
     $origimg.data('Jcrop', api);
     return api;
