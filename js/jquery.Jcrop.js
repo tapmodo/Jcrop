@@ -33,7 +33,7 @@
 
   $.Jcrop = function (obj, opt) {
     var options = $.extend({}, $.Jcrop.defaults),
-        docOffset, lastcurs;
+        docOffset,
         _ua = navigator.userAgent.toLowerCase(),
         is_msie = /msie/.test(_ua),
         ie6mode = /msie [1-6]\./.test(_ua);
