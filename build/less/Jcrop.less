@@ -1,0 +1,146 @@
+/* jquery.Jcrop.css v0.9.12 - MIT License */
+
+@white: white;
+@black: black;
+
+@selectionBorderWidth: 1px;
+@selectionBackgroundImage: "Jcrop.gif";
+@selectionBackgroundColor: @white;
+@selectionBackground: @selectionBackgroundColor url(@selectionBackgroundImage);
+
+// Setting some variables to 
+// Used to set handle and dragbar size/width
+// To center on a 1px selection line, use an odd number
+@grabSize: 7px;
+
+// Used to offset handles and dragbar
+// Default value will center on 1px selection line
+@grabOffset: (floor(@grabSize/2)+1) * -1;
+
+@handleSize: @grabSize;
+@handleOffset: @grabOffset;
+@handleBorderWidth: 1px;
+@handleBorderColor: #eee;
+@handleBorderStyle: solid;
+@handleBackgroundColor: #333;
+
+@dragbarWidth: @grabSize;
+@dragbarOffset: @grabOffset;
+
+/*
+  The outer-most container in a typical Jcrop instance
+  If you are having difficulty with formatting related to styles
+  on a parent element, place any fixes here or in a like selector
+
+  You can also style this element if you want to add a border, etc
+  A better method for styling can be seen below with .jcrop-light
+  (Add a class to the holder and style elements for that extended class)
+*/
+.jcrop-holder {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Selection Border */
+.jcrop-vline, .jcrop-hline {
+  background: @selectionBackground;
+  font-size: 0;
+  position: absolute;
+}
+.jcrop-vline {
+  height: 100%;
+  width: @selectionBorderWidth !important;
+  &.right { right: 0; }
+}
+.jcrop-hline{
+  height: @selectionBorderWidth !important;
+  width: 100%;
+  &.bottom { bottom: 0; }
+}
+
+/* Invisible click targets */
+
+.jcrop-tracker
+{
+  height: 100%; 
+  width: 100%;
+  /* "turn off" link highlight */ -webkit-tap-highlight-color: transparent;
+  /* disable callout, image save panel */ -webkit-touch-callout: none;
+  /* disable cut copy paste */ -webkit-user-select: none;
+}
+
+/* Selection Handles */
+
+.jcrop-handle {
+
+  background-color: @handleBackgroundColor;
+  border: @handleBorderWidth @handleBorderColor @handleBorderStyle;
+  width: @handleSize;
+  height: @handleSize;
+  font-size: 1px;
+
+  &.ord-n {left:50%;margin-left:@handleOffset;margin-top:@handleOffset;top:0;}
+  &.ord-s {bottom:0;left:50%;margin-bottom:@handleOffset;margin-left:@handleOffset;}
+  &.ord-e {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:50%;}
+  &.ord-w {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:50%;}
+  &.ord-nw {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:0;}
+  &.ord-ne {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:0;}
+  &.ord-se {bottom:0;margin-bottom:@handleOffset;margin-right:@handleOffset;right:0;}
+  &.ord-sw {bottom:0;left:0;margin-bottom:@handleOffset;margin-left:@handleOffset;}
+
+}
+
+/* Dragbars */
+.jcrop-dragbar {
+
+  &.ord-n, &.ord-s {height:@dragbarWidth;width:100%;}
+  &.ord-e,&.ord-w {height:100%;width:@dragbarWidth;}
+  &.ord-n {margin-top:@dragbarOffset;}
+  &.ord-s {bottom:0;margin-bottom:@dragbarOffset;}
+  &.ord-e {margin-right:@dragbarOffset;right:0;}
+  &.ord-w {margin-left:@dragbarOffset;}
+
+}
+
+/* The "jcrop-light" class/extension */
+.jcrop-light {
+  .jcrop-vline, .jcrop-hline {
+    background: @white;
+    filter:Alpha(opacity=70)!important;
+    opacity:.70!important;
+  }
+  .jcrop-handle {
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    background-color: @black;
+    border-color: @white;
+    border-radius:3px;
+  }
+}
+
+/* The "jcrop-dark" class/extension */
+.jcrop-dark {
+  .jcrop-vline, .jcrop-hline {
+    background: @black;
+    filter: Alpha(opacity=70) !important;
+    opacity: 0.7 !important;
+  }
+  .jcrop-handle {
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    background-color: @white;
+    border-color: @black;
+    border-radius: 3px;
+  }
+}
+
+/* Simple macro to turn off the antlines */
+.solid-line {
+  .jcrop-vline, .jcrop-hline {
+    background: @selectionBackgroundColor;
+  }
+}
+
+/* Fix for twitter bootstrap et al. */
+.jcrop-holder img,img.jcrop-preview{ max-width: none; }
+
