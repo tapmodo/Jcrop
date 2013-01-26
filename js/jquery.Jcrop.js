@@ -889,10 +889,15 @@
       //}}}
       function insertHandle(ord) //{{{
       {
-        var hs = options.handleSize;
-        return dragDiv(ord, hdep++).css({
-          opacity: options.handleOpacity
-        }).width(hs).height(hs).addClass(cssClass('handle'));
+        var hs = options.handleSize,
+
+          div = dragDiv(ord, hdep++).css({
+            opacity: options.handleOpacity
+          }).addClass(cssClass('handle'));
+
+        if (hs) { div.width(hs).height(hs); }
+
+        return div;
       }
       //}}}
       function insertDragbar(ord) //{{{
