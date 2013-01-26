@@ -1658,7 +1658,7 @@
     bgFade: false,
     borderOpacity: 0.4,
     handleOpacity: 0.5,
-    handleSize: 7,
+    handleSize: null,
 
     aspectRatio: 0,
     keySupport: true,
