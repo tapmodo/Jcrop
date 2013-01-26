@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd `dirname $0`
+pushd `dirname $0` > /dev/null
 
 echo 'Running Jcrop minimization script'
 
@@ -17,6 +17,5 @@ cat LICENSE | sed \
 
 uglifyjs --max-line-len 1024 -nc < ../js/jquery.Jcrop.js >> ../js/${OUTFILE}
 
-popd
+popd > /dev/null
 
-git add js/${OUTFILE}

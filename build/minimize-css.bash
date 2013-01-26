@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd `dirname $0`
+pushd `dirname $0` > /dev/null
 
 echo 'Running Jcrop CSS minimization script'
 
@@ -17,6 +17,5 @@ csstidy ../css/jquery.Jcrop.css \
   --sort_properties=true \
   >> ../css/${OUTFILE}
 
-popd
+popd > /dev/null
 
-git add css/${OUTFILE}
