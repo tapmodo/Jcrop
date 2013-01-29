@@ -290,7 +290,9 @@
       padding: 0,
       position: 'absolute',
       top: 0,
-      left: 0
+      left: 0,
+      maxWidth: 'none',
+      maxHeight: 'none'
     };
 
     var $origimg = $(obj),
