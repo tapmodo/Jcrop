@@ -856,6 +856,8 @@
       var awake,
           hdep = 370,
           borders = {},
+          hGuides = [],
+          vGuides = [],
           handle = {},
           dragbar = {},
           seehandles = false;
@@ -927,6 +929,20 @@
         }
       }
       //}}}
+      function createHGuides(guides) //{{{
+      {
+          for (var i=0; i<guides.length; i++) {
+              hGuides.push(insertBorder('hguide').data('position', guides[i]));
+          }
+      }
+      //}}}
+      function createVGuides(guides) //{{{
+      {
+          for (var i = 0; i < guides.length; i++) {
+              vGuides.push(insertBorder('vguide').data('position', guides[i]));
+          }
+      }
+        //}}}
       function createHandles(li) //{{{
       {
         var i;
@@ -951,7 +967,13 @@
       //}}}
       function resize(w, h) //{{{
       {
-        $sel.width(Math.round(w)).height(Math.round(h));
+          $sel.width(Math.round(w)).height(Math.round(h));
+          for (var i = 0; i < hGuides.length; i++) {
+              hGuides[i].css({ top: px(h * hGuides[i].data('position')) });
+          }
+          for (var i = 0; i < vGuides.length; i++) {
+              vGuides[i].css({ left: px(w * vGuides[i].data('position')) });
+          }
       }
       //}}}
       function refresh() //{{{
@@ -1077,6 +1099,12 @@
 
       if (options.drawBorders && $.isArray(options.createBorders))
         createBorders(options.createBorders);
+
+      if (options.drawBorders && $.isArray(options.createHGuides))
+          createHGuides(options.createHGuides);
+        
+      if (options.drawBorders && $.isArray(options.createVGuides))
+          createVGuides(options.createVGuides);
 
       //}}}
 
@@ -1665,6 +1693,8 @@
     createHandles: ['n','s','e','w','nw','ne','se','sw'],
     createDragbars: ['n','s','e','w'],
     createBorders: ['n','s','e','w'],
+    createHGuides: null,
+    createVGuides: null,
     drawBorders: true,
     dragEdges: true,
     fixedSupport: true,
