@@ -362,7 +362,7 @@
     if (img_mode) {
 
       $img2 = $('<img />')
-          .attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy),
+          .attr('src', $img.attr('src')).css(img_css).width(boundx).height(boundy).css({"min-width":boundx, "min-height":boundy}),
 
       $img_holder.append($img2);
 
