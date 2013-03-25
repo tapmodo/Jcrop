@@ -37,7 +37,7 @@
         _ua = navigator.userAgent.toLowerCase(),
         is_msie = /msie/.test(_ua),
         ie6mode = /msie [1-6]\./.test(_ua);
-
+    
     // Internal Methods {{{
     function px(n) {
       return Math.round(n) + 'px';
@@ -67,6 +67,11 @@
       $.each(['onChange','onSelect','onRelease','onDblClick'],function(i,e) {
         if (typeof(options[e]) !== 'function') options[e] = function () {};
       });
+      
+      options.borderNorth=Math.max(options.borderNorth, options.border);
+      options.borderEast=Math.max(options.borderEast, options.border);
+      options.borderSouth=Math.max(options.borderSouth, options.border);
+      options.borderWest=Math.max(options.borderWest, options.border);
     }
     //}}}
     function startDragMode(mode, pos, touch) //{{{
@@ -487,18 +492,18 @@
         var ox = offset[0],
             oy = offset[1];
 
-        if (0 > x1 + ox) {
-          ox -= ox + x1;
+        if (options.borderWest > x1 + ox) {
+          ox -= ox + x1 - options.borderWest;
         }
-        if (0 > y1 + oy) {
-          oy -= oy + y1;
+        if (options.borderSouth > y1 + oy) {
+          oy -= oy + y1 - options.borderNorth;
         }
 
-        if (boundy < y2 + oy) {
-          oy += boundy - (y2 + oy);
+        if (boundy - options.borderNorth < y2 + oy) {
+          oy += boundy - options.borderSouth - (y2 + oy);
         }
-        if (boundx < x2 + ox) {
-          ox += boundx - (x2 + ox);
+        if (boundx - options.borderEast < x2 + ox) {
+          ox += boundx - options.borderEast - (x2 + ox);
         }
 
         x1 += ox;
@@ -553,12 +558,12 @@
           w = rha * aspect;
           xx = rw < 0 ? x1 - w : w + x1;
 
-          if (xx < 0) {
-            xx = 0;
+          if (xx < options.borderWest) {
+            xx = options.borderWest;
             h = Math.abs((xx - x1) / aspect);
             yy = rh < 0 ? y1 - h : h + y1;
-          } else if (xx > boundx) {
-            xx = boundx;
+          } else if (xx > boundx - options.borderEast) {
+            xx = boundx - options.borderEast;
             h = Math.abs((xx - x1) / aspect);
             yy = rh < 0 ? y1 - h : h + y1;
           }
@@ -566,12 +571,12 @@
           xx = x2;
           h = rwa / aspect;
           yy = rh < 0 ? y1 - h : y1 + h;
-          if (yy < 0) {
-            yy = 0;
+          if (yy < options.borderNorth) {
+            yy = options.borderNorth;
             w = Math.abs((yy - y1) * aspect);
             xx = rw < 0 ? x1 - w : w + x1;
-          } else if (yy > boundy) {
-            yy = boundy;
+          } else if (yy > boundy - options.borderSouth) {
+            yy = boundy - options.borderSouth;
             w = Math.abs(yy - y1) * aspect;
             xx = rw < 0 ? x1 - w : w + x1;
           }
@@ -602,20 +607,20 @@
           }
         }
 
-        if (xx < 0) {
-          x1 -= xx;
-          xx = 0;
-        } else if (xx > boundx) {
-          x1 -= xx - boundx;
-          xx = boundx;
+        if (xx < options.borderWest) {
+          x1 -= xx - options.borderWest;
+          xx = options.borderWest;
+        } else if (xx > boundx - options.borderEast) {
+          x1 -= xx - (boundx - options.borderEast);
+          xx = boundx - options.borderEast;
         }
 
-        if (yy < 0) {
-          y1 -= yy;
-          yy = 0;
-        } else if (yy > boundy) {
-          y1 -= yy - boundy;
-          yy = boundy;
+        if (yy < options.borderNorth) {
+          y1 -= yy - options.borderNorth;
+          yy = options.borderNorth;
+        } else if (yy > boundy - options.borderSouth) {
+          y1 -= yy - (boundy - options.borderSouth);
+          yy = boundy - options.borderSouth;
         }
 
         return makeObj(flipCoords(x1, y1, xx, yy));
@@ -623,11 +628,11 @@
       //}}}
       function rebound(p) //{{{
       {
-        if (p[0] < 0) p[0] = 0;
-        if (p[1] < 0) p[1] = 0;
+        if (p[0] < options.borderWest) p[0] = options.borderWest;
+        if (p[1] < options.borderNorth) p[1] = options.borderNorth;
 
-        if (p[0] > boundx) p[0] = boundx;
-        if (p[1] > boundy) p[1] = boundy;
+        if (p[0] > boundx - options.borderEast) p[0] = boundx - options.borderEast;
+        if (p[1] > boundy - options.borderSouth) p[1] = boundy - options.borderSouth;
 
         return [Math.round(p[0]), Math.round(p[1])];
       }
@@ -1683,6 +1688,12 @@
     maxSize: [0, 0],
     minSize: [0, 0],
 
+    borderNorth: 0,
+    borderEast: 0,
+    borderSouth: 0,
+    borderWest: 0,
+    border: 0,
+    
     // Callbacks / Event Handlers
     onChange: function () {},
     onSelect: function () {},
