@@ -187,17 +187,25 @@
     function presize($obj, w, h) //{{{
     {
       var nw = $obj.width(),
-          nh = $obj.height();
-      if ((nw > w) && w > 0) {
+          nh = $obj.height(),
+          rw = nw,
+          rh = nh;
+
+      if (options.photoRealSize) {
+        rw = options.photoRealSize[0];
+        rh = options.photoRealSize[1];
+      }
+
+      if ((rw > w) && w > 0) {
         nw = w;
-        nh = (w / $obj.width()) * $obj.height();
+        nh = (w / rw) * rh;
       }
-      if ((nh > h) && h > 0) {
+      if ((rh > h) && h > 0) {
         nh = h;
-        nw = (h / $obj.height()) * $obj.width();
+        nw = (h / rh) * rw;
       }
-      xscale = $obj.width() / nw;
-      yscale = $obj.height() / nh;
+      xscale = rw / nw;
+      yscale = rh / nh;
       $obj.width(nw).height(nh);
     }
     //}}}
