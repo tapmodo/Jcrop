@@ -572,6 +572,7 @@
           
         if (real_ratio < aspect) {
           width = height * aspect;
+          if (width > boundx) { width = boundx; }
           
           var pos1XAdjust = resizeCentered ? (width - startCoords.w) / 2 : 0;
           
@@ -598,6 +599,7 @@
           pos2Y = flipY ? pos1Y - height : pos1Y + height;
         } else {
           height = width / aspect;
+          if (height > boundy) { height = boundy; }
 
           var pos1YAdjust = resizeCentered ? (height - startCoords.h) / 2 : 0;
 
