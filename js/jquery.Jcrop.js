@@ -1089,7 +1089,7 @@
         cursor: 'move',
         position: 'absolute',
         zIndex: 360
-      });
+      }).addClass("jcrop-viewport");
 
       if (Touch.support) {
         $track.bind('touchstart.jcrop', Touch.createDragger('move'));
