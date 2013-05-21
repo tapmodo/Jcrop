@@ -13,7 +13,6 @@
         xsize = $pcnt.width(),
         ysize = $pcnt.height();
     
-    console.log('init',[xsize,ysize]);
     $('#target').Jcrop({
       onChange: updatePreview,
       onSelect: updatePreview,
