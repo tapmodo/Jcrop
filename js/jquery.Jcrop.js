@@ -208,12 +208,12 @@
     function unscale(c) //{{{
     {
       return {
-        x: c.x * xscale,
-        y: c.y * yscale,
-        x2: c.x2 * xscale,
-        y2: c.y2 * yscale,
-        w: c.w * xscale,
-        h: c.h * yscale
+        x: Math.floor(c.x * xscale),
+        y: Math.floor(c.y * yscale),
+        x2: Math.floor(c.x2 * xscale),
+        y2: Math.floor(c.y2 * yscale),
+        w: Math.floor(c.w * xscale),
+        h: Math.floor(c.h * yscale)
       };
     }
     //}}}
