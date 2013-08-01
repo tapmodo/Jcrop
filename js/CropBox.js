@@ -156,6 +156,9 @@
 
       t.filter(this.master.getSelectionRaw());
     },
+    destroy: function(){
+      this.container.remove();
+    },
     createShade: function(){
       return $('<div />').css({
         position: 'absolute',
@@ -250,6 +253,11 @@
     //}}}
     //clearFilters: function(){{{
     clearFilters: function(){
+      var i, f = this.filters;
+
+      for(var i=0;i<f.length;i++)
+        if (f[i].destroy) f[i].destroy();
+
       this.filters = [];
     },
     //}}}
