@@ -15,7 +15,6 @@
     t.offsety = 0;
     t.ord = ord;
     t.filters = filters;
-    console.log('create',this);
   };
 
   $.extend(DragState.prototype,{
@@ -345,7 +344,6 @@
     //endDrag: function(){{{
     endDrag: function(){
       if (this.state) {
-        console.log(this.state);
         $(document.body).off('.jcrop');
         this.state = null;
       }
