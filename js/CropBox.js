@@ -47,20 +47,20 @@
     //getBox: function(){{{
     getBox: function(){
       var t = this;
-      var _t = { x2: t.bx + t.bw, y2: t.by + t.bh };
+      var _c = { x2: t.bx + t.bw, y2: t.by + t.bh };
       switch(t.ord){
-        case 'n': return t.resultWrap([ t.bx, t.offsety + t.by, _t.x2, _t.y2 ]);
-        case 's': return t.resultWrap([ t.bx, t.by, _t.x2, t.offsety + _t.y2 ]);
-        case 'e': return t.resultWrap([ t.bx, t.by, t.offsetx + _t.x2, _t.y2 ]);
-        case 'w': return t.resultWrap([ t.bx + t.offsetx, t.by, _t.x2, _t.y2 ]);
-        case 'sw': return t.resultWrap([ t.offsetx + t.bx, t.by, _t.x2, t.offsety + _t.y2 ]);
-        case 'se': return t.resultWrap([ t.bx, t.by, t.offsetx + _t.x2, t.offsety + _t.y2 ]);
-        case 'ne': return t.resultWrap([ t.bx, t.offsety + t.by, t.offsetx + _t.x2, _t.y2 ]);
-        case 'nw': return t.resultWrap([ t.offsetx + t.bx, t.offsety + t.by, _t.x2, _t.y2 ]);
+        case 'n': return t.resultWrap([ t.bx, t.offsety + t.by, _c.x2, _c.y2 ]);
+        case 's': return t.resultWrap([ t.bx, t.by, _c.x2, t.offsety + _c.y2 ]);
+        case 'e': return t.resultWrap([ t.bx, t.by, t.offsetx + _c.x2, _c.y2 ]);
+        case 'w': return t.resultWrap([ t.bx + t.offsetx, t.by, _c.x2, _c.y2 ]);
+        case 'sw': return t.resultWrap([ t.offsetx + t.bx, t.by, _c.x2, t.offsety + _c.y2 ]);
+        case 'se': return t.resultWrap([ t.bx, t.by, t.offsetx + _c.x2, t.offsety + _c.y2 ]);
+        case 'ne': return t.resultWrap([ t.bx, t.offsety + t.by, t.offsetx + _c.x2, _c.y2 ]);
+        case 'nw': return t.resultWrap([ t.offsetx + t.bx, t.offsety + t.by, _c.x2, _c.y2 ]);
         case 'move':
-          _t.nx = t.bx + t.offsetx;
-          _t.ny = t.by + t.offsety;
-          return t.resultWrap([ _t.nx, _t.ny, _t.nx + t.bw, _t.ny + t.bh ]);
+          _c.nx = t.bx + t.offsetx;
+          _c.ny = t.by + t.offsety;
+          return t.resultWrap([ _c.nx, _c.ny, _c.nx + t.bw, _c.ny + t.bh ]);
       }
     }
     //}}}
