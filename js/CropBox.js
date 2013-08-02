@@ -7,8 +7,6 @@
     var p = $box.position();
     t.elx = p.left;
     t.ely = p.top;
-    t.elw = $box.width();
-    t.elh = $box.height();
     t.bx = parseInt(bx);
     t.by = parseInt(by);
     t.bw = parseInt(bw);
@@ -73,18 +71,19 @@
     this.master = null;
   };
   $.extend(ConstrainFilter.prototype,{
-    filter: function(b){
-      var st = this.master.state;
+    filter: function(b,raw){
+      var m = this.master, st = m.state;
+      if (raw) return b;
       if (st.ord == 'move') {
         if (b.x < 0) { b.x = 0; b.x2 = b.w; }
         if (b.y < 0) { b.y = 0; b.y2 = b.h; }
-        if (b.x2 > st.elw) { b.x2 = st.elw; b.x = b.x2 - st.bw; }
-        if (b.y2 > st.elh) { b.y2 = st.elh; b.y = b.y2 - st.bh; }
+        if (b.x2 > m.elw) { b.x2 = m.elw; b.x = b.x2 - st.bw; }
+        if (b.y2 > m.elh) { b.y2 = m.elh; b.y = b.y2 - st.bh; }
       } else {
         if (b.x < 0) { b.x = 0; }
         if (b.y < 0) { b.y = 0; }
-        if (b.x2 > st.elw) { b.x2 = st.elw; }
-        if (b.y2 > st.elh) { b.y2 = st.elh; }
+        if (b.x2 > m.elw) { b.x2 = m.elw; }
+        if (b.y2 > m.elh) { b.y2 = m.elh; }
       }
       b.w = b.x2 - b.x;
       b.h = b.y2 - b.y;
@@ -97,10 +96,11 @@
     this.master = null;
   };
   $.extend(RatioFilter.prototype,{
-    filter: function(b){
+    filter: function(b,raw){
       var rt = b.w / b.h;
-      var st = this.master.state;
-      if (st.ord == 'move') return b;
+      var m = this.master;
+      if (raw) return b;
+      if (m.state.ord == 'move') return b;
       if (rt < 1) {
         if (rt < this.ratio) {
           b.x2 = b.y2 * this.ratio;
@@ -120,9 +120,9 @@
           b.x2 = b.y2 * this.ratio;
         }
       }
-      if (b.y2 > st.elh) {
+      if (b.y2 > m.elh) {
         if (this.ratio < 1){
-          b.y2 = st.elh;
+          b.y2 = m.elh;
           b.x2 = (b.y2 - b.y) * this.ratio;
         }
       }
@@ -166,13 +166,11 @@
         opacity: .5
       }).appendTo(this.container);
     },
-    filter: function(b){
+    filter: function(b,raw){
       var t = this,
-        st = t.master.state,
+        m = t.master,
         s = t.shades;
       
-      if (st) { t.elh = st.elh; t.elw = st.elw; }
-
       s.top.css({
         left: b.x+'px',
         width: b.w+'px',
@@ -182,15 +180,15 @@
         top: b.y2+'px',
         left: b.x+'px',
         width: b.w+'px',
-        height: (t.elh-b.y2)+'px'
+        height: (m.elh-b.y2)+'px'
       });
       s.right.css({
-        height: t.elh+'px',
+        height: m.elh+'px',
         left: b.x2+'px',
-        width: (t.elw-b.x2)+'px'
+        width: (m.elw-b.x2)+'px'
       });
       s.left.css({
-        height: t.elh+'px',
+        height: m.elh+'px',
         width: b.x+'px'
       });
 
@@ -246,6 +244,8 @@
     //}}}
     //addFilter: function(filter){{{
     addFilter: function(filter){
+      this.elw = this.container.width();
+      this.elh = this.container.height();
       filter.master = this;
       this.filters.push(filter);
       if (filter.init) filter.init();
@@ -311,7 +311,8 @@
     //createDragState: function(x,y,ord){{{
     createDragState: function(x,y,ord){
       var b = this.getSelectionRaw();
-      var sw = this.container.width(), sh = this.container.height();
+      this.elw = this.container.width();
+      this.elh = this.container.height();
       this.state = new CropBox.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
     },
     //}}}
