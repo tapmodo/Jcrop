@@ -241,6 +241,41 @@
       this.initEvents();
     },
     //}}}
+    callFiltersRaw: function(props){
+      var f = this.filters;
+      var b = {
+        x: parseFloat(props.left),
+        y: parseFloat(props.top),
+        w: parseFloat(props.width),
+        h: parseFloat(props.height)
+      };
+
+      b.x2 = b.x + b.w;
+      b.y2 = b.y + b.h;
+
+      for(var i=0;i<f.length;i++)
+        b = f[i].filter(b,1);
+
+      return b;
+    },
+    animateTo: function(box){
+      var i = 0, t = this;
+      this.ui.cropper.animate({
+        left: box[0]+'px',
+        top: box[1]+'px',
+        width: box[2]+'px',
+        height: box[3]+'px'
+      },{
+        progress: function(anim){
+          var props = {}, i, tw = anim.tweens;
+
+          for(i=0;i<tw.length;i++){
+            props[tw[i].prop] = tw[i].now; }
+
+          t.callFiltersRaw(props);
+        }
+      });
+    },
     //addFilter: function(filter){{{
     addFilter: function(filter){
       this.elw = this.container.width();
