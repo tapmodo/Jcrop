@@ -319,40 +319,9 @@
       this.initEvents();
     },
     //}}}
-    callFiltersRaw: function(props){
-      var f = this.filters;
-      var b = {
-        x: parseFloat(props.left),
-        y: parseFloat(props.top),
-        w: parseFloat(props.width),
-        h: parseFloat(props.height)
-      };
-
-      b.x2 = b.x + b.w;
-      b.y2 = b.y + b.h;
-
-      for(var i=0;i<f.length;i++)
-        b = f[i].filter(b,1);
-
-      return b;
-    },
-    animateTo: function(box){
-      var i = 0, t = this;
-      this.ui.cropper.animate({
-        left: box[0]+'px',
-        top: box[1]+'px',
-        width: box[2]+'px',
-        height: box[3]+'px'
-      },{
-        progress: function(anim){
-          var props = {}, i, tw = anim.tweens;
-
-          for(i=0;i<tw.length;i++){
-            props[tw[i].prop] = tw[i].now; }
-
-          t.callFiltersRaw(props);
-        }
-      });
+    animateTo: function(box,cb){
+      var ca = new CropBox.component.Animator(this);
+      ca.animate(box[0],box[1],box[2],box[3],cb);
     },
     //addFilter: function(filter){{{
     addFilter: function(filter){
