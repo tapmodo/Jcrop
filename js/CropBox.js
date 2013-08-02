@@ -32,8 +32,7 @@
     //}}}
     //resultWrap: function(d){{{
     resultWrap: function(d){
-      var f = this.filters,
-        b = {
+      var b = {
           x: Math.min(d[0],d[2]),
           y: Math.min(d[1],d[3]),
           x2: Math.max(d[0],d[2]),
@@ -42,9 +41,6 @@
 
       b.w = b.x2 - b.x;
       b.h = b.y2 - b.y;
-
-      for(var i=0;i<f.length;i++)
-        b = f[i].filter(b);
 
       return b;
     },
@@ -80,10 +76,9 @@
     this.master = null;
   };
   $.extend(ConstrainFilter.prototype,{
-    filter: function(b,raw){
+    filter: function(b){
       var m = this.master, st = m.state;
-      if (raw) return b;
-      if (st.ord == 'move') {
+      if (st && st.ord && (st.ord == 'move')) {
         if (b.x < 0) { b.x = 0; b.x2 = b.w; }
         if (b.y < 0) { b.y = 0; b.y2 = b.h; }
         if (b.x2 > m.elw) { b.x2 = m.elw; b.x = b.x2 - st.bw; }
@@ -113,8 +108,7 @@
     filter: function(b,raw){
       var rt = b.w / b.h;
       var m = this.master;
-      if (raw) return b;
-      if (m.state.ord == 'move') return b;
+      if (m.state && m.state.ord && (m.state.ord == 'move')) return b;
       if (rt < 1) {
         if (rt < this.ratio) {
           b.x2 = b.y2 * this.ratio;
@@ -435,9 +429,11 @@
     },
     //}}}
     redraw: function(){
-      var b = this.getSelectionRaw(),
-        f = this.filters;
-      
+      this.update(this.getSelectionRaw());
+    },
+    update: function(b){
+      var f = this.filters;
+
       for(var i=0;i<f.length;i++)
         b = f[i].filter(b);
 
@@ -447,8 +443,7 @@
     //redrawState: function(){{{
     redrawState: function(){
       var b = this.state.getBox();
-      this.resize(b.w,b.h);
-      this.moveTo(b.x,b.y);
+      this.update(this.state.getBox());
     },
     //}}}
     //createDragHandler: function($targ){{{
