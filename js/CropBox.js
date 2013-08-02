@@ -199,6 +199,65 @@
       return b;
     }
   });
+  // }}}
+  // CropAnimator {{{
+  /**
+   *  CropAnimator
+   *  manages smooth cropping animation
+   */
+  var CropAnimator = function(master){
+    this.master = master;
+  };
+
+  $.extend(CropAnimator.prototype,{
+    addElement: function(){
+      var b = this.master.getSelectionRaw();
+      this.element = $('<div />')
+        .css({
+          position: 'absolute',
+          top: b.y+'px',
+          left: b.x+'px',
+          width: b.w+'px',
+          height: b.h+'px'
+        });
+
+      this.master.container.append(this.element);
+    },
+    removeElement: function(){
+      this.element.remove();
+    },
+    animate: function(x,y,w,h){
+      var t = this;
+      t.addElement();
+      t.element.animate({
+        top: y+'px',
+        left: x+'px',
+        width: w+'px',
+        height: h+'px'
+      },{
+        progress: function(anim){
+          var props = {}, i, tw = anim.tweens;
+
+          for(i=0;i<tw.length;i++){
+            props[tw[i].prop] = tw[i].now; }
+
+          var b = {
+            x: parseInt(props.left),
+            y: parseInt(props.top),
+            w: parseInt(props.width),
+            h: parseInt(props.height)
+          };
+
+          b.x2 = b.x + b.w;
+          b.y2 = b.y + b.h;
+
+          t.master.update(b);
+        }
+      });
+      t.removeElement();
+    }
+  });
+  // }}}
 
   var CropBox = function(element,opt){
     this.ui = {
@@ -229,7 +288,8 @@
     //}}}
     //components: internal components {{{
     component: {
-      DragState: DragState
+      DragState: DragState,
+      Animator: CropAnimator
     }
     //}}}
   });
