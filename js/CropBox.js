@@ -1,5 +1,10 @@
 (function($){
 
+  // DragState {{{
+  /**
+   *  DragState
+   *  an object that handles dragging events
+   */
   var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
     var t = this;
     t.x = cx;
@@ -65,7 +70,12 @@
     }
     //}}}
   });
-
+  // }}}
+  // ConstrainFilter {{{
+  /**
+   *  ConstrainFilter
+   *  a filter to constrain crop selection to bounding element
+   */
   var ConstrainFilter = function(){
     this.master = null;
   };
@@ -89,7 +99,12 @@
       return b;
     }
   });
-
+  // }}}
+  // RatioFilter {{{
+  /**
+   *  RatioFilter
+   *  a filter to implement aspect ratio (not working yet)
+   */
   var RatioFilter = function(ratio){
     this.ratio = ratio;
     this.master = null;
@@ -130,7 +145,12 @@
       return b;
     }
   });
-
+  // }}}
+  // ShadeFilter {{{
+  /**
+   *  ShadeFilter
+   *  A filter that implements div-based shading on any element
+   */
   var ShadeFilter = function(){
     this.master = null;
     this.shades = {};
@@ -259,6 +279,10 @@
   });
   // }}}
 
+  /**
+   *  CropBox
+   *  core cropping code
+   */
   var CropBox = function(element,opt){
     this.ui = {
       cropper: $('<div />').addClass('jcrop-selection'),
