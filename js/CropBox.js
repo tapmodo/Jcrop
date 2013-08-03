@@ -369,35 +369,34 @@
       this.filters = [];
     },
     //}}}
-    //initEvents: function(){{{
-    initEvents: function(){
-      var t = this;
-      t.container.on('selectstart',function(e){ return false; })
-        .on('mousedown','.jcrop-drag',t.startDrag());
-    },
-    //}}}
-    //moveTo: function(x,y){{{
-    moveTo: function(x,y){
-      this.ui.cropper.css({top: y+'px', left: x+'px'});
-    },
-    //}}}
-    //resize: function(w,h){{{
-    resize: function(w,h){
-      this.ui.cropper.css({width: w+'px', height: h+'px'});
-    },
-    //}}}
-    //startDrag: function(){{{
-    startDrag: function(){
+    //createDragHandler: function($targ){{{
+    createDragHandler: function($targ){
       var t = this;
       return function(e){
-        var $targ = $(e.target);
-        t.createDragState(e.pageX,e.pageY,$targ.data('ord'));
-
-        $(document.body).on('mousemove.jcrop',t.createDragHandler($targ))
-          .on('mouseup.jcrop',function(e){ t.endDrag(); });
-
-        return false;
+        t.state.update(e.pageX,e.pageY);
+        t.redrawState();
       };
+    },
+    //}}}
+    //createDragState: function(x,y,ord){{{
+    createDragState: function(x,y,ord){
+      var b = this.getSelectionRaw();
+      this.elw = this.container.width();
+      this.elh = this.container.height();
+      this.state = new CropBox.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
+    },
+    //}}}
+    //createElement: function(type,ord){{{
+    createElement: function(type,ord){
+      return $('<div />').addClass('jcrop-'+type+' ord-'+ord).data('ord',ord);
+    },
+    //}}}
+    //endDrag: function(){{{
+    endDrag: function(){
+      if (this.state) {
+        $(document.body).off('.jcrop');
+        this.state = null;
+      }
     },
     //}}}
     //getSelectionRaw: function(){{{
@@ -416,47 +415,11 @@
       return rv;
     },
     //}}}
-    //createDragState: function(x,y,ord){{{
-    createDragState: function(x,y,ord){
-      var b = this.getSelectionRaw();
-      this.elw = this.container.width();
-      this.elh = this.container.height();
-      this.state = new CropBox.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
-    },
-    //}}}
-    redraw: function(){
-      this.update(this.getSelectionRaw());
-    },
-    update: function(b){
-      var f = this.filters;
-
-      for(var i=0;i<f.length;i++)
-        b = f[i].filter(b);
-
-      this.resize(b.w,b.h);
-      this.moveTo(b.x,b.y);
-    },
-    //redrawState: function(){{{
-    redrawState: function(){
-      var b = this.state.getBox();
-      this.update(this.state.getBox());
-    },
-    //}}}
-    //createDragHandler: function($targ){{{
-    createDragHandler: function($targ){
+    //initEvents: function(){{{
+    initEvents: function(){
       var t = this;
-      return function(e){
-        t.state.update(e.pageX,e.pageY);
-        t.redrawState();
-      };
-    },
-    //}}}
-    //endDrag: function(){{{
-    endDrag: function(){
-      if (this.state) {
-        $(document.body).off('.jcrop');
-        this.state = null;
-      }
+      t.container.on('selectstart',function(e){ return false; })
+        .on('mousedown','.jcrop-drag',t.startDrag());
     },
     //}}}
     //insertElements: function(){{{
@@ -476,11 +439,57 @@
         t.ui.box.append(t.createElement('handle jcrop-drag',h[i]));
     },
     //}}}
-    //createElement: function(type,ord){{{
-    createElement: function(type,ord){
-      return $('<div />').addClass('jcrop-'+type+' ord-'+ord).data('ord',ord);
-    }
+    //moveTo: function(x,y){{{
+    moveTo: function(x,y){
+      this.ui.cropper.css({top: y+'px', left: x+'px'});
+    },
     //}}}
+    //resize: function(w,h){{{
+    resize: function(w,h){
+      this.ui.cropper.css({width: w+'px', height: h+'px'});
+    },
+    //}}}
+    // redraw: function(){{{
+    redraw: function(){
+      this.update(this.getSelectionRaw());
+    },
+    // }}}
+    //redrawState: function(){{{
+    redrawState: function(){
+      var b = this.state.getBox();
+      this.update(this.state.getBox());
+    },
+    //}}}
+    //startDrag: function(){{{
+    startDrag: function(){
+      var t = this;
+      return function(e){
+        var $targ = $(e.target);
+        var ord = $targ.data('ord');
+
+        if ((ord == 'move') && t.container.hasClass('jcrop-nodrag'))
+          return false;
+
+        t.createDragState(e.pageX,e.pageY,ord);
+
+        $(document.body).on('mousemove.jcrop',t.createDragHandler($targ))
+          .on('mouseup.jcrop',function(e){ t.endDrag(); });
+
+        return false;
+      };
+    },
+    //}}}
+    // update: function(b){{{
+    update: function(b){
+      var f = this.filters;
+
+      for(var i=0;i<f.length;i++)
+        b = f[i].filter(b);
+
+      this.resize(b.w,b.h);
+      this.moveTo(b.x,b.y);
+    }
+    // }}}
   });
 
   $.CropBox = CropBox;
