@@ -6,17 +6,41 @@
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/CropBox.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script type="text/javascript">
   var cb;
   jQuery(function($){
 
     // How easy is this??
     var $targ = $('#target');
+    var $easing = $('#easing');
+
+    // Create crop widget
     cb = new $.CropBox($('.jcrop-able'),{});
+
+    // Some basic stuff that will be wrapped later..
     cb.ui.cropper.css({ top: '50px', left: '50px', width: '200px', height: '150px' });
     cb.container.css({ width: '602px', height: '400px' });
+
+    // Add some filters; constraint and shading
+    // This will also be wrapped later
     cb.addFilter(new $.CropBox.filter.constrain());
-    cb.addFilter(new $.CropBox.filter.shader());
+    cb.shader = new $.CropBox.filter.shader();
+    cb.addFilter(cb.shader);
+
+    // Select an interesting easing function
+    $easing[0].selectedIndex = 13;
+
+    // Set up the easing function select element event
+    cb.opt.easeFunction = $easing.change(function(e){
+      cb.opt.easeFunction = $(e.target).val();
+      e.preventDefault();
+    }).val();
+
+    // Animate button event
+    $(document.body).on('click','[data-action=random-animate]',function(e){
+      cb.animateTo([Math.random()*300,Math.random()*200,(Math.random()*240)+50,(Math.random()*140)+60]);
+    });
 
   });
 
@@ -46,9 +70,47 @@
   <img src="demo_files/sago.jpg" id="target" alt="[Jcrop Example]" />
   </div>
 
+  <div class="btn-toolbar">
+    <a data-action="random-animate" class="btn">Animate</a>
+  </div>
+    <select data-action="update-easing" class="select" id="easing">
+      <option>linear</option>
+      <option>swing</option>
+      <option>easeInOutQuad</option>
+      <option>easeInQuad</option>
+      <option>easeOutQuad</option>
+      <option>easeInOutExpo</option>
+      <option>easeInExpo</option>
+      <option>easeOutExpo</option>
+      <option>easeInOutSine</option>
+      <option>easeInSine</option>
+      <option>easeOutSine</option>
+      <option>easeInOutBounce</option>
+      <option>easeInBounce</option>
+      <option>easeOutBounce</option>
+      <option>easeInOutCirc</option>
+      <option>easeInCirc</option>
+      <option>easeOutCirc</option>
+      <option>easeInOutCubic</option>
+      <option>easeInCubic</option>
+      <option>easeOutCubic</option>
+      <option>easeInOutElastic</option>
+      <option>easeInElastic</option>
+      <option>easeOutElastic</option>
+      <option>easeInOutBack</option>
+      <option>easeInBack</option>
+      <option>easeOutBack</option>
+      <option>easeInOutQuart</option>
+      <option>easeInQuart</option>
+      <option>easeOutQuart</option>
+      <option>easeInOutQuint</option>
+      <option>easeInQuint</option>
+      <option>easeOutQuint</option>
+    </select>
+
   <div class="description">
   <p>
-    <b>Meet CropBox.js, a whole new Jcrop engine.</b></p>
+    <b>Meet a whole new Jcrop engine.</b></p>
     <ul>
       <li>Completely re-written from scratch</li>
       <li>Uses true Javascript (prototypical) objects</li>
