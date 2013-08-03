@@ -240,8 +240,9 @@
     removeElement: function(){
       this.element.remove();
     },
-    animate: function(x,y,w,h){
+    animate: function(x,y,w,h,cb){
       var t = this;
+      t.master.allowResize(false);
       t.addElement();
       t.element.animate({
         top: y+'px',
@@ -249,6 +250,12 @@
         width: w+'px',
         height: h+'px'
       },{
+        easing: t.master.opt.animEasing,
+        duration: t.master.opt.animDuration,
+        complete: function(){
+          t.master.allowResize(true);
+          cb.call(this);
+        },
         progress: function(anim){
           var props = {}, i, tw = anim.tweens;
 
@@ -292,6 +299,10 @@
   $.extend(CropBox,{
     //defaults: default settings {{{
     defaults: {
+      resizable: true,
+      draggable: true,
+      animEasing: 'easeOutBack',
+      animDuration: 400,
       borders:  [ 'n', 's', 'e', 'w' ],
       handles:  [ 'n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se' ],
       dragbars: [ 'n', 's', 'e', 'w' ]
@@ -319,10 +330,6 @@
       this.initEvents();
     },
     //}}}
-    animateTo: function(box,cb){
-      var ca = new CropBox.component.Animator(this);
-      ca.animate(box[0],box[1],box[2],box[3],cb);
-    },
     //addFilter: function(filter){{{
     addFilter: function(filter){
       this.elw = this.container.width();
@@ -332,6 +339,26 @@
       if (filter.init) filter.init();
     },
     //}}}
+    // allowDrag: function(v){{{
+    allowDrag: function(v){
+      if (v == undefined) v = this.opt.draggable;
+      if (v && this.opt.draggable) this.container.removeClass('jcrop-nodrag');
+        else this.container.addClass('jcrop-nodrag');
+    },
+    // }}}
+    // allowResize: function(v){{{
+    allowResize: function(v){
+      if (v == undefined) v = this.opt.resizable;
+      if (v && this.opt.resizable) this.container.removeClass('jcrop-noresize');
+        else this.container.addClass('jcrop-noresize');
+    },
+    // }}}
+    // animateTo: function(box,cb){{{
+    animateTo: function(box,cb){
+      var ca = new CropBox.component.Animator(this);
+      ca.animate(box[0],box[1],box[2],box[3],cb);
+    },
+    // }}}
     //clearFilters: function(){{{
     clearFilters: function(){
       var i, f = this.filters;
