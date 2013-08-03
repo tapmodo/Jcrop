@@ -76,6 +76,7 @@
     this.master = null;
   };
   $.extend(ConstrainFilter.prototype,{
+    priority: 5,
     filter: function(b){
       var m = this.master, st = m.state;
       if (st && st.ord && (st.ord == 'move')) {
@@ -105,7 +106,8 @@
     this.master = null;
   };
   $.extend(RatioFilter.prototype,{
-    filter: function(b,raw){
+    priority: 15,
+    filter: function(b){
       var rt = b.w / b.h;
       var m = this.master;
       if (m.state && m.state.ord && (m.state.ord == 'move')) return b;
@@ -150,6 +152,7 @@
     this.shades = {};
   };
   $.extend(ShadeFilter.prototype,{
+    priority: 95,
     init: function(){
       var t = this;
       t.visible = false;
@@ -179,7 +182,7 @@
         opacity: .5
       }).appendTo(this.container);
     },
-    filter: function(b,raw){
+    filter: function(b){
       var t = this,
         m = t.master,
         s = t.shades;
@@ -336,9 +339,15 @@
       this.elh = this.container.height();
       filter.master = this;
       this.filters.push(filter);
+      this.sortFilters();
       if (filter.init) filter.init();
     },
     //}}}
+    sortFilters: function(){
+      this.filters.sort(
+        function(x,y){ return x.priority - y.priority; }
+      );
+    },
     // allowDrag: function(v){{{
     allowDrag: function(v){
       if (v == undefined) v = this.opt.draggable;
