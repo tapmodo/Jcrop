@@ -304,8 +304,8 @@
       animEasing: 'easeOutBack',
       animDuration: 400,
       borders:  [ 'n', 's', 'e', 'w' ],
-      handles:  [ 'n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se' ],
-      dragbars: [ 'n', 's', 'e', 'w' ]
+      handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
+      dragbars: [ 'n', 'e', 'w', 's' ]
     },
     //}}}
     //filter: built-in filter collection {{{
