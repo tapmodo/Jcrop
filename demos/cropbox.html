@@ -16,7 +16,10 @@
     var $easing = $('#easing');
 
     // Create crop widget
-    cb = new $.CropBox($('.jcrop-able'),{});
+    cb = new $.CropBox($('.jcrop-able'),{
+      resizable: true,
+      draggable: true
+    });
 
     // Some basic stuff that will be wrapped later..
     cb.ui.cropper.css({ top: '50px', left: '50px', width: '200px', height: '150px' });
@@ -28,12 +31,15 @@
     cb.shader = new $.CropBox.filter.shader();
     cb.addFilter(cb.shader);
 
+    cb.allowResize();
+    cb.allowDrag();
+
     // Select an interesting easing function
     $easing[0].selectedIndex = 13;
 
     // Set up the easing function select element event
-    cb.opt.easeFunction = $easing.change(function(e){
-      cb.opt.easeFunction = $(e.target).val();
+    cb.opt.animEasing = $easing.change(function(e){
+      cb.opt.animEasing = $(e.target).val();
       e.preventDefault();
     }).val();
 
