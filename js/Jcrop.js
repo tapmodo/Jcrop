@@ -181,7 +181,7 @@
     },
     getBoundRatio: function(b,quad){
       var box = this.getLargestBox(this.ratio,b.w,b.h);
-      return CropBox.wrapFromXywh(this.offsetFromCorner(quad,box,b));
+      return Jcrop.wrapFromXywh(this.offsetFromCorner(quad,box,b));
     },
     getQuadrant: function(s){
       var relx = s.opposite[0]-s.offsetx
@@ -404,22 +404,22 @@
   // }}}
 
   /**
-   *  CropBox
+   *  Jcrop
    *  core cropping code
    */
-  var CropBox = function(element,opt){
+  var Jcrop = function(element,opt){
     this.ui = {
       cropper: $('<button />').addClass('jcrop-selection'),
       box: $('<div />').addClass('jcrop-box jcrop-drag').data('ord','move')
     };
     this.container = $(element).append(this.ui.cropper.append(this.ui.box)).addClass('jcrop-active');
-    this.opt = $.extend({},CropBox.defaults,opt);
+    this.opt = $.extend({},Jcrop.defaults,opt);
     this.state = null;
     this.filters = [];
     this.init();
   };
 
-  $.extend(CropBox,{
+  $.extend(Jcrop,{
     //defaults: default settings {{{
     defaults: {
       resizable: true,
@@ -455,7 +455,7 @@
     // }}}
   });
 
-  $.extend(CropBox.prototype,{
+  $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
       this.insertElements();
@@ -497,7 +497,7 @@
     // }}}
     // animateTo: function(box,cb){{{
     animateTo: function(box,cb){
-      var ca = new CropBox.component.Animator(this);
+      var ca = new Jcrop.component.Animator(this);
       ca.animate(box[0],box[1],box[2],box[3],cb);
     },
     // }}}
@@ -538,7 +538,7 @@
       var b = this.getSelectionRaw();
       this.elw = this.container.width();
       this.elh = this.container.height();
-      this.state = new CropBox.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
+      this.state = new Jcrop.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
     },
     //}}}
     //createElement: function(type,ord){{{
@@ -648,7 +648,7 @@
     // }}}
     // setSelect: function(box){{{
     setSelect: function(box){
-      this.update(CropBox.wrapFromXywh(box));
+      this.update(Jcrop.wrapFromXywh(box));
       return this;
     },
     // }}}
@@ -693,7 +693,7 @@
     // }}}
   });
 
-  $.CropBox = CropBox;
+  $.Jcrop = Jcrop;
 
 })(jQuery);
 
