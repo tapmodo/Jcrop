@@ -466,14 +466,21 @@
       this.initEvents();
     },
     //}}}
+    hasFilter: function(filter){
+      var i, f = this.filters, n = [];
+      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
+    },
     //addFilter: function(filter){{{
     addFilter: function(filter){
       this.elw = this.container.width();
       this.elh = this.container.height();
       filter.master = this;
-      this.filters.push(filter);
-      this.sortFilters();
-      if (filter.init) filter.init();
+      if (!this.hasFilter(filter)) {
+        this.filters.push(filter);
+        this.sortFilters();
+        if (filter.init) filter.init();
+        this.redraw();
+      }
     },
     //}}}
     sortFilters: function(){
@@ -501,6 +508,17 @@
       ca.animate(box[0],box[1],box[2],box[3],cb);
     },
     // }}}
+    removeFiltersByTag: function(tag){
+      var i, f = this.filters, n = [];
+
+      for(var i=0;i<f.length;i++)
+        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
+          if (f[i].destroy) f[i].destroy();
+        }
+        else n.push(f[i]);
+
+      this.filters = n;
+    },
     //clearFilters: function(){{{
     clearFilters: function(){
       var i, f = this.filters;
