@@ -501,6 +501,12 @@
       ca.animate(box[0],box[1],box[2],box[3],cb);
     },
     // }}}
+    // blur: function(){{{
+    blur: function(){
+      this.ui.cropper.blur();
+      return this;
+    },
+    // }}}
     // centerSelection: function(instant){{{
     centerSelection: function(instant){
       var b = this.getSelectionRaw();
@@ -544,11 +550,17 @@
     endDrag: function(){
       if (this.state) {
         $(document.body).off('.jcrop');
-        this.ui.cropper.focus();
+        this.focus();
         this.state = null;
       }
     },
     //}}}
+    // focus: function(){{{
+    focus: function(){
+      this.ui.cropper.focus();
+      return this;
+    },
+    // }}}
     //getSelectionRaw: function(){{{
     getSelectionRaw: function(){
       var b = this.ui.cropper,
