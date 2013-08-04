@@ -435,7 +435,8 @@
     filter: {
       constrain: ConstrainFilter,
       shader: ShadeFilter,
-      ratio: RatioFilter
+      ratio: RatioFilter,
+      round: RoundFilter
     },
     //}}}
     //components: internal components {{{
