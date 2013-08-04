@@ -409,7 +409,7 @@
    */
   var CropBox = function(element,opt){
     this.ui = {
-      cropper: $('<div />').addClass('jcrop-selection'),
+      cropper: $('<button />').addClass('jcrop-selection'),
       box: $('<div />').addClass('jcrop-box jcrop-drag').data('ord','move')
     };
     this.container = $(element).append(this.ui.cropper.append(this.ui.box)).addClass('jcrop-active');
@@ -544,6 +544,7 @@
     endDrag: function(){
       if (this.state) {
         $(document.body).off('.jcrop');
+        this.ui.cropper.focus();
         this.state = null;
       }
     },
