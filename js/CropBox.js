@@ -165,38 +165,67 @@
   };
   $.extend(RatioFilter.prototype,{
     priority: 15,
+    getLargestBox: function(ratio,w,h){
+      if ((w/h) > ratio)
+        return [ h * ratio, h ];
+          else return [ w, w / ratio ];
+    },
+    offsetFromCorner: function(corner,box,b){
+      var w = box[0], h = box[1];
+      switch(corner){
+        case 'bl': return [ b.x2 - w, b.y, w, h ];
+        case 'tl': return [ b.x2 - w , b.y2 - h, w, h ];
+        case 'br': return [ b.x, b.y, w, h ];
+        case 'tr': return [ b.x, b.y2 - h, w, h ];
+      }
+    },
+    getBoundRatio: function(b,quad){
+      var box = this.getLargestBox(this.ratio,b.w,b.h);
+      return CropBox.wrapFromXywhArray(this.offsetFromCorner(quad,box,b));
+    },
+    getQuadrant: function(s){
+      var relx = s.opposite[0]-s.offsetx
+      var rely = s.opposite[1]-s.offsety;
+
+      if ((relx < 0) && (rely < 0)) return 'br';
+        else if ((relx >= 0) && (rely >= 0)) return 'tl';
+        else if ((relx < 0) && (rely >= 0)) return 'tr';
+        return 'bl';
+    },
     filter: function(b){
       var rt = b.w / b.h;
       var m = this.master;
-      if (m.state && m.state.ord && (m.state.ord == 'move')) return b;
-      if (rt < 1) {
-        if (rt < this.ratio) {
-          b.x2 = b.y2 * this.ratio;
-          console.log('n1 ok');
-        } else {
-          console.log('n2 ok');
-          b.y2 = b.x2 / this.ratio;
-          b.y2 = b.x2 / this.ratio;
-        }
-      }
-      else {
-        if (rt > this.ratio) {
-          console.log('n3');
-          b.y2 = b.x2 / this.ratio;
-        } else {
-          console.log('n4');
-          b.x2 = b.y2 * this.ratio;
-        }
-      }
-      if (b.y2 > m.elh) {
-        if (this.ratio < 1){
+      var st = m.state;
+
+      var quad = st? this.getQuadrant(st): 'br';
+      var ord = (st && st.ord) ? st.ord: 'se';
+
+      if (ord == 'move') return b;
+
+      switch(this.ord) {
+        case 'n':
+          b.x2 = m.elw;
+          b.w = b.x2 - b.x;
+          quad = 'tr';
+          break;
+        case 's':
+          b.x2 = m.elw;
+          b.w = b.x2 - b.x;
+          quad = 'br';
+          break;
+        case 'e':
           b.y2 = m.elh;
-          b.x2 = (b.y2 - b.y) * this.ratio;
-        }
+          b.h = b.y2 - b.y;
+          quad = 'br';
+          break;
+        case 'w':
+          b.y2 = m.elh;
+          b.h = b.y2 - b.y;
+          quad = 'bl';
+          break;
       }
-      b.w = b.x2 - b.x;
-      b.h = b.y2 - b.y;
-      return b;
+
+      return this.getBoundRatio(b,quad);
     }
   });
   // }}}
