@@ -23,7 +23,7 @@
     });
 
     // Some basic stuff that will be wrapped later..
-    cb.ui.cropper.css({ top: '50px', left: '50px', width: '200px', height: '150px' });
+    //cb.ui.cropper.css({ top: '50px', left: '50px', width: '200px', height: '150px' });
     cb.container.css({ width: '602px', height: '400px' });
 
     filter = {
@@ -32,10 +32,6 @@
       ratio: new $.CropBox.filter.ratio(1.0),
       round: new $.CropBox.filter.round()
     };
-
-    cb.allowResize();
-    cb.allowDrag();
-    cb.redraw();
 
     // Select an interesting easing function
     $easing[0].selectedIndex = 24;
@@ -54,6 +50,16 @@
     $('#page-interface').on('mousedown',function(e){
       if (e.target.tagName !== 'SELECT')
         e.preventDefault();
+    });
+
+    cb.allowResize();
+    cb.allowDrag();
+    cb.setSelect([ 50, 50, 200, 150 ]);
+    cb.redraw();
+
+    cb.container.on('keydown',function(e){
+      console.log('keydown',e);
+      e.preventDefault();
     });
 
     // Filter toggles
