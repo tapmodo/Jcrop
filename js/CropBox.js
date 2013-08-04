@@ -243,8 +243,8 @@
   $.extend(ShadeFilter.prototype,{
     tag: 'shader',
     fade: true,
-    fadeEasing: 'easeOutExpo',
-    fadeSpeed: 500,
+    fadeEasing: 'easeInOutSine',
+    fadeSpeed: 320,
     priority: 95,
     init: function(){
       var t = this;
