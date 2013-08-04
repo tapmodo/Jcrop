@@ -445,12 +445,14 @@
       Animator: CropAnimator
     },
     //}}}
+    // wrapFromXywh: function(xywh){{{
     wrapFromXywh: function(xywh){
       var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
       b.x2 = b.x + b.w;
       b.y2 = b.y + b.h;
       return b;
     }
+    // }}}
   });
 
   $.extend(CropBox.prototype,{
@@ -460,10 +462,6 @@
       this.initEvents();
     },
     //}}}
-    hasFilter: function(filter){
-      var i, f = this.filters, n = [];
-      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
-    },
     //addFilter: function(filter){{{
     addFilter: function(filter){
       this.elw = this.container.width();
@@ -477,45 +475,39 @@
       }
     },
     //}}}
-    sortFilters: function(){
-      this.filters.sort(
-        function(x,y){ return x.priority - y.priority; }
-      );
-    },
     // allowDrag: function(v){{{
     allowDrag: function(v){
       if (v == undefined) v = this.opt.draggable;
+
       if (v && this.opt.draggable) this.container.removeClass('jcrop-nodrag');
         else this.container.addClass('jcrop-nodrag');
+
+      return this;
     },
     // }}}
     // allowResize: function(v){{{
     allowResize: function(v){
       if (v == undefined) v = this.opt.resizable;
+
       if (v && this.opt.resizable) this.container.removeClass('jcrop-noresize');
         else this.container.addClass('jcrop-noresize');
+
+      return this;
     },
     // }}}
-    setSelect: function(box){
-      this.update(CropBox.wrapFromXywh(box));
-    },
     // animateTo: function(box,cb){{{
     animateTo: function(box,cb){
       var ca = new CropBox.component.Animator(this);
       ca.animate(box[0],box[1],box[2],box[3],cb);
     },
     // }}}
-    removeFiltersByTag: function(tag){
-      var i, f = this.filters, n = [];
-
-      for(var i=0;i<f.length;i++)
-        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
-          if (f[i].destroy) f[i].destroy();
-        }
-        else n.push(f[i]);
-
-      this.filters = n;
+    // centerSelection: function(instant){{{
+    centerSelection: function(instant){
+      var b = this.getSelectionRaw();
+      var box = [ (this.elw-b.w)/2, (this.elh-b.h)/2, b.w, b.h ];
+      return this[instant?'setSelect':'animateTo'](box);
     },
+    // }}}
     //clearFilters: function(){{{
     clearFilters: function(){
       var i, f = this.filters;
@@ -572,6 +564,12 @@
       return rv;
     },
     //}}}
+    // hasFilter: function(filter){{{
+    hasFilter: function(filter){
+      var i, f = this.filters, n = [];
+      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
+    },
+    // }}}
     //initEvents: function(){{{
     initEvents: function(){
       var t = this;
@@ -596,6 +594,11 @@
         t.ui.box.append(t.createElement('handle jcrop-drag',h[i]));
     },
     //}}}
+    // maxSelect: function(){{{
+    maxSelect: function(){
+      this.setSelect([0,0,this.elw,this.elh]);
+    },
+    // }}}
     //moveTo: function(x,y){{{
     moveTo: function(x,y){
       this.ui.cropper.css({top: y+'px', left: x+'px'});
@@ -617,6 +620,32 @@
       this.update(this.state.getBox());
     },
     //}}}
+    // removeFiltersByTag: function(tag){{{
+    removeFiltersByTag: function(tag){
+      var i, f = this.filters, n = [];
+
+      for(var i=0;i<f.length;i++)
+        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
+          if (f[i].destroy) f[i].destroy();
+        }
+        else n.push(f[i]);
+
+      this.filters = n;
+    },
+    // }}}
+    // setSelect: function(box){{{
+    setSelect: function(box){
+      this.update(CropBox.wrapFromXywh(box));
+      return this;
+    },
+    // }}}
+    // sortFilters: function(){{{
+    sortFilters: function(){
+      this.filters.sort(
+        function(x,y){ return x.priority - y.priority; }
+      );
+    },
+    // }}}
     //startDrag: function(){{{
     startDrag: function(){
       var t = this;
