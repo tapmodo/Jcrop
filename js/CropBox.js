@@ -502,6 +502,9 @@
         else this.container.addClass('jcrop-noresize');
     },
     // }}}
+    setSelect: function(box){
+      this.update(CropBox.wrapFromXywhArray(box));
+    },
     // animateTo: function(box,cb){{{
     animateTo: function(box,cb){
       var ca = new CropBox.component.Animator(this);
