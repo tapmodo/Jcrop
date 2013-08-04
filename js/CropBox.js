@@ -443,8 +443,20 @@
     component: {
       DragState: DragState,
       Animator: CropAnimator
-    }
+    },
     //}}}
+    wrapFromXywhArray: function(xywh){
+      var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
+      b.x2 = b.x + b.w;
+      b.y2 = b.y + b.h;
+      return b;
+    },
+    wrapFromXywh: function(x,y,w,h){
+      var b = { x: x, y: y, w: w, h: h };
+      b.x2 = x + w;
+      b.y2 = y + h;
+      return b;
+    }
   });
 
   $.extend(CropBox.prototype,{
