@@ -377,7 +377,7 @@
         duration: t.master.opt.animDuration,
         complete: function(){
           t.master.allowResize(true);
-          cb.call(this);
+          cb && cb.call(this);
         },
         progress: function(anim){
           var props = {}, i, tw = anim.tweens;
