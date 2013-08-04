@@ -5,7 +5,7 @@
   <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 
 <script src="../js/jquery.min.js"></script>
-<script src="../js/CropBox.js"></script>
+<script src="../js/Jcrop.js"></script>
 <script src="../js/jquery.color.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script type="text/javascript">
@@ -17,7 +17,7 @@
     var $easing = $('#easing');
 
     // Create crop widget
-    cb = new $.CropBox($('.jcrop-able'),{
+    cb = new $.Jcrop($('.jcrop-able'),{
       resizable: true,
       draggable: true
     });
@@ -27,10 +27,10 @@
     cb.container.css({ width: '602px', height: '400px' });
 
     filter = {
-      shader: new $.CropBox.filter.shader(),
-      constrain: new $.CropBox.filter.constrain(),
-      ratio: new $.CropBox.filter.ratio(1.0),
-      round: new $.CropBox.filter.round()
+      shader: new $.Jcrop.filter.shader(0.6,'black'),
+      constrain: new $.Jcrop.filter.constrain(),
+      ratio: new $.Jcrop.filter.ratio(1.0),
+      round: new $.Jcrop.filter.round()
     };
 
     // Select an interesting easing function
@@ -89,6 +89,9 @@
           $targ.addClass('active');
           filter.shader.setColor('black').setOpacity($targ.data('opacity'));
           break;
+        case 'center-selection':
+          cb.centerSelection();
+          break;
         case 'random-select':
           cb.setSelect([Math.random()*300,Math.random()*200,(Math.random()*540)+50,(Math.random()*340)+60]);
           break;
@@ -130,6 +133,7 @@
 
   <div class="btn-toolbar">
     <a data-action="random-animate" class="btn">Animate</a>
+    <a data-action="center-selection" class="btn">Center</a>
     <a data-action="random-select" class="btn">Select</a>
     <a data-action="color-cycle" class="btn">Color</a>
     <span class="btn-group">
