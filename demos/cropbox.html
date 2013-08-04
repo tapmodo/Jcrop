@@ -6,9 +6,10 @@
 
 <script src="../js/jquery.min.js"></script>
 <script src="../js/CropBox.js"></script>
+<script src="../js/jquery.color.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 <script type="text/javascript">
-  var cb;
+  var cb, filter;
   jQuery(function($){
 
     // How easy is this??
@@ -25,27 +26,71 @@
     cb.ui.cropper.css({ top: '50px', left: '50px', width: '200px', height: '150px' });
     cb.container.css({ width: '602px', height: '400px' });
 
-    // Add some filters; constraint and shading
-    // This will also be wrapped later
-    cb.addFilter(new $.CropBox.filter.constrain());
-    cb.shader = new $.CropBox.filter.shader();
-    cb.addFilter(cb.shader);
+    filter = {
+      shader: new $.CropBox.filter.shader(),
+      constrain: new $.CropBox.filter.constrain(),
+      ratio: new $.CropBox.filter.ratio(1.0),
+      round: new $.CropBox.filter.round()
+    };
 
     cb.allowResize();
     cb.allowDrag();
+    cb.redraw();
 
     // Select an interesting easing function
-    $easing[0].selectedIndex = 13;
+    $easing[0].selectedIndex = 24;
 
     // Set up the easing function select element event
     cb.opt.animEasing = $easing.change(function(e){
-      cb.opt.animEasing = $(e.target).val();
+      var $targ = $(e.target);
+      cb.opt.animEasing = $targ.val();
+      $targ.blur();
       e.preventDefault();
+      cb.animateTo([Math.random()*300,Math.random()*200,(Math.random()*540)+50,(Math.random()*340)+60]);
     }).val();
 
+    $.each(filter,function(u,i){ cb.addFilter(i); });
+    $('#filter-selections input').attr('checked','checked');
+    $('#page-interface').on('mousedown',function(e){
+      if (e.target.tagName !== 'SELECT')
+        e.preventDefault();
+    });
+
+    // Filter toggles
+    $(document.body).on('change','[data-filter-toggle]',function(e){
+      var tog = $(e.target).data('filter-toggle');
+      if (e.target.checked) {
+        cb.addFilter(filter[tog]);
+      } else {
+        cb.removeFiltersByTag(filter[tog]);
+      }
+    });
+
+    var cycle_colors = ['red','blue','gray','yellow','orange','green','white'];
+
     // Animate button event
-    $(document.body).on('click','[data-action=random-animate]',function(e){
-      cb.animateTo([Math.random()*300,Math.random()*200,(Math.random()*240)+50,(Math.random()*140)+60]);
+    $(document.body).on('click','[data-action]',function(e){
+      var $targ = $(e.target);
+      var action = $targ.data('action');
+      switch(action){
+        case 'color-cycle':
+          var cc = cycle_colors.shift();
+          filter.shader.setColor(cc);
+          cycle_colors.push(cc);
+          break;
+        case 'set-opacity':
+          $targ.parent().find('.active').removeClass('active');
+          $targ.addClass('active');
+          filter.shader.setColor('black').setOpacity($targ.data('opacity'));
+          break;
+        case 'random-select':
+          cb.setSelect([Math.random()*300,Math.random()*200,(Math.random()*540)+50,(Math.random()*340)+60]);
+          break;
+        case 'random-animate':
+          cb.animateTo([Math.random()*300,Math.random()*200,(Math.random()*540)+50,(Math.random()*340)+60]);
+          break;
+      }
+      e.preventDefault();
     });
 
   });
@@ -72,12 +117,20 @@
 <h1>Hello World</h1>
 </div>
 
+  <div id="page-interface">
   <div class="jcrop-able">
   <img src="demo_files/sago.jpg" id="target" alt="[Jcrop Example]" />
   </div>
 
   <div class="btn-toolbar">
     <a data-action="random-animate" class="btn">Animate</a>
+    <a data-action="random-select" class="btn">Select</a>
+    <a data-action="color-cycle" class="btn">Color</a>
+    <span class="btn-group">
+    <a data-action="set-opacity" data-opacity=".35" class="btn">Light</a>
+    <a data-action="set-opacity" data-opacity=".55" class="btn active">Medium</a>
+    <a data-action="set-opacity" data-opacity=".75" class="btn">Dark</a>
+    </span>
   </div>
     <select data-action="update-easing" class="select" id="easing">
       <option>linear</option>
@@ -91,8 +144,6 @@
       <option>easeInOutSine</option>
       <option>easeInSine</option>
       <option>easeOutSine</option>
-      <option>easeInOutBounce</option>
-      <option>easeInBounce</option>
       <option>easeOutBounce</option>
       <option>easeInOutCirc</option>
       <option>easeInCirc</option>
@@ -100,8 +151,6 @@
       <option>easeInOutCubic</option>
       <option>easeInCubic</option>
       <option>easeOutCubic</option>
-      <option>easeInOutElastic</option>
-      <option>easeInElastic</option>
       <option>easeOutElastic</option>
       <option>easeInOutBack</option>
       <option>easeInBack</option>
@@ -113,6 +162,23 @@
       <option>easeInQuint</option>
       <option>easeOutQuint</option>
     </select>
+
+    <div id="filter-selections">
+      <label class="checkbox">
+        <input type="checkbox" data-filter-toggle="constrain" /> Constrain
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" data-filter-toggle="ratio" /> Aspect ratio
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" data-filter-toggle="round" /> Rounding
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" data-filter-toggle="shader" /> Shading
+      </label>
+    </div>
+
+    </div>
 
   <div class="description">
   <p>
