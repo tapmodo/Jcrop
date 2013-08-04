@@ -651,6 +651,8 @@
 
       this.resize(b.w,b.h);
       this.moveTo(b.x,b.y);
+
+      this.container.trigger('cropmove',b);
     }
     // }}}
   });
