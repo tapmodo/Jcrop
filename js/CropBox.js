@@ -20,9 +20,41 @@
     t.offsety = 0;
     t.ord = ord;
     t.filters = filters;
+    t.opposite = t.getOppositeCornerOffset();
+
+    for(var i=0;i<filters.length;i++)
+      if (filters[i].preDrag) filters[i].preDrag(t);
   };
 
   $.extend(DragState.prototype,{
+    // getOppositeCornerOffset: function(){{{
+    // Calculate relative offset of locked corner
+    getOppositeCornerOffset: function(){
+
+      var relx = this.x - this.elx - this.bx;
+      var rely = this.y - this.ely - this.by;
+
+      switch(this.ord){
+        case 'nw':
+        case 'w':
+          return [ this.bw - relx, this.bh - rely ];
+
+        case 'sw':
+          return [ this.bw - relx, -rely ];
+
+        case 'se':
+        case 's':
+        case 'e':
+          return [ -relx, -rely ];
+
+        case 'ne':
+        case 'n':
+          return [ -relx, this.bh - rely ];
+      }
+
+      return [ null, null ];
+    },
+    // }}}
     //update: function(x,y){{{
     update: function(x,y){
       var t = this;
