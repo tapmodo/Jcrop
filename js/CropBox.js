@@ -234,11 +234,17 @@
    *  ShadeFilter
    *  A filter that implements div-based shading on any element
    */
-  var ShadeFilter = function(){
+  var ShadeFilter = function(color,opacity){
+    this.color = color || 'black';
+    this.opacity = opacity || 0.5;
     this.master = null;
     this.shades = {};
   };
   $.extend(ShadeFilter.prototype,{
+    tag: 'shader',
+    fade: true,
+    fadeEasing: 'easeOutExpo',
+    fadeSpeed: 500,
     priority: 95,
     init: function(){
       var t = this;
@@ -257,17 +263,46 @@
         bottom: t.createShade()
       };
 
+      t.reheighten();
       t.filter(this.master.getSelectionRaw());
+    },
+    reheighten: function(){
+      var m = this.master, s = this.shades;
+      this.elh = m.elh;
+      this.elw = m.elw;
+      s.right.css('height',m.elh+'px');
+      s.left.css('height',m.elh+'px');
     },
     destroy: function(){
       this.container.remove();
     },
+    setColor: function(color,instant){
+      var t = this;
+      this.color = color;
+      $.each(t.shades,function(u,i){
+        if (!t.fade || instant) i.css('backgroundColor',color);
+          else i.animate({backgroundColor:color},{queue:false,duration:t.fadeSpeed,easing:t.fadeEasing});
+      });
+      return t;
+    },
+    setOpacity: function(opacity,instant){
+      var t = this;
+      this.opacity = opacity;
+      $.each(t.shades,function(u,i){
+        if (!t.fade || instant) i.css({opacity:opacity});
+          else i.animate({opacity:opacity},{queue:false,duration:t.fadeSpeed,easing:t.fadeEasing});
+      });
+      return t;
+    },
     createShade: function(){
       return $('<div />').css({
         position: 'absolute',
-        backgroundColor: 'black',
-        opacity: .5
+        backgroundColor: this.color,
+        opacity: this.opacity
       }).appendTo(this.container);
+    },
+    preDrag: function(st){
+      this.reheighten();
     },
     filter: function(b){
       var t = this,
@@ -275,24 +310,22 @@
         s = t.shades;
       
       s.top.css({
-        left: b.x+'px',
-        width: b.w+'px',
-        height: b.y+'px'
+        left: Math.round(b.x)+'px',
+        width: Math.round(b.w)+'px',
+        height: Math.round(b.y)+'px'
       });
       s.bottom.css({
-        top: b.y2+'px',
-        left: b.x+'px',
-        width: b.w+'px',
-        height: (m.elh-b.y2)+'px'
+        top: Math.round(b.y2)+'px',
+        left: Math.round(b.x)+'px',
+        width: Math.round(b.w)+'px',
+        height: (t.elh-Math.round(b.y2))+'px'
       });
       s.right.css({
-        height: m.elh+'px',
-        left: b.x2+'px',
-        width: (m.elw-b.x2)+'px'
+        left: Math.round(b.x2)+'px',
+        width: (t.elw-Math.round(b.x2))+'px'
       });
       s.left.css({
-        height: m.elh+'px',
-        width: b.x+'px'
+        width: Math.round(b.x)+'px'
       });
 
       if (!t.visible) {
