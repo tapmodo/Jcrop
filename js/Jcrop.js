@@ -660,6 +660,23 @@
       this.ui.cropper.css({top: y+'px', left: x+'px'});
     },
     //}}}
+    // nudge: function(x,y){{{
+    nudge: function(x,y){
+      var b = this.getSelectionRaw();
+      b.x += x;
+      b.x2 += x;
+      b.y += y;
+      b.y2 += y;
+
+      if (b.x < 0) { b.x2 = b.w; b.x = 0; }
+        else if (b.x2 > this.elw) { b.x2 = this.elw; b.x = b.x2 - b.w; }
+
+      if (b.y < 0) { b.y2 = b.h; b.y = 0; }
+        else if (b.y2 > this.elh) { b.y2 = this.elh; b.y = b.y2 - b.h; }
+      
+      this.update(b);
+    },
+    // }}}
     //resize: function(w,h){{{
     resize: function(w,h){
       this.ui.cropper.css({width: w+'px', height: h+'px'});
