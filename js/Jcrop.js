@@ -234,7 +234,7 @@
    *  ShadeFilter
    *  A filter that implements div-based shading on any element
    */
-  var ShadeFilter = function(color,opacity){
+  var ShadeFilter = function(opacity,color){
     this.color = color || 'black';
     this.opacity = opacity || 0.5;
     this.master = null;
