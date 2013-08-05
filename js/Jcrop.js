@@ -420,11 +420,14 @@
   $.extend(KeyWatcher.prototype,{
     init: function(){
       $.extend(this,KeyWatcher.defaults);
-      this.initEvents();
+      this.enable();
     },
-    initEvents: function(){
+    disable: function(){
+      this.master.container.off('keydown.jcrop');
+    },
+    enable: function(){
       var t = this, m = t.master;
-      m.container.on('keydown',function(e){
+      m.container.on('keydown.jcrop',function(e){
         var nudge = e.shiftKey? 16: 2;
 
         if ($.inArray(e.keyCode,t.passthru) >= 0)
@@ -451,10 +454,10 @@
    */
   var Jcrop = function(element,opt){
     this.ui = {
-      cropper: $('<button />').addClass('jcrop-selection'),
-      box: $('<div />').addClass('jcrop-box jcrop-drag').data('ord','move')
+      selection: $('<button />').addClass('jcrop-selection'),
+      frame: $('<div />').addClass('jcrop-box jcrop-drag').data('ord','move')
     };
-    this.container = $(element).append(this.ui.cropper.append(this.ui.box)).addClass('jcrop-active');
+    this.container = $(element).append(this.ui.selection.append(this.ui.frame)).addClass('jcrop-active');
     this.opt = $.extend({},Jcrop.defaults,opt);
     this.state = null;
     this.filters = [];
@@ -481,7 +484,7 @@
       round: RoundFilter
     },
     //}}}
-    //components: internal components {{{
+    //component: internal components {{{
     component: {
       DragState: DragState,
       Animator: CropAnimator,
@@ -503,6 +506,7 @@
     init: function(){
       this.insertElements();
       this.initEvents();
+      this.ui.keyboard = new $.Jcrop.component.Keyboard(this);
     },
     //}}}
     //addFilter: function(filter){{{
@@ -546,7 +550,7 @@
     // }}}
     // blur: function(){{{
     blur: function(){
-      this.ui.cropper.blur();
+      this.ui.selection.blur();
       return this;
     },
     // }}}
@@ -600,13 +604,13 @@
     //}}}
     // focus: function(){{{
     focus: function(){
-      this.ui.cropper.focus();
+      this.ui.selection.focus();
       return this;
     },
     // }}}
     //getSelectionRaw: function(){{{
     getSelectionRaw: function(){
-      var b = this.ui.cropper,
+      var b = this.ui.selection,
         o = b.position(),
         w = b.width(),
         h = b.height(),
@@ -636,18 +640,19 @@
     //insertElements: function(){{{
     insertElements: function(){
       var t = this, i,
+        fr = t.ui.frame,
         b = t.opt.borders,
         h = t.opt.handles,
         d = t.opt.dragbars;
 
       for(i=0; i<b.length; i++)
-        t.ui.box.append(t.createElement('border',b[i]));
+        fr.append(t.createElement('border',b[i]));
 
       for(i=0; i<d.length; i++)
-        t.ui.box.append(t.createElement('dragbar jcrop-drag',d[i]));
+        fr.append(t.createElement('dragbar jcrop-drag',d[i]));
 
       for(i=0; i<h.length; i++)
-        t.ui.box.append(t.createElement('handle jcrop-drag',h[i]));
+        fr.append(t.createElement('handle jcrop-drag',h[i]));
     },
     //}}}
     // maxSelect: function(){{{
@@ -657,7 +662,7 @@
     // }}}
     //moveTo: function(x,y){{{
     moveTo: function(x,y){
-      this.ui.cropper.css({top: y+'px', left: x+'px'});
+      this.ui.selection.css({top: y+'px', left: x+'px'});
     },
     //}}}
     // nudge: function(x,y){{{
@@ -679,7 +684,7 @@
     // }}}
     //resize: function(w,h){{{
     resize: function(w,h){
-      this.ui.cropper.css({width: w+'px', height: h+'px'});
+      this.ui.selection.css({width: w+'px', height: h+'px'});
     },
     //}}}
     // redraw: function(){{{
@@ -730,6 +735,7 @@
           return false;
 
         t.createDragState(e.pageX,e.pageY,ord);
+        t.focus();
 
         $(document.body).on('mousemove.jcrop',t.createDragHandler($targ))
           .on('mouseup.jcrop',function(e){ t.endDrag(); });
