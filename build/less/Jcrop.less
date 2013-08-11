@@ -60,6 +60,20 @@
   &.bottom { bottom: 0; }
 }
 
+/* Crop Borders */
+.jcrop-border {
+  background: @selectionBackground;
+  font-size: 0;
+  position: absolute;
+  filter: Alpha(opacity=50) !important;
+  opacity: 0.5 !important;
+  &.ord-w, &.ord-e, &.ord-n { top: 0px; }
+  &.ord-n, &.ord-s { width: 100%; height: @selectionBorderWidth !important; }
+  &.ord-w, &.ord-e { height: 100%; width: @selectionBorderWidth !important; }
+  &.ord-e { right: 0; }
+  &.ord-s { bottom: 0; }
+}
+
 /* Invisible click targets */
 
 .jcrop-tracker
@@ -71,42 +85,77 @@
   /* disable cut copy paste */ -webkit-user-select: none;
 }
 
+.jcrop-shades {
+  position: absolute;
+  top: 0;
+  z-index: 10;
+}
+
+.jcrop-selection {
+  position: absolute;
+}
+
+.jcrop-box {
+  display: block;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0;
+  z-index: 15;
+  &:focus {
+    outline: 1px rgba(128,128,128,.65) dotted;
+  }
+}
+
+.jcrop-active, .jcrop-box { position: relative; }
+.jcrop-box { z-index: 2; width: 100%; height: 100%; cursor: move; }
+
 /* Selection Handles */
 
 .jcrop-handle {
 
+  z-index: 10;
   background-color: @handleBackgroundColor;
   border: @handleBorderWidth @handleBorderColor @handleBorderStyle;
   width: @handleSize;
   height: @handleSize;
-  font-size: 1px;
+  font-size: 0;
+  position: absolute;
+  filter: Alpha(opacity=70) !important;
+  opacity: 0.7 !important;
 
-  &.ord-n {left:50%;margin-left:@handleOffset;margin-top:@handleOffset;top:0;}
-  &.ord-s {bottom:0;left:50%;margin-bottom:@handleOffset;margin-left:@handleOffset;}
-  &.ord-e {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:50%;}
-  &.ord-w {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:50%;}
-  &.ord-nw {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:0;}
-  &.ord-ne {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:0;}
-  &.ord-se {bottom:0;margin-bottom:@handleOffset;margin-right:@handleOffset;right:0;}
-  &.ord-sw {bottom:0;left:0;margin-bottom:@handleOffset;margin-left:@handleOffset;}
+  &.ord-n {left:50%;margin-left:@handleOffset;margin-top:@handleOffset;top:0;cursor:n-resize;}
+  &.ord-s {bottom:0;left:50%;margin-bottom:@handleOffset;margin-left:@handleOffset;cursor:s-resize;}
+  &.ord-e {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:50%;cursor:e-resize;}
+  &.ord-w {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:50%;cursor:w-resize;}
+  &.ord-nw {left:0;margin-left:@handleOffset;margin-top:@handleOffset;top:0;cursor:nw-resize;}
+  &.ord-ne {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:0;cursor:ne-resize;}
+  &.ord-se {bottom:0;margin-bottom:@handleOffset;margin-right:@handleOffset;right:0;cursor:se-resize;}
+  &.ord-sw {bottom:0;left:0;margin-bottom:@handleOffset;margin-left:@handleOffset;cursor:sw-resize;}
 
 }
 
 /* Dragbars */
 .jcrop-dragbar {
-
-  &.ord-n, &.ord-s {height:@dragbarWidth;width:100%;}
-  &.ord-e,&.ord-w {height:100%;width:@dragbarWidth;}
-  &.ord-n {margin-top:@dragbarOffset;}
-  &.ord-s {bottom:0;margin-bottom:@dragbarOffset;}
-  &.ord-e {margin-right:@dragbarOffset;right:0;}
-  &.ord-w {margin-left:@dragbarOffset;}
+  z-index: 8;
+  position: absolute;
+  &.ord-n, &.ord-s {height:@dragbarWidth !important;width:100%;}
+  &.ord-e,&.ord-w { top:0px; height:100%;width:@dragbarWidth !important;}
+  &.ord-n {margin-top:@dragbarOffset;cursor:n-resize; top:0px; }
+  &.ord-s {bottom:0;margin-bottom:@dragbarOffset;cursor:s-resize;}
+  &.ord-e {margin-right:@dragbarOffset;right:0;cursor:e-resize;}
+  &.ord-w {margin-left:@dragbarOffset;cursor:w-resize;}
 
 }
 
+.jcrop-noresize {
+  .jcrop-dragbar, .jcrop-handle { display: none; }
+}
+.jcrop-nodrag .jcrop-box { cursor: no-drop; }
+
 /* The "jcrop-light" class/extension */
 .jcrop-light {
-  .jcrop-vline, .jcrop-hline {
+  .jcrop-border {
     background: @white;
     filter:Alpha(opacity=70)!important;
     opacity:.70!important;
@@ -122,7 +171,7 @@
 
 /* The "jcrop-dark" class/extension */
 .jcrop-dark {
-  .jcrop-vline, .jcrop-hline {
+  .jcrop-border {
     background: @black;
     filter: Alpha(opacity=70) !important;
     opacity: 0.7 !important;
@@ -146,3 +195,50 @@
 /* Fix for twitter bootstrap et al. */
 .jcrop-holder img,img.jcrop-preview{ max-width: none; }
 
+.jcrop-hl-active {
+  .jcrop-border {
+    filter:Alpha(opacity=20)!important;
+    opacity:.20!important;
+  }
+  .jcrop-handle {
+    filter:Alpha(opacity=10)!important;
+    opacity:.10!important;
+  }
+  .jcrop-selection:hover {
+    .jcrop-border {
+      background-color: #ccc;
+      filter:Alpha(opacity=50)!important;
+      opacity:.50!important;
+    }
+    /*
+    .jcrop-handle {
+      filter:Alpha(opacity=35)!important;
+      opacity:.35!important;
+    }
+    */
+  }
+  .jcrop-selection.jcrop-current {
+    .jcrop-border {
+      background-color: gray;
+      background: url('Jcrop.gif');
+      filter:Alpha(opacity=35)!important;
+      opacity:.35!important;
+    }
+    .jcrop-handle {
+      filter:Alpha(opacity=30)!important;
+      opacity:.30!important;
+    }
+  }
+  .jcrop-selection.jcrop-focus {
+    .jcrop-border {
+      background-color: black;
+      background: url('Jcrop.gif');
+      filter:Alpha(opacity=65)!important;
+      opacity:.65!important;
+    }
+    .jcrop-handle {
+      filter:Alpha(opacity=60)!important;
+      opacity:.60!important;
+    }
+  }
+}

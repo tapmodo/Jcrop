@@ -65,10 +65,22 @@ form.coords input { width: 3em; }
   -webkit-box-shadow: 0px 0px 15px #999; /* Safari, Chrome */
   box-shadow: 0px 0px 15px #999; /* CSS3 */
 }
- .jcrop-dark .jcrop-selection {
-  -moz-box-shadow: 0px 0px 15px #000; /* Firefox */
-  -webkit-box-shadow: 0px 0px 15px #000; /* Safari, Chrome */
-  box-shadow: 0px 0px 15px #000; /* CSS3 */
+.jcrop-dark .jcrop-selection {
+  -moz-box-shadow: 0px 0px 6px rgba(0,0,0,.35); /* Firefox */
+  -webkit-box-shadow: 0px 0px 6px rgba(0,0,0,.35); /* Safari, Chrome */
+  box-shadow: 0px 0px 6px rgba(0,0,0,.35); /* CSS3 */
+
+  &:hover {
+    -moz-box-shadow: 0px 0px 6px rgba(0,0,0,1); /* Firefox */
+    -webkit-box-shadow: 0px 0px 6px rgba(0,0,0,1); /* Safari, Chrome */
+    box-shadow: 0px 0px 6px rgba(0,0,0,1); /* CSS3 */
+  }
+
+  &.jcrop-current {
+    -moz-box-shadow: 0px 0px 15px #000; /* Firefox */
+    -webkit-box-shadow: 0px 0px 15px #000; /* Safari, Chrome */
+    box-shadow: 0px 0px 15px #000; /* CSS3 */
+  }
 }
 
 .jcrop-fancy .jcrop-handle.ord-e {
