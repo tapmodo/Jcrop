@@ -264,7 +264,7 @@
       };
 
       t.reheighten();
-      t.filter(this.master.getSelectionRaw());
+      t.filter(this.master.getSelection(1));
     },
     reheighten: function(){
       var m = this.master, s = this.shades;
@@ -342,14 +342,16 @@
    *  CropAnimator
    *  manages smooth cropping animation
    */
-  var CropAnimator = function(master){
-    this.master = master;
+  var CropAnimator = function(selection){
+    this.selection = selection;
+    this.master = selection.master;
   };
 
   $.extend(CropAnimator.prototype,{
-    addElement: function(){
-      var b = this.master.getSelectionRaw();
-      this.element = $('<div />')
+    getElement: function(){
+      var b = this.master.getSelection(1);
+
+      return $('<div />')
         .css({
           position: 'absolute',
           top: b.y+'px',
@@ -357,17 +359,11 @@
           width: b.w+'px',
           height: b.h+'px'
         });
-
-      this.master.container.append(this.element);
-    },
-    removeElement: function(){
-      this.element.remove();
     },
     animate: function(x,y,w,h,cb){
       var t = this;
-      t.master.allowResize(false);
-      t.addElement();
-      t.element.animate({
+      t.selection.allowResize(false);
+      t.getElement().animate({
         top: y+'px',
         left: x+'px',
         width: w+'px',
@@ -376,7 +372,7 @@
         easing: t.master.opt.animEasing,
         duration: t.master.opt.animDuration,
         complete: function(){
-          t.master.allowResize(true);
+          t.selection.allowResize(true);
           cb && cb.call(this);
         },
         progress: function(anim){
@@ -395,10 +391,9 @@
           b.x2 = b.x + b.w;
           b.y2 = b.y + b.h;
 
-          t.master.update(b);
+          t.selection.update(b);
         }
       });
-      t.removeElement();
     }
   });
   // }}}
@@ -438,6 +433,13 @@
           case 38: m.nudge(0,-nudge); break;
           case 39: m.nudge(nudge,0); break;
           case 40: m.nudge(0,nudge); break;
+
+          case 46:
+          case 8:
+            m.requestDelete();
+            return false;
+            break;
+
           default: if (t.debug) console.log('keycode: ' + e.keyCode);
         }
 
@@ -447,18 +449,162 @@
     }
   });
   // }}}
+  var Selection = function(master){
+    this.master = master;
+    this.init();
+  };
+
+  Selection.defaults = {
+  };
+
+  $.extend(Selection.prototype,{
+    // init: function(){{{
+    init: function(){
+      var t = this;
+      $.extend(t,Selection.defaults);
+
+      t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
+      t.frame = $('<button />').addClass('jcrop-box jcrop-drag').data('ord','move');
+
+      t.element.append(t.frame).appendTo(t.master.container);
+
+      t.insertElements();
+      t.frame.on('focus.jcrop',function(e){
+        t.master.setSelection(t);
+        t.element.addClass('jcrop-focus');
+      }).on('blur.jcrop',function(e){
+        t.element.removeClass('jcrop-focus');
+      });
+    },
+    // }}}
+    // allowDrag: function(v){{{
+    allowDrag: function(v){
+      var o = this.master.opt, el = this.element;
+      if (v == undefined) v = o.draggable;
+
+      if (v && o.draggable) el.removeClass('jcrop-nodrag');
+        else el.addClass('jcrop-nodrag');
+
+      return this;
+    },
+    // }}}
+    // allowResize: function(v){{{
+    allowResize: function(v){
+      var o = this.master.opt, el = this.element;
+      if (v == undefined) v = o.resizable;
+
+      if (v && o.resizable) el.removeClass('jcrop-noresize');
+        else el.addClass('jcrop-noresize');
+
+      return this;
+    },
+    // }}}
+    remove: function(){
+      this.element.remove();
+    },
+    toBack: function(){
+      this.element
+        .removeClass('jcrop-current')
+        .css({zIndex:20});
+    },
+    toFront: function(){
+      this.element
+        .addClass('jcrop-current')
+        .css({zIndex:30});
+    },
+    update: function(b){
+      b = this.master.runFilters(b);
+      this.moveTo(b.x,b.y);
+      this.resize(b.w,b.h);
+    },
+    // animateTo: function(box,cb){{{
+    animateTo: function(box,cb){
+      var ca = new Jcrop.component.Animator(this);
+      ca.animate(box[0],box[1],box[2],box[3],cb);
+    },
+    // }}}
+    // center: function(instant){{{
+    center: function(instant){
+      var b = this.get(), m = this.master;
+      var box = [ (m.elw-b.w)/2, (m.elh-b.h)/2, b.w, b.h ];
+      return this[instant?'setSelect':'animateTo'](box);
+    },
+    // }}}
+    //createElement: function(type,ord){{{
+    createElement: function(type,ord){
+      return $('<div />').addClass('jcrop-'+type+' ord-'+ord).data('ord',ord);
+    },
+    //}}}
+    //moveTo: function(x,y){{{
+    moveTo: function(x,y){
+      this.element.css({top: y+'px', left: x+'px'});
+    },
+    //}}}
+    // blur: function(){{{
+    blur: function(){
+      this.element.blur();
+      return this;
+    },
+    // }}}
+    // focus: function(){{{
+    focus: function(){
+      this.frame.focus();
+      this.master.setSelection(this);
+      return this;
+    },
+    // }}}
+    //resize: function(w,h){{{
+    resize: function(w,h){
+      this.element.css({width: w+'px', height: h+'px'});
+    },
+    //}}}
+    //get: function(){{{
+    get: function(){
+      var b = this.element,
+        o = b.position(),
+        w = b.width(),
+        h = b.height(),
+        rv = { x: o.left, y: o.top };
+
+      rv.x2 = o.left + w;
+      rv.y2 = o.top + h;
+      rv.w = w;
+      rv.h = h;
+
+      return rv;
+    },
+    //}}}
+    //insertElements: function(){{{
+    insertElements: function(){
+      var t = this, i,
+        m = t.master,
+        fr = t.element,
+        b = m.opt.borders,
+        h = m.opt.handles,
+        d = m.opt.dragbars;
+
+      for(i=0; i<b.length; i++)
+        fr.append(t.createElement('border',b[i]));
+
+      for(i=0; i<d.length; i++)
+        fr.append(t.createElement('dragbar jcrop-drag',d[i]));
+
+      for(i=0; i<h.length; i++)
+        fr.append(t.createElement('handle jcrop-drag',h[i]));
+    }
+    //}}}
+  });
 
   /**
    *  Jcrop
    *  core cropping code
    */
   var Jcrop = function(element,opt){
-    this.ui = {
-      selection: $('<button />').addClass('jcrop-selection'),
-      frame: $('<div />').addClass('jcrop-box jcrop-drag').data('ord','move')
-    };
-    this.container = $(element).append(this.ui.selection.append(this.ui.frame)).addClass('jcrop-active');
+    this.container = $(element).addClass('jcrop-active');
     this.opt = $.extend({},Jcrop.defaults,opt);
+    this.ui = {};
+    this.ui.multi = [];
+    this.newSelection();
     this.state = null;
     this.filters = [];
     this.init();
@@ -488,6 +634,7 @@
     component: {
       DragState: DragState,
       Animator: CropAnimator,
+      Selection: Selection,
       Keyboard: KeyWatcher
     },
     //}}}
@@ -504,11 +651,47 @@
   $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
-      this.insertElements();
       this.initEvents();
       this.ui.keyboard = new $.Jcrop.component.Keyboard(this);
     },
     //}}}
+    setSelection: function(sel){
+      var m = this.ui.multi;
+      for(var i=0;i<m.length;i++) m[i].toBack();
+      this.ui.selection = sel;
+      sel.toFront();
+      this.redraw();
+      return sel;
+    },
+    getSelection: function(raw){
+      var b = this.ui.selection.get();
+      if (raw) return b;
+      // @todo scaled coordinates
+        return b;
+    },
+    newSelection: function(){
+      return this.addSelection(new $.Jcrop.component.Selection(this));
+    },
+    addSelection: function(sel){
+      if (!this.hasSelection(sel))
+        this.ui.multi.push(sel);
+
+      this.ui.selection = sel;
+      return sel;
+    },
+    hasSelection: function(sel){
+      for(var i=0;i<this.ui.multi;i++)
+        if (sel === this.ui.multi[i]) return true;
+    },
+    removeSelection: function(sel){
+      var i, n = [], m = this.ui.multi;
+      for(var i=0;i<m.length;i++){
+        if (sel !== m[i])
+          n.push(m[i]);
+        else m[i].remove();
+      }
+      return this.ui.multi = n;
+    },
     //addFilter: function(filter){{{
     addFilter: function(filter){
       this.elw = this.container.width();
@@ -522,43 +705,10 @@
       }
     },
     //}}}
-    // allowDrag: function(v){{{
-    allowDrag: function(v){
-      if (v == undefined) v = this.opt.draggable;
-
-      if (v && this.opt.draggable) this.container.removeClass('jcrop-nodrag');
-        else this.container.addClass('jcrop-nodrag');
-
-      return this;
-    },
-    // }}}
-    // allowResize: function(v){{{
-    allowResize: function(v){
-      if (v == undefined) v = this.opt.resizable;
-
-      if (v && this.opt.resizable) this.container.removeClass('jcrop-noresize');
-        else this.container.addClass('jcrop-noresize');
-
-      return this;
-    },
-    // }}}
-    // animateTo: function(box,cb){{{
-    animateTo: function(box,cb){
-      var ca = new Jcrop.component.Animator(this);
-      ca.animate(box[0],box[1],box[2],box[3],cb);
-    },
-    // }}}
     // blur: function(){{{
     blur: function(){
       this.ui.selection.blur();
       return this;
-    },
-    // }}}
-    // centerSelection: function(instant){{{
-    centerSelection: function(instant){
-      var b = this.getSelectionRaw();
-      var box = [ (this.elw-b.w)/2, (this.elh-b.h)/2, b.w, b.h ];
-      return this[instant?'setSelect':'animateTo'](box);
     },
     // }}}
     //clearFilters: function(){{{
@@ -582,22 +732,17 @@
     //}}}
     //createDragState: function(x,y,ord){{{
     createDragState: function(x,y,ord){
-      var b = this.getSelectionRaw();
+      var b = this.getSelection(1);
       this.elw = this.container.width();
       this.elh = this.container.height();
       this.state = new Jcrop.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
-    },
-    //}}}
-    //createElement: function(type,ord){{{
-    createElement: function(type,ord){
-      return $('<div />').addClass('jcrop-'+type+' ord-'+ord).data('ord',ord);
     },
     //}}}
     //endDrag: function(){{{
     endDrag: function(){
       if (this.state) {
         $(document.body).off('.jcrop');
-        this.focus();
+        this.ui.selection.focus();
         this.state = null;
       }
     },
@@ -608,22 +753,6 @@
       return this;
     },
     // }}}
-    //getSelectionRaw: function(){{{
-    getSelectionRaw: function(){
-      var b = this.ui.selection,
-        o = b.position(),
-        w = b.width(),
-        h = b.height(),
-        rv = { x: o.left, y: o.top };
-
-      rv.x2 = o.left + w;
-      rv.y2 = o.top + h;
-      rv.w = w;
-      rv.h = h;
-
-      return rv;
-    },
-    //}}}
     // hasFilter: function(filter){{{
     hasFilter: function(filter){
       var i, f = this.filters, n = [];
@@ -637,37 +766,14 @@
         .on('mousedown','.jcrop-drag',t.startDrag());
     },
     //}}}
-    //insertElements: function(){{{
-    insertElements: function(){
-      var t = this, i,
-        fr = t.ui.frame,
-        b = t.opt.borders,
-        h = t.opt.handles,
-        d = t.opt.dragbars;
-
-      for(i=0; i<b.length; i++)
-        fr.append(t.createElement('border',b[i]));
-
-      for(i=0; i<d.length; i++)
-        fr.append(t.createElement('dragbar jcrop-drag',d[i]));
-
-      for(i=0; i<h.length; i++)
-        fr.append(t.createElement('handle jcrop-drag',h[i]));
-    },
-    //}}}
     // maxSelect: function(){{{
     maxSelect: function(){
       this.setSelect([0,0,this.elw,this.elh]);
     },
     // }}}
-    //moveTo: function(x,y){{{
-    moveTo: function(x,y){
-      this.ui.selection.css({top: y+'px', left: x+'px'});
-    },
-    //}}}
     // nudge: function(x,y){{{
     nudge: function(x,y){
-      var b = this.getSelectionRaw();
+      var b = this.getSelection(1);
       b.x += x;
       b.x2 += x;
       b.y += y;
@@ -682,20 +788,32 @@
       this.update(b);
     },
     // }}}
-    //resize: function(w,h){{{
-    resize: function(w,h){
-      this.ui.selection.css({width: w+'px', height: h+'px'});
-    },
-    //}}}
     // redraw: function(){{{
     redraw: function(){
-      this.update(this.getSelectionRaw());
+      this.update(this.getSelection(1));
     },
     // }}}
+    requestDelete: function(){
+      if (this.ui.multi.length > 1)
+        this.deleteSelection();
+    },
+    deleteSelection: function(){
+      this.removeSelection(this.ui.selection);
+      this.ui.multi[0].focus();
+    },
+    runFilters: function(b){
+      var f = this.filters,
+        s = this.ui.selection;
+
+      for(var i=0;i<f.length;i++)
+        b = f[i].filter(b);
+
+      return b;
+    },
     //redrawState: function(){{{
     redrawState: function(){
       var b = this.state.getBox();
-      this.update(this.state.getBox());
+      this.ui.selection.update(this.state.getBox());
     },
     //}}}
     // removeFiltersByTag: function(tag){{{
@@ -711,9 +829,15 @@
       this.filters = n;
     },
     // }}}
-    // setSelect: function(box){{{
+    // animateTo: function(box){{{
+    animateTo: function(box){
+      this.ui.selection.animateTo(box);
+      return this;
+    },
+    // }}}
+    // setselect: function(box){{{
     setSelect: function(box){
-      this.update(Jcrop.wrapFromXywh(box));
+      this.ui.selection.update(Jcrop.wrapFromXywh(box));
       return this;
     },
     // }}}
@@ -729,13 +853,15 @@
       var t = this;
       return function(e){
         var $targ = $(e.target);
+        var selection = $targ.closest('.jcrop-selection').data('selection');
         var ord = $targ.data('ord');
+
+        selection.focus();
 
         if ((ord == 'move') && t.container.hasClass('jcrop-nodrag'))
           return false;
 
         t.createDragState(e.pageX,e.pageY,ord);
-        t.focus();
 
         $(document.body).on('mousemove.jcrop',t.createDragHandler($targ))
           .on('mouseup.jcrop',function(e){ t.endDrag(); });
@@ -746,14 +872,7 @@
     //}}}
     // update: function(b){{{
     update: function(b){
-      var f = this.filters;
-
-      for(var i=0;i<f.length;i++)
-        b = f[i].filter(b);
-
-      this.resize(b.w,b.h);
-      this.moveTo(b.x,b.y);
-
+      this.ui.selection.update(b);
       this.container.trigger('cropmove',b);
     }
     // }}}
