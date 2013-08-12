@@ -603,28 +603,6 @@
         b = this.filters[i].filter(b);
       return b;
     },
-    // allowDrag: function(v){{{
-    allowDrag: function(v){
-      var o = this.core.opt, el = this.element;
-      if (v == undefined) v = o.draggable;
-
-      if (v && o.draggable) el.removeClass('jcrop-nodrag');
-        else el.addClass('jcrop-nodrag');
-
-      return this;
-    },
-    // }}}
-    // allowResize: function(v){{{
-    allowResize: function(v){
-      var o = this.core.opt, el = this.element;
-      if (v == undefined) v = o.resizable;
-
-      if (v && o.resizable) el.removeClass('jcrop-noresize');
-        else el.addClass('jcrop-noresize');
-
-      return this;
-    },
-    // }}}
     //endDrag: function(){{{
     endDrag: function(){
       if (this.state) {
@@ -657,7 +635,7 @@
 
       this.focus();
 
-      if ((ord == 'move') && m.container.hasClass('jcrop-nodrag'))
+      if ((ord == 'move') && t.element.hasClass('jcrop-nodrag'))
         return false;
 
       t.createDragState(e.pageX,e.pageY,ord);
