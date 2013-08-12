@@ -251,7 +251,7 @@
       t.visible = false;
 
       t.container = $('<div />').addClass('jcrop-shades')
-        .appendTo(this.master.container).hide();
+        .prependTo(this.master.container).hide();
 
       t.elh = this.master.container.height();
       t.elw = this.master.container.width();
@@ -449,6 +449,112 @@
     }
   });
   // }}}
+  var StageDrag = function(manager,opt){
+    $.extend(this,StageDrag.defaults,opt || {});
+    this.manager = manager;
+    this.master = manager.master;
+  };
+  
+  StageDrag.defaults = {
+    minsize: [ 20, 20 ],
+    multi: true
+  };
+
+  $.extend(StageDrag.prototype,{
+    start: function(x,y){
+      var m = this.master.ui.multi;
+      var b = {
+        x: x,
+        y: y,
+        x2: x,
+        y2: y,
+        w: 0,
+        h: 0
+      };
+      this.ox = x;
+      this.oy = y;
+
+      if (!this.multi) {
+        for(var i=0;i<m.length;i++) m[i].remove();
+        this.master.ui.multi = [];
+      }
+      this.sel = this.master.newSelection().update(b).focus();
+    },
+    drag: function(x,y){
+      //console.log('drag',x,y);
+      //this.sel.focus();
+      var x2 = this.ox + x;
+      var y2 = this.oy + y;
+      var b = {
+        x: Math.min( this.ox, x2 ),
+        y: Math.min( this.oy, y2 ),
+        x2: Math.max( this.ox, x2 ),
+        y2: Math.max( this.oy, y2 )
+      };
+      b.w = b.x2 - b.x;
+      b.l = b.y2 - b.y;
+      this.sel.update(b);
+      return b;
+    },
+    end: function(x,y){
+      this.drag(x,y);
+      var b = this.sel.get();
+
+      if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
+        this.master.requestDelete();
+
+        else this.sel.focus();
+      //console.log('end',x,y);
+    }
+  });
+
+  var StageManager = function(master){
+    this.master = master;
+    this.init();
+  };
+
+  StageManager.defaults = {
+  };
+
+  $.extend(StageManager.prototype,{
+    init: function(){
+      this.setupEvents();
+      this.dragger = new StageDrag(this);
+    },
+    createDragHandler: function(){
+      var t = this;
+      return function(e){
+        t.dragger.drag(e.pageX-t.startX,e.pageY-t.startY);
+        return false;
+      };
+    },
+    startDragHandler: function(){
+      var t = this;
+      return function(e){
+        var o = $(e.currentTarget).offset();
+        t.startX = e.pageX;
+        t.startY = e.pageY;
+        t.origX = t.startX - o.left;
+        t.origY = t.startY - o.top;
+
+        t.dragger.start(t.origX,t.origY);
+
+        $(document.body).on('mousemove.jcrop',t.createDragHandler())
+          .on('mouseup.jcrop',function(e){
+            t.dragger.end(e.pageX-t.startX,e.pageY-t.startY);
+            $(document.body).off('.jcrop');
+            return false;
+          });
+
+        return false;
+      };
+    },
+    setupEvents: function(){
+      this.master.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
+    }
+  });
+
+  // Selection {{{
   var Selection = function(master){
     this.master = master;
     this.init();
@@ -466,12 +572,19 @@
       t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
       t.frame = $('<button />').addClass('jcrop-box jcrop-drag').data('ord','move');
 
+      if (t.master.opt.is_msie)
+        t.frame.css({
+          opacity: 0,
+          backgroundColor: 'white'
+        });
+
       t.element.append(t.frame).appendTo(t.master.container);
 
       t.insertElements();
       t.frame.on('focus.jcrop',function(e){
         t.master.setSelection(t);
         t.element.addClass('jcrop-focus');
+        t.master.redraw();
       }).on('blur.jcrop',function(e){
         t.element.removeClass('jcrop-focus');
       });
@@ -505,6 +618,7 @@
     toBack: function(){
       this.element
         .removeClass('jcrop-current')
+        .removeClass('jcrop-focus')
         .css({zIndex:20});
     },
     toFront: function(){
@@ -516,6 +630,7 @@
       b = this.master.runFilters(b);
       this.moveTo(b.x,b.y);
       this.resize(b.w,b.h);
+      return this;
     },
     // animateTo: function(box,cb){{{
     animateTo: function(box,cb){
@@ -548,8 +663,8 @@
     // }}}
     // focus: function(){{{
     focus: function(){
-      this.frame.focus();
       this.master.setSelection(this);
+      this.frame.focus();
       return this;
     },
     // }}}
@@ -594,19 +709,24 @@
     }
     //}}}
   });
+  // }}}
 
   /**
    *  Jcrop
    *  core cropping code
    */
   var Jcrop = function(element,opt){
-    this.container = $(element).addClass('jcrop-active');
+    var _ua = navigator.userAgent.toLowerCase();
     this.opt = $.extend({},Jcrop.defaults,opt);
+    this.opt.is_msie = /msie/.test(_ua);
+    this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
+
+    this.container = $(element).addClass('jcrop-active');
     this.ui = {};
-    this.ui.multi = [];
-    this.newSelection();
     this.state = null;
+    this.ui.multi = [];
     this.filters = [];
+    this.newSelection();
     this.init();
   };
 
@@ -633,6 +753,7 @@
     //component: internal components {{{
     component: {
       DragState: DragState,
+      StageManager: StageManager,
       Animator: CropAnimator,
       Selection: Selection,
       Keyboard: KeyWatcher
@@ -653,14 +774,20 @@
     init: function(){
       this.initEvents();
       this.ui.keyboard = new $.Jcrop.component.Keyboard(this);
+      this.ui.stage = new $.Jcrop.component.StageManager(this);
     },
     //}}}
     setSelection: function(sel){
       var m = this.ui.multi;
-      for(var i=0;i<m.length;i++) m[i].toBack();
+      var n = [];
+      for(var i=0;i<m.length;i++) {
+        if (m[i] !== sel) n.push(m[i]);
+        m[i].toBack();
+      }
+      n.unshift(sel);
+      this.ui.multi = n;
       this.ui.selection = sel;
       sel.toFront();
-      this.redraw();
       return sel;
     },
     getSelection: function(raw){
@@ -670,14 +797,8 @@
         return b;
     },
     newSelection: function(){
-      return this.addSelection(new $.Jcrop.component.Selection(this));
-    },
-    addSelection: function(sel){
-      if (!this.hasSelection(sel))
-        this.ui.multi.push(sel);
-
-      this.ui.selection = sel;
-      return sel;
+      var sel = new $.Jcrop.component.Selection(this);
+      return this.setSelection(sel);
     },
     hasSelection: function(sel){
       for(var i=0;i<this.ui.multi;i++)
@@ -793,6 +914,13 @@
       this.update(this.getSelection(1));
     },
     // }}}
+    blurAll: function(){
+      var m = this.ui.multi;
+      for(var i=0;i<m.length;i++) {
+        if (m[i] !== sel) n.push(m[i]);
+        m[i].toBack();
+      }
+    },
     requestDelete: function(){
       if (this.ui.multi.length > 1)
         this.deleteSelection();
@@ -800,6 +928,7 @@
     deleteSelection: function(){
       this.removeSelection(this.ui.selection);
       this.ui.multi[0].focus();
+      this.redraw();
     },
     runFilters: function(b){
       var f = this.filters,
