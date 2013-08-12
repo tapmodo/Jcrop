@@ -106,7 +106,7 @@
    *  a filter to constrain crop selection to bounding element
    */
   var RoundFilter = function(){
-    this.master = null;
+    this.core = null;
   };
   $.extend(RoundFilter.prototype,{
     priority: 90,
@@ -132,12 +132,12 @@
    *  a filter to constrain crop selection to bounding element
    */
   var ConstrainFilter = function(){
-    this.master = null;
+    this.core = null;
   };
   $.extend(ConstrainFilter.prototype,{
     priority: 5,
     filter: function(b){
-      var m = this.master, st = m.state;
+      var m = this.core, st = m.state;
       if (st && st.ord && (st.ord == 'move')) {
         if (b.x < 0) { b.x = 0; b.x2 = b.w; }
         if (b.y < 0) { b.y = 0; b.y2 = b.h; }
@@ -162,7 +162,7 @@
    */
   var RatioFilter = function(ratio){
     this.ratio = ratio;
-    this.master = null;
+    this.core = null;
   };
   $.extend(RatioFilter.prototype,{
     priority: 15,
@@ -195,7 +195,7 @@
     },
     filter: function(b){
       var rt = b.w / b.h;
-      var m = this.master;
+      var m = this.core;
       var st = m.state;
 
       var quad = st? this.getQuadrant(st): 'br';
@@ -238,7 +238,7 @@
   var ShadeFilter = function(opacity,color){
     this.color = color || 'black';
     this.opacity = opacity || 0.5;
-    this.master = null;
+    this.core = null;
     this.shades = {};
   };
   $.extend(ShadeFilter.prototype,{
@@ -252,10 +252,10 @@
       t.visible = false;
 
       t.container = $('<div />').addClass('jcrop-shades')
-        .prependTo(this.master.container).hide();
+        .prependTo(this.core.container).hide();
 
-      t.elh = this.master.container.height();
-      t.elw = this.master.container.width();
+      t.elh = this.core.container.height();
+      t.elw = this.core.container.width();
 
       t.shades = {
         top: t.createShade(),
@@ -265,10 +265,10 @@
       };
 
       t.reheighten();
-      t.filter(this.master.getSelection(1));
+      t.filter(this.core.getSelection(1));
     },
     reheighten: function(){
-      var m = this.master, s = this.shades;
+      var m = this.core, s = this.shades;
       this.elh = m.elh;
       this.elw = m.elw;
       s.right.css('height',m.elh+'px');
@@ -307,7 +307,7 @@
     },
     filter: function(b){
       var t = this,
-        m = t.master,
+        m = t.core,
         s = t.shades;
       
       s.top.css({
@@ -345,12 +345,12 @@
    */
   var CropAnimator = function(selection){
     this.selection = selection;
-    this.master = selection.master;
+    this.core = selection.core;
   };
 
   $.extend(CropAnimator.prototype,{
     getElement: function(){
-      var b = this.master.getSelection(1);
+      var b = this.core.getSelection(1);
 
       return $('<div />')
         .css({
@@ -370,8 +370,8 @@
         width: w+'px',
         height: h+'px'
       },{
-        easing: t.master.opt.animEasing,
-        duration: t.master.opt.animDuration,
+        easing: t.core.opt.animEasing,
+        duration: t.core.opt.animDuration,
         complete: function(){
           t.selection.allowResize(true);
           cb && cb.call(this);
@@ -403,8 +403,8 @@
    *  KeyWatcher
    *  provides keyboard support
    */
-  var KeyWatcher = function(master){
-    this.master = master;
+  var KeyWatcher = function(core){
+    this.core = core;
     this.init();
   };
 
@@ -419,10 +419,10 @@
       this.enable();
     },
     disable: function(){
-      this.master.container.off('keydown.jcrop');
+      this.core.container.off('keydown.jcrop');
     },
     enable: function(){
-      var t = this, m = t.master;
+      var t = this, m = t.core;
       m.container.on('keydown.jcrop',function(e){
         var nudge = e.shiftKey? 16: 2;
 
@@ -454,7 +454,7 @@
   var StageDrag = function(manager,opt){
     $.extend(this,StageDrag.defaults,opt || {});
     this.manager = manager;
-    this.master = manager.master;
+    this.core = manager.core;
   };
   
   StageDrag.defaults = {
@@ -464,7 +464,7 @@
 
   $.extend(StageDrag.prototype,{
     start: function(x,y){
-      var m = this.master.ui.multi;
+      var m = this.core.ui.multi;
       var b = {
         x: x,
         y: y,
@@ -478,9 +478,9 @@
 
       if (!this.multi) {
         for(var i=0;i<m.length;i++) m[i].remove();
-        this.master.ui.multi = [];
+        this.core.ui.multi = [];
       }
-      this.sel = this.master.newSelection().update(b).focus();
+      this.sel = this.core.newSelection().update(b).focus();
     },
     drag: function(x,y){
       //console.log('drag',x,y);
@@ -503,15 +503,15 @@
       var b = this.sel.get();
 
       if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
-        this.master.requestDelete();
+        this.core.requestDelete();
 
         else this.sel.focus();
       //console.log('end',x,y);
     }
   });
 
-  var StageManager = function(master){
-    this.master = master;
+  var StageManager = function(core){
+    this.core = core;
     this.init();
   };
 
@@ -552,16 +552,16 @@
       };
     },
     removeEvents: function(){
-      this.master.container.off('.jcrop-stage');
+      this.core.container.off('.jcrop-stage');
     },
     setupEvents: function(){
-      this.master.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
+      this.core.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
     }
   });
   // }}}
   // Selection {{{
-  var Selection = function(master){
-    this.master = master;
+  var Selection = function(core){
+    this.core = core;
     this.init();
   };
 
@@ -573,26 +573,26 @@
     init: function(){
       var t = this;
       t.state = null;
-      t.filters = t.master.filters;
+      t.filters = t.core.filters;
 
       $.extend(t,Selection.defaults);
 
       t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
       t.frame = $('<button />').addClass('jcrop-box jcrop-drag').data('ord','move');
 
-      if (t.master.opt.is_msie)
+      if (t.core.opt.is_msie)
         t.frame.css({
           opacity: 0,
           backgroundColor: 'white'
         });
 
-      t.element.append(t.frame).appendTo(t.master.container);
+      t.element.append(t.frame).appendTo(t.core.container);
 
       t.insertElements();
       t.frame.on('focus.jcrop',function(e){
-        t.master.setSelection(t);
+        t.core.setSelection(t);
         t.element.addClass('jcrop-focus');
-        t.master.redraw();
+        t.core.redraw();
       }).on('blur.jcrop',function(e){
         t.element.removeClass('jcrop-focus');
       });
@@ -605,7 +605,7 @@
     },
     // allowDrag: function(v){{{
     allowDrag: function(v){
-      var o = this.master.opt, el = this.element;
+      var o = this.core.opt, el = this.element;
       if (v == undefined) v = o.draggable;
 
       if (v && o.draggable) el.removeClass('jcrop-nodrag');
@@ -616,7 +616,7 @@
     // }}}
     // allowResize: function(v){{{
     allowResize: function(v){
-      var o = this.master.opt, el = this.element;
+      var o = this.core.opt, el = this.element;
       if (v == undefined) v = o.resizable;
 
       if (v && o.resizable) el.removeClass('jcrop-noresize');
@@ -646,14 +646,14 @@
     //createDragState: function(x,y,ord){{{
     createDragState: function(x,y,ord){
       var b = this.get();
-      this.state = new Jcrop.component.DragState(x,y,this.master.container,b.x,b.y,b.w,b.h,ord,this.filters);
+      this.state = new Jcrop.component.DragState(x,y,this.core.container,b.x,b.y,b.w,b.h,ord,this.filters);
     },
     //}}}
     startDrag: function(e){
       var $targ = $(e.target);
       var ord = $targ.data('ord');
       var t = this;
-      var m = t.master;
+      var m = t.core;
 
       this.focus();
 
@@ -695,7 +695,7 @@
     // }}}
     // center: function(instant){{{
     center: function(instant){
-      var b = this.get(), m = this.master;
+      var b = this.get(), m = this.core;
       var box = [ (m.elw-b.w)/2, (m.elh-b.h)/2, b.w, b.h ];
       return this[instant?'setSelect':'animateTo'](box);
     },
@@ -718,7 +718,7 @@
     // }}}
     // focus: function(){{{
     focus: function(){
-      this.master.setSelection(this);
+      this.core.setSelection(this);
       this.frame.focus();
       return this;
     },
@@ -747,7 +747,7 @@
     //insertElements: function(){{{
     insertElements: function(){
       var t = this, i,
-        m = t.master,
+        m = t.core,
         fr = t.element,
         b = m.opt.borders,
         h = m.opt.handles,
@@ -872,7 +872,7 @@
     addFilter: function(filter){
       this.elw = this.container.width();
       this.elh = this.container.height();
-      filter.master = this;
+      filter.core = this;
       if (!this.hasFilter(filter)) {
         this.filters.push(filter);
         this.sortFilters();
