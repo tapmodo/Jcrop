@@ -449,6 +449,7 @@
     }
   });
   // }}}
+  // StageDrag {{{
   var StageDrag = function(manager,opt){
     $.extend(this,StageDrag.defaults,opt || {});
     this.manager = manager;
@@ -549,11 +550,14 @@
         return false;
       };
     },
+    removeEvents: function(){
+      this.master.container.off('.jcrop-stage');
+    },
     setupEvents: function(){
       this.master.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
     }
   });
-
+  // }}}
   // Selection {{{
   var Selection = function(master){
     this.master = master;
