@@ -4,6 +4,9 @@
   /**
    *  DragState
    *  an object that handles dragging events
+   *
+   *  This object is used by the built-in selection object to
+   *  track a dragging operation on a selection
    */
   var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
     var t = this;
@@ -104,6 +107,7 @@
   /**
    *  RoundFilter
    *  a filter to constrain crop selection to bounding element
+   *  This filter simply rounds coordinate values to integers
    */
   var RoundFilter = function(){
     this.core = null;
@@ -158,7 +162,7 @@
   // RatioFilter {{{
   /**
    *  RatioFilter
-   *  a filter to implement aspect ratio (not working yet)
+   *  a filter to implement aspect ratio (partially working)
    */
   var RatioFilter = function(ratio){
     this.ratio = ratio;
@@ -234,6 +238,9 @@
   /**
    *  ShadeFilter
    *  A filter that implements div-based shading on any element
+   *
+   *  The shading you see is actually four semi-opaque divs
+   *  positioned inside the container, around the selection
    */
   var ShadeFilter = function(opacity,color){
     this.color = color || 'black';
@@ -342,6 +349,11 @@
   /**
    *  CropAnimator
    *  manages smooth cropping animation
+   *
+   *  This object is called internally to manage animation.
+   *  An in-memory div is animated and a progress callback
+   *  is used to update the selection coordinates of the
+   *  visible selection in realtime.
    */
   var CropAnimator = function(selection){
     this.selection = selection;
