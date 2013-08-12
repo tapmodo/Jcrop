@@ -21,6 +21,7 @@
     t.ord = ord;
     t.filters = filters;
     t.opposite = t.getOppositeCornerOffset();
+    console.log('getoppcorner',t.opposite);
 
     for(var i=0;i<filters.length;i++)
       if (filters[i].preDrag) filters[i].preDrag(t);
@@ -571,6 +572,9 @@
     // init: function(){{{
     init: function(){
       var t = this;
+      t.state = null;
+      t.filters = t.master.filters;
+
       $.extend(t,Selection.defaults);
 
       t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
@@ -594,6 +598,11 @@
       });
     },
     // }}}
+    runFilters: function(b){
+      for(var i=0;i<this.filters.length;i++)
+        b = this.filters[i].filter(b);
+      return b;
+    },
     // allowDrag: function(v){{{
     allowDrag: function(v){
       var o = this.master.opt, el = this.element;
@@ -616,6 +625,48 @@
       return this;
     },
     // }}}
+    //endDrag: function(){{{
+    endDrag: function(){
+      if (this.state) {
+        $(document.body).off('.jcrop');
+        this.focus();
+        this.state = null;
+      }
+    },
+    //}}}
+    //createDragHandler: function($targ){{{
+    createDragHandler: function($targ){
+      var t = this;
+      return function(e){
+        t.state.update(e.pageX,e.pageY);
+        t.update(t.state.getBox());
+      };
+    },
+    //}}}
+    //createDragState: function(x,y,ord){{{
+    createDragState: function(x,y,ord){
+      var b = this.get();
+      this.state = new Jcrop.component.DragState(x,y,this.master.container,b.x,b.y,b.w,b.h,ord,this.filters);
+    },
+    //}}}
+    startDrag: function(e){
+      var $targ = $(e.target);
+      var ord = $targ.data('ord');
+      var t = this;
+      var m = t.master;
+
+      this.focus();
+
+      if ((ord == 'move') && m.container.hasClass('jcrop-nodrag'))
+        return false;
+
+      t.createDragState(e.pageX,e.pageY,ord);
+
+      $(document.body).on('mousemove.jcrop',t.createDragHandler())
+        .on('mouseup.jcrop',function(e){ t.endDrag(); });
+
+      return false;
+    },
     remove: function(){
       this.element.remove();
     },
@@ -631,7 +682,7 @@
         .css({zIndex:30});
     },
     update: function(b){
-      b = this.master.runFilters(b);
+      b = this.runFilters(b);
       this.moveTo(b.x,b.y);
       this.resize(b.w,b.h);
       return this;
@@ -846,32 +897,6 @@
       this.filters = [];
     },
     //}}}
-    //createDragHandler: function($targ){{{
-    createDragHandler: function($targ){
-      var t = this;
-      return function(e){
-        t.state.update(e.pageX,e.pageY);
-        t.redrawState();
-      };
-    },
-    //}}}
-    //createDragState: function(x,y,ord){{{
-    createDragState: function(x,y,ord){
-      var b = this.getSelection(1);
-      this.elw = this.container.width();
-      this.elh = this.container.height();
-      this.state = new Jcrop.component.DragState(x,y,this.container,b.x,b.y,b.w,b.h,ord,this.filters);
-    },
-    //}}}
-    //endDrag: function(){{{
-    endDrag: function(){
-      if (this.state) {
-        $(document.body).off('.jcrop');
-        this.ui.selection.focus();
-        this.state = null;
-      }
-    },
-    //}}}
     // focus: function(){{{
     focus: function(){
       this.ui.selection.focus();
@@ -934,21 +959,6 @@
       this.ui.multi[0].focus();
       this.redraw();
     },
-    runFilters: function(b){
-      var f = this.filters,
-        s = this.ui.selection;
-
-      for(var i=0;i<f.length;i++)
-        b = f[i].filter(b);
-
-      return b;
-    },
-    //redrawState: function(){{{
-    redrawState: function(){
-      var b = this.state.getBox();
-      this.ui.selection.update(this.state.getBox());
-    },
-    //}}}
     // removeFiltersByTag: function(tag){{{
     removeFiltersByTag: function(tag){
       var i, f = this.filters, n = [];
@@ -985,20 +995,8 @@
     startDrag: function(){
       var t = this;
       return function(e){
-        var $targ = $(e.target);
-        var selection = $targ.closest('.jcrop-selection').data('selection');
-        var ord = $targ.data('ord');
-
-        selection.focus();
-
-        if ((ord == 'move') && t.container.hasClass('jcrop-nodrag'))
-          return false;
-
-        t.createDragState(e.pageX,e.pageY,ord);
-
-        $(document.body).on('mousemove.jcrop',t.createDragHandler($targ))
-          .on('mouseup.jcrop',function(e){ t.endDrag(); });
-
+        var selection = $(e.target).closest('.jcrop-selection').data('selection');
+        return selection.startDrag(e);
         return false;
       };
     },
