@@ -578,6 +578,10 @@
   };
 
   Selection.defaults = {
+    canDelete: true,
+    canDrag: true,
+    canResize: true,
+    canSelect: true
   };
 
   $.extend(Selection.prototype,{
@@ -657,6 +661,26 @@
 
       return false;
     },
+    // allowDrag: function(v){{{
+    allowDrag: function(v){
+      if (v == undefined) v = this.canDrag;
+
+      if (v && this.canDrag) this.element.removeClass('jcrop-nodrag');
+        else this.element.addClass('jcrop-nodrag');
+
+      return this;
+    },
+    // }}}
+    // allowResize: function(v){{{
+    allowResize: function(v){
+      if (v == undefined) v = this.canResize;
+
+      if (v && this.canResize) this.element.removeClass('jcrop-noresize');
+        else this.element.addClass('jcrop-noresize');
+
+      return this;
+    },
+    // }}}
     remove: function(){
       this.element.remove();
     },
