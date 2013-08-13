@@ -206,10 +206,6 @@
    *  a filter to implement minimum or maximum size
    */
   var ExtentFilter = function(){
-    this.minw = 40;
-    this.minh = 40;
-    this.maxw = 0;
-    this.maxh = 0;
     this.core = null;
   };
   $.extend(ExtentFilter.prototype,{
@@ -236,36 +232,27 @@
 
       if (ord == 'move') return b;
 
-      var w = b.w, h = b.h, st = sel.state, r = this.bound;
+      var w = b.w, h = b.h, st = sel.state, r = this.limits;
       var quad = st? this.getQuadrant(st): 'br';
 
-      if (this.minw && (w < this.minw)) w = this.minw;
-      if (this.minh && (h < this.minh)) h = this.minh;
-      if (this.maxw && (w > this.maxw)) w = this.maxw;
-      if (this.maxh && (h > this.maxh)) h = this.maxh;
+      if (r.minw && (w < r.minw)) w = r.minw;
+      if (r.minh && (h < r.minh)) h = r.minh;
+      if (r.maxw && (w > r.maxw)) w = r.maxw;
+      if (r.maxh && (h > r.maxh)) h = r.maxh;
 
       if ((w == b.w) && (h == b.h)) return b;
 
-      return this.backOff(Jcrop.wrapFromXywh(this.offsetFromCorner(quad,[w,h],b)));
-    },
-    backOff: function(b){
-      var r = this.bound;
-
-      if (b.x < r.minx) { b.x = r.minx; b.x2 = b.w + b.x; }
-      if (b.y < r.miny) { b.y = r.miny; b.y2 = b.h + b.y; }
-      if (b.x2 > r.maxx) { b.x2 = r.maxx; b.x = b.x2 - b.w; }
-      if (b.y2 > r.maxy) { b.y2 = r.maxy; b.y = b.y2 - b.h; }
-
-      return b;
+      return Jcrop.wrapFromXywh(this.offsetFromCorner(quad,[w,h],b));
     },
     refresh: function(sel){
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
-      this.bound = {
-        minx: 0 + sel.bound.w,
-        miny: 0 + sel.bound.n,
-        maxx: this.elw + sel.bound.e,
-        maxy: this.elh + sel.bound.s
+
+      this.limits = {
+        minw: sel.limitmin[0],
+        minh: sel.limitmin[1],
+        maxw: sel.limitmax[0],
+        maxh: sel.limitmax[1]
       };
     }
   });
