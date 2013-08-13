@@ -8,26 +8,30 @@
    *  This object is used by the built-in selection object to
    *  track a dragging operation on a selection
    */
-  var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
+  //var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
+  var DragState = function(e,selection,ord){
     var t = this;
-    t.x = cx;
-    t.y = cy;
-    var p = $box.position();
+
+    t.x = e.pageX;
+    t.y = e.pageY;
+
+    t.selection = selection;
+    t.orig = selection.get();
+
+    selection.callFilterFunction('refresh');
+
+    var p = selection.core.container.position();
     t.elx = p.left;
     t.ely = p.top;
-    t.bx = parseInt(bx);
-    t.by = parseInt(by);
-    t.bw = parseInt(bw);
-    t.bh = parseInt(bh);
+
     t.offsetx = 0;
     t.offsety = 0;
     t.ord = ord;
-    t.filters = filters;
     t.opposite = t.getOppositeCornerOffset();
-    console.log('getoppcorner',t.opposite);
 
-    for(var i=0;i<filters.length;i++)
-      if (filters[i].preDrag) filters[i].preDrag(t);
+    $(document.body).on('mousemove.jcrop',t.createDragHandler())
+      .on('mouseup.jcrop',t.createStopHandler());
+
   };
 
   $.extend(DragState.prototype,{
@@ -35,30 +39,59 @@
     // Calculate relative offset of locked corner
     getOppositeCornerOffset: function(){
 
-      var relx = this.x - this.elx - this.bx;
-      var rely = this.y - this.ely - this.by;
+      var o = this.orig;
+      var relx = this.x - this.elx - o.x;
+      var rely = this.y - this.ely - o.y;
 
       switch(this.ord){
         case 'nw':
         case 'w':
-          return [ this.bw - relx, this.bh - rely ];
+          return [ o.w - relx, o.h - rely ];
+          return [ o.x + o.w, o.y + o.h ];
 
         case 'sw':
-          return [ this.bw - relx, -rely ];
+          return [ o.w - relx, -rely ];
+          return [ o.x + o.w, o.y ];
 
         case 'se':
         case 's':
         case 'e':
           return [ -relx, -rely ];
+          return [ o.x, o.y ];
 
         case 'ne':
         case 'n':
-          return [ -relx, this.bh - rely ];
+          return [ -relx, o.h - rely ];
+          return [ o.w, o.y + o.h ];
       }
 
       return [ null, null ];
     },
     // }}}
+    dragEvent: function(e){
+      this.offsetx = e.pageX - this.x;
+      this.offsety = e.pageY - this.y;
+      this.selection.update(this.getBox(),this.ord);
+      this.selection.element.trigger('cropmove');
+    },
+    endDragEvent: function(e){
+      this.selection.element.trigger('cropend');
+    },
+    createStopHandler: function(){
+      var t = this;
+      return function(e){
+        $(document.body).off('.jcrop');
+        t.endDragEvent(e);
+        return false;
+      };
+    },
+    createDragHandler: function(){
+      var t = this;
+      return function(e){
+        t.dragEvent(e);
+        return false;
+      };
+    },
     //update: function(x,y){{{
     update: function(x,y){
       var t = this;
@@ -84,20 +117,21 @@
     //getBox: function(){{{
     getBox: function(){
       var t = this;
-      var _c = { x2: t.bx + t.bw, y2: t.by + t.bh };
+      var o = t.orig;
+      var _c = { x2: o.x + o.w, y2: o.y + o.h };
       switch(t.ord){
-        case 'n': return t.resultWrap([ t.bx, t.offsety + t.by, _c.x2, _c.y2 ]);
-        case 's': return t.resultWrap([ t.bx, t.by, _c.x2, t.offsety + _c.y2 ]);
-        case 'e': return t.resultWrap([ t.bx, t.by, t.offsetx + _c.x2, _c.y2 ]);
-        case 'w': return t.resultWrap([ t.bx + t.offsetx, t.by, _c.x2, _c.y2 ]);
-        case 'sw': return t.resultWrap([ t.offsetx + t.bx, t.by, _c.x2, t.offsety + _c.y2 ]);
-        case 'se': return t.resultWrap([ t.bx, t.by, t.offsetx + _c.x2, t.offsety + _c.y2 ]);
-        case 'ne': return t.resultWrap([ t.bx, t.offsety + t.by, t.offsetx + _c.x2, _c.y2 ]);
-        case 'nw': return t.resultWrap([ t.offsetx + t.bx, t.offsety + t.by, _c.x2, _c.y2 ]);
+        case 'n': return t.resultWrap([ o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
+        case 's': return t.resultWrap([ o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
+        case 'e': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, _c.y2 ]);
+        case 'w': return t.resultWrap([ o.x + t.offsetx, o.y, _c.x2, _c.y2 ]);
+        case 'sw': return t.resultWrap([ t.offsetx + o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
+        case 'se': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, t.offsety + _c.y2 ]);
+        case 'ne': return t.resultWrap([ o.x, t.offsety + o.y, t.offsetx + _c.x2, _c.y2 ]);
+        case 'nw': return t.resultWrap([ t.offsetx + o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
         case 'move':
-          _c.nx = t.bx + t.offsetx;
-          _c.ny = t.by + t.offsety;
-          return t.resultWrap([ _c.nx, _c.ny, _c.nx + t.bw, _c.ny + t.bh ]);
+          _c.nx = o.x + t.offsetx;
+          _c.ny = o.y + t.offsety;
+          return t.resultWrap([ _c.nx, _c.ny, _c.nx + o.w, _c.ny + o.h ]);
       }
     }
     //}}}
@@ -140,22 +174,31 @@
   };
   $.extend(ConstrainFilter.prototype,{
     priority: 5,
-    filter: function(b){
-      var m = this.core, st = m.state;
-      if (st && st.ord && (st.ord == 'move')) {
-        if (b.x < 0) { b.x = 0; b.x2 = b.w; }
-        if (b.y < 0) { b.y = 0; b.y2 = b.h; }
-        if (b.x2 > m.elw) { b.x2 = m.elw; b.x = b.x2 - st.bw; }
-        if (b.y2 > m.elh) { b.y2 = m.elh; b.y = b.y2 - st.bh; }
+    filter: function(b,ord){
+      console.log('constrain filter');
+      if (ord == 'move') {
+        if (b.x < this.minx) { b.x = this.minx; b.x2 = b.w + b.x; }
+        if (b.y < this.miny) { b.y = this.miny; b.y2 = b.h + b.y; }
+        if (b.x2 > this.maxx) { b.x2 = this.maxx; b.x = b.x2 - b.w; }
+        if (b.y2 > this.maxy) { b.y2 = this.maxy; b.y = b.y2 - b.h; }
       } else {
-        if (b.x < 0) { b.x = 0; }
-        if (b.y < 0) { b.y = 0; }
-        if (b.x2 > m.elw) { b.x2 = m.elw; }
-        if (b.y2 > m.elh) { b.y2 = m.elh; }
+        if (b.x < this.minx) { b.x = this.minx; }
+        if (b.y < this.miny) { b.y = this.miny; }
+        if (b.x2 > this.maxx) { b.x2 = this.maxx; }
+        if (b.y2 > this.maxy) { b.y2 = this.maxy; }
       }
       b.w = b.x2 - b.x;
       b.h = b.y2 - b.y;
       return b;
+    },
+    refresh: function(sel){
+      console.log('constrain refresh');
+      this.elw = sel.core.container.width();
+      this.elh = sel.core.container.height();
+      this.minx = 0 + sel.bound.w;
+      this.miny = 0 + sel.bound.n;
+      this.maxx = this.elw + sel.bound.e;
+      this.maxy = this.elh + sel.bound.s;
     }
   });
   // }}}
@@ -164,8 +207,8 @@
    *  RatioFilter
    *  a filter to implement aspect ratio (partially working)
    */
-  var RatioFilter = function(ratio){
-    this.ratio = ratio;
+  var RatioFilter = function(){
+    this.ratio = 0;
     this.core = null;
   };
   $.extend(RatioFilter.prototype,{
@@ -197,40 +240,47 @@
         else if ((relx < 0) && (rely >= 0)) return 'tr';
         return 'bl';
     },
-    filter: function(b){
+    filter: function(b,ord,sel){
+
+      if (!this.ratio) return b;
+
       var rt = b.w / b.h;
-      var m = this.core;
-      var st = m.state;
+      var st = sel.state;
 
       var quad = st? this.getQuadrant(st): 'br';
-      var ord = (st && st.ord) ? st.ord: 'se';
+      ord = ord || 'se';
 
       if (ord == 'move') return b;
 
-      switch(this.ord) {
+      switch(ord) {
         case 'n':
-          b.x2 = m.elw;
+          b.x2 = this.elw;
           b.w = b.x2 - b.x;
           quad = 'tr';
           break;
         case 's':
-          b.x2 = m.elw;
+          b.x2 = this.elw;
           b.w = b.x2 - b.x;
           quad = 'br';
           break;
         case 'e':
-          b.y2 = m.elh;
+          b.y2 = this.elh;
           b.h = b.y2 - b.y;
           quad = 'br';
           break;
         case 'w':
-          b.y2 = m.elh;
+          b.y2 = this.elh;
           b.h = b.y2 - b.y;
           quad = 'bl';
           break;
       }
 
       return this.getBoundRatio(b,quad);
+    },
+    refresh: function(sel){
+      this.ratio = sel.aspect;
+      this.elw = sel.core.container.width();
+      this.elh = sel.core.container.height();
     }
   });
   // }}}
@@ -256,30 +306,28 @@
     priority: 95,
     init: function(){
       var t = this;
-      t.visible = false;
 
-      t.container = $('<div />').addClass('jcrop-shades')
-        .prependTo(this.core.container).hide();
+      if (!t.attached) {
+        t.visible = false;
 
-      t.elh = this.core.container.height();
-      t.elw = this.core.container.width();
+        t.container = $('<div />').addClass('jcrop-shades')
+          .prependTo(this.core.container).hide();
 
-      t.shades = {
-        top: t.createShade(),
-        right: t.createShade(),
-        left: t.createShade(),
-        bottom: t.createShade()
-      };
+        t.elh = this.core.container.height();
+        t.elw = this.core.container.width();
 
-      t.reheighten();
-      t.filter(this.core.getSelection(1));
-    },
-    reheighten: function(){
-      var m = this.core, s = this.shades;
-      this.elh = m.elh;
-      this.elw = m.elw;
-      s.right.css('height',m.elh+'px');
-      s.left.css('height',m.elh+'px');
+        t.shades = {
+          top: t.createShade(),
+          right: t.createShade(),
+          left: t.createShade(),
+          bottom: t.createShade()
+        };
+
+        t.attached = true;
+      }
+
+      t.refresh();
+      //t.filter(this.core.getSelection(1),null,this.core.ui.selection);
     },
     destroy: function(){
       this.container.remove();
@@ -309,12 +357,18 @@
         opacity: this.opacity
       }).appendTo(this.container);
     },
-    preDrag: function(st){
-      this.reheighten();
+    refresh: function(){
+      var m = this.core, s = this.shades;
+      this.elh = m.container.height();
+      this.elw = m.container.width();
+      s.right.css('height',this.elh+'px');
+      s.left.css('height',this.elh+'px');
     },
-    filter: function(b){
+    filter: function(b,ord,sel){
+
+      if (!sel.active) return b;
+
       var t = this,
-        m = t.core,
         s = t.shades;
       
       s.top.css({
@@ -470,45 +524,29 @@
   };
   
   StageDrag.defaults = {
+    active: true,
+    max: null,
     minsize: [ 20, 20 ],
     multi: true
   };
 
   $.extend(StageDrag.prototype,{
-    start: function(x,y){
+    start: function(e){
+      if (!this.active) return false;
+      if (this.max && (this.core.ui.multi.length >= this.max)) return false;
+
+      var o = $(e.currentTarget).offset();
+      var origx = e.pageX - o.left;
+      var origy = e.pageY - o.top;
       var m = this.core.ui.multi;
-      var b = {
-        x: x,
-        y: y,
-        x2: x,
-        y2: y,
-        w: 0,
-        h: 0
-      };
-      this.ox = x;
-      this.oy = y;
 
       if (!this.multi) {
         for(var i=0;i<m.length;i++) m[i].remove();
         this.core.ui.multi = [];
       }
-      this.sel = this.core.newSelection().update(b).focus();
-    },
-    drag: function(x,y){
-      //console.log('drag',x,y);
-      //this.sel.focus();
-      var x2 = this.ox + x;
-      var y2 = this.oy + y;
-      var b = {
-        x: Math.min( this.ox, x2 ),
-        y: Math.min( this.oy, y2 ),
-        x2: Math.max( this.ox, x2 ),
-        y2: Math.max( this.oy, y2 )
-      };
-      b.w = b.x2 - b.x;
-      b.l = b.y2 - b.y;
-      this.sel.update(b);
-      return b;
+
+      var sel = cb.newSelection().update(Jcrop.wrapFromXywh([origx,origy,1,1]));
+      return sel.startDrag(e,'se');
     },
     end: function(x,y){
       this.drag(x,y);
@@ -518,10 +556,10 @@
         this.core.requestDelete();
 
         else this.sel.focus();
-      //console.log('end',x,y);
     }
   });
-
+  // }}}
+  // StageManager {{{
   var StageManager = function(core){
     this.core = core;
     this.init();
@@ -535,32 +573,10 @@
       this.setupEvents();
       this.dragger = new StageDrag(this);
     },
-    createDragHandler: function(){
-      var t = this;
-      return function(e){
-        t.dragger.drag(e.pageX-t.startX,e.pageY-t.startY);
-        return false;
-      };
-    },
     startDragHandler: function(){
       var t = this;
       return function(e){
-        var o = $(e.currentTarget).offset();
-        t.startX = e.pageX;
-        t.startY = e.pageY;
-        t.origX = t.startX - o.left;
-        t.origY = t.startY - o.top;
-
-        t.dragger.start(t.origX,t.origY);
-
-        $(document.body).on('mousemove.jcrop',t.createDragHandler())
-          .on('mouseup.jcrop',function(e){
-            t.dragger.end(e.pageX-t.startX,e.pageY-t.startY);
-            $(document.body).off('.jcrop');
-            return false;
-          });
-
-        return false;
+        return t.dragger.start(e);
       };
     },
     removeEvents: function(){
@@ -575,9 +591,13 @@
   var Selection = function(core){
     this.core = core;
     this.init();
+    this.bound = { n: 0, s: 0, e: 0, w: 0 };
   };
 
   Selection.defaults = {
+    state: null,
+    aspect: 0,
+    active: true,
     canDelete: true,
     canDrag: true,
     canResize: true,
@@ -588,35 +608,95 @@
     // init: function(){{{
     init: function(){
       var t = this;
-      t.state = null;
-      t.filters = t.core.filters;
-
       $.extend(t,Selection.defaults);
+      t.filters = t.core.getDefaultFilters();
 
       t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
       t.frame = $('<button />').addClass('jcrop-box jcrop-drag').data('ord','move');
-
-      if (t.core.opt.is_msie)
-        t.frame.css({
-          opacity: 0,
-          backgroundColor: 'white'
-        });
-
       t.element.append(t.frame).appendTo(t.core.container);
 
+      // IE background/draggable hack
+      if (t.core.opt.is_msie) t.frame.css({
+        opacity: 0,
+        backgroundColor: 'white'
+      });
+
       t.insertElements();
+
+      // Bind focus and blur events for this selection
       t.frame.on('focus.jcrop',function(e){
+        t.element.trigger('cropfocus');
         t.core.setSelection(t);
         t.element.addClass('jcrop-focus');
         t.core.redraw();
       }).on('blur.jcrop',function(e){
         t.element.removeClass('jcrop-focus');
+        t.element.trigger('cropblur');
       });
     },
     // }}}
-    runFilters: function(b){
+    refresh: function(){
+      this.allowResize();
+      this.allowDrag();
+      this.allowSelect();
+      this.callFilterFunction('refresh');
+      this.update(this.get(),'se');
+    },
+    callFilterFunction: function(f,args){
       for(var i=0;i<this.filters.length;i++)
-        b = this.filters[i].filter(b);
+        if (this.filters[i][f]) this.filters[i][f](this);
+      return this;
+    },
+    //addFilter: function(filter){{{
+    addFilter: function(filter){
+      filter.core = this.core;
+      if (!this.hasFilter(filter)) {
+        this.filters.push(filter);
+        this.sortFilters();
+        if (filter.init) filter.init();
+        this.refresh();
+      }
+    },
+    //}}}
+    // hasFilter: function(filter){{{
+    hasFilter: function(filter){
+      var i, f = this.filters, n = [];
+      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
+    },
+    // }}}
+    // sortFilters: function(){{{
+    sortFilters: function(){
+      this.filters.sort(
+        function(x,y){ return x.priority - y.priority; }
+      );
+    },
+    // }}}
+    //clearFilters: function(){{{
+    clearFilters: function(){
+      var i, f = this.filters;
+
+      for(var i=0;i<f.length;i++)
+        if (f[i].destroy) f[i].destroy();
+
+      this.filters = [];
+    },
+    //}}}
+    // removeFiltersByTag: function(tag){{{
+    removeFilter: function(tag){
+      var i, f = this.filters, n = [];
+
+      for(var i=0;i<f.length;i++)
+        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
+          if (f[i].destroy) f[i].destroy();
+        }
+        else n.push(f[i]);
+
+      this.filters = n;
+    },
+    // }}}
+    runFilters: function(b,ord){
+      for(var i=0;i<this.filters.length;i++)
+        b = this.filters[i].filter(b,ord,this);
       return b;
     },
     //endDrag: function(){{{
@@ -628,39 +708,36 @@
       }
     },
     //}}}
-    //createDragHandler: function($targ){{{
-    createDragHandler: function($targ){
-      var t = this;
-      return function(e){
-        t.state.update(e.pageX,e.pageY);
-        t.update(t.state.getBox());
-      };
-    },
-    //}}}
     //createDragState: function(x,y,ord){{{
     createDragState: function(x,y,ord){
       var b = this.get();
       this.state = new Jcrop.component.DragState(x,y,this.core.container,b.x,b.y,b.w,b.h,ord,this.filters);
     },
     //}}}
-    startDrag: function(e){
-      var $targ = $(e.target);
-      var ord = $targ.data('ord');
+    startDrag: function(e,ord){
       var t = this;
       var m = t.core;
+
+      ord = ord || $(e.target).data('ord');
 
       this.focus();
 
       if ((ord == 'move') && t.element.hasClass('jcrop-nodrag'))
         return false;
 
-      t.createDragState(e.pageX,e.pageY,ord);
-
-      $(document.body).on('mousemove.jcrop',t.createDragHandler())
-        .on('mouseup.jcrop',function(e){ t.endDrag(); });
-
+      this.state = new Jcrop.component.DragState(e,this,ord);
       return false;
     },
+    // allowSelect: function(v){{{
+    allowSelect: function(v){
+      if (v === undefined) v = this.canSelect;
+
+      if (v && this.canSelect) this.frame.attr('disabled',false);
+        else this.frame.attr('disabled','disabled');
+
+      return this;
+    },
+    // }}}
     // allowDrag: function(v){{{
     allowDrag: function(v){
       if (v == undefined) v = this.canDrag;
@@ -685,18 +762,21 @@
       this.element.remove();
     },
     toBack: function(){
+      this.active = false;
       this.element
         .removeClass('jcrop-current')
         .removeClass('jcrop-focus')
         .css({zIndex:20});
     },
     toFront: function(){
+      this.active = true;
       this.element
         .addClass('jcrop-current')
         .css({zIndex:30});
+      this.callFilterFunction('refresh');
     },
-    update: function(b){
-      b = this.runFilters(b);
+    update: function(b,ord){
+      b = this.runFilters(b,ord);
       this.moveTo(b.x,b.y);
       this.resize(b.w,b.h);
       return this;
@@ -710,7 +790,8 @@
     // center: function(instant){{{
     center: function(instant){
       var b = this.get(), m = this.core;
-      var box = [ (m.elw-b.w)/2, (m.elh-b.h)/2, b.w, b.h ];
+      var elw = m.container.width(), elh = m.container.height();
+      var box = [ (elw-b.w)/2, (elh-b.h)/2, b.w, b.h ];
       return this[instant?'setSelect':'animateTo'](box);
     },
     // }}}
@@ -786,7 +867,7 @@
    */
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
-    this.opt = $.extend({},Jcrop.defaults,opt);
+    this.opt = $.extend(true,{},Jcrop.defaults,opt);
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
 
@@ -846,6 +927,13 @@
       this.ui.stage = new $.Jcrop.component.StageManager(this);
     },
     //}}}
+    // getDefaultFilters: function(){{{
+    getDefaultFilters: function(){
+      for(var rv=[],i=0,f=this.filters,l=f.length; i<l; i++) rv.push(f[i]);
+      return rv;
+    },
+    // }}}
+    // setSelection: function(sel){{{
     setSelection: function(sel){
       var m = this.ui.multi;
       var n = [];
@@ -859,20 +947,28 @@
       sel.toFront();
       return sel;
     },
+    // }}}
+    // getSelection: function(raw){{{
     getSelection: function(raw){
       var b = this.ui.selection.get();
       if (raw) return b;
       // @todo scaled coordinates
-        return b;
+      return b;
     },
+    // }}}
+    // newSelection: function(){{{
     newSelection: function(){
       var sel = new $.Jcrop.component.Selection(this);
       return this.setSelection(sel);
     },
+    // }}}
+    // hasSelection: function(sel){{{
     hasSelection: function(sel){
       for(var i=0;i<this.ui.multi;i++)
         if (sel === this.ui.multi[i]) return true;
     },
+    // }}}
+    // removeSelection: function(sel){{{
     removeSelection: function(sel){
       var i, n = [], m = this.ui.multi;
       for(var i=0;i<m.length;i++){
@@ -882,45 +978,33 @@
       }
       return this.ui.multi = n;
     },
+    // }}}
     //addFilter: function(filter){{{
     addFilter: function(filter){
-      this.elw = this.container.width();
-      this.elh = this.container.height();
-      filter.core = this;
-      if (!this.hasFilter(filter)) {
-        this.filters.push(filter);
-        this.sortFilters();
-        if (filter.init) filter.init();
-        this.redraw();
-      }
+      for(var i=0,m=this.ui.multi,l=m.length; i<l; i++)
+        m[i].addFilter(filter);
+
+      return this;
     },
     //}}}
+    // removeFiltersByTag: function(tag){{{
+    removeFilter: function(filter){
+      for(var i=0,m=this.ui.multi,l=m.length; i<l; i++)
+        m[i].removeFilter(filter);
+
+      return this;
+    },
+    // }}}
     // blur: function(){{{
     blur: function(){
       this.ui.selection.blur();
       return this;
     },
     // }}}
-    //clearFilters: function(){{{
-    clearFilters: function(){
-      var i, f = this.filters;
-
-      for(var i=0;i<f.length;i++)
-        if (f[i].destroy) f[i].destroy();
-
-      this.filters = [];
-    },
-    //}}}
     // focus: function(){{{
     focus: function(){
       this.ui.selection.focus();
       return this;
-    },
-    // }}}
-    // hasFilter: function(filter){{{
-    hasFilter: function(filter){
-      var i, f = this.filters, n = [];
-      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
     },
     // }}}
     //initEvents: function(){{{
@@ -957,6 +1041,7 @@
       this.update(this.getSelection(1));
     },
     // }}}
+    // blurAll: function(){{{
     blurAll: function(){
       var m = this.ui.multi;
       for(var i=0;i<m.length;i++) {
@@ -964,26 +1049,18 @@
         m[i].toBack();
       }
     },
+    // }}}
+    // requestDelete: function(){{{
     requestDelete: function(){
-      if (this.ui.multi.length > 1)
-        this.deleteSelection();
+      if ((this.ui.multi.length > 1) && (this.ui.selection.canDelete))
+        return this.deleteSelection();
     },
+    // }}}
+    // deleteSelection: function(){{{
     deleteSelection: function(){
       this.removeSelection(this.ui.selection);
       this.ui.multi[0].focus();
       this.redraw();
-    },
-    // removeFiltersByTag: function(tag){{{
-    removeFiltersByTag: function(tag){
-      var i, f = this.filters, n = [];
-
-      for(var i=0;i<f.length;i++)
-        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
-          if (f[i].destroy) f[i].destroy();
-        }
-        else n.push(f[i]);
-
-      this.filters = n;
     },
     // }}}
     // animateTo: function(box){{{
@@ -998,19 +1075,14 @@
       return this;
     },
     // }}}
-    // sortFilters: function(){{{
-    sortFilters: function(){
-      this.filters.sort(
-        function(x,y){ return x.priority - y.priority; }
-      );
-    },
-    // }}}
     //startDrag: function(){{{
     startDrag: function(){
       var t = this;
       return function(e){
-        var selection = $(e.target).closest('.jcrop-selection').data('selection');
-        return selection.startDrag(e);
+        var $targ = $(e.target);
+        var selection = $targ.closest('.jcrop-selection').data('selection');
+        var ord = $targ.data('ord');
+        return selection.startDrag(e,ord);
         return false;
       };
     },
@@ -1018,7 +1090,6 @@
     // update: function(b){{{
     update: function(b){
       this.ui.selection.update(b);
-      this.container.trigger('cropmove',b);
     }
     // }}}
   });
