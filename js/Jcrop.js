@@ -615,7 +615,7 @@
   };
   
   StageDrag.defaults = {
-    offset: [ 0, 0 ],
+    offset: [ -8, -8 ],
     active: true,
     max: null,
     minsize: [ 20, 20 ],
@@ -687,6 +687,8 @@
   };
 
   Selection.defaults = {
+    limitmax: [ 0, 0 ],
+    limitmin: [ 8, 8 ],
     state: null,
     aspect: 0,
     active: true,
