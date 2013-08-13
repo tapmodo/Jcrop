@@ -202,6 +202,77 @@
     }
   });
   // }}}
+  // ExtentFilter {{{
+  /**
+   *  ExtentFilter
+   *  a filter to implement minimum or maximum size
+   */
+  var ExtentFilter = function(){
+    this.minw = 40;
+    this.minh = 40;
+    this.maxw = 0;
+    this.maxh = 0;
+    this.core = null;
+  };
+  $.extend(ExtentFilter.prototype,{
+    priority: 12,
+    offsetFromCorner: function(corner,box,b){
+      var w = box[0], h = box[1];
+      switch(corner){
+        case 'bl': return [ b.x2 - w, b.y, w, h ];
+        case 'tl': return [ b.x2 - w , b.y2 - h, w, h ];
+        case 'br': return [ b.x, b.y, w, h ];
+        case 'tr': return [ b.x, b.y2 - h, w, h ];
+      }
+    },
+    getQuadrant: function(s){
+      var relx = s.opposite[0]-s.offsetx
+      var rely = s.opposite[1]-s.offsety;
+
+      if ((relx < 0) && (rely < 0)) return 'br';
+        else if ((relx >= 0) && (rely >= 0)) return 'tl';
+        else if ((relx < 0) && (rely >= 0)) return 'tr';
+        return 'bl';
+    },
+    filter: function(b,ord,sel){
+
+      if (ord == 'move') return b;
+
+      var w = b.w, h = b.h, st = sel.state, r = this.bound;
+      var quad = st? this.getQuadrant(st): 'br';
+
+      if (this.minw && (w < this.minw)) w = this.minw;
+      if (this.minh && (h < this.minh)) h = this.minh;
+      if (this.maxw && (w > this.maxw)) w = this.maxw;
+      if (this.maxh && (h > this.maxh)) h = this.maxh;
+
+      if ((w == b.w) && (h == b.h)) return b;
+
+      return this.backOff(Jcrop.wrapFromXywh(this.offsetFromCorner(quad,[w,h],b)));
+    },
+    backOff: function(b){
+      var r = this.bound;
+
+      if (b.x < r.minx) { b.x = r.minx; b.x2 = b.w + b.x; }
+      if (b.y < r.miny) { b.y = r.miny; b.y2 = b.h + b.y; }
+      if (b.x2 > r.maxx) { b.x2 = r.maxx; b.x = b.x2 - b.w; }
+      if (b.y2 > r.maxy) { b.y2 = r.maxy; b.y = b.y2 - b.h; }
+
+      return b;
+    },
+    refresh: function(sel){
+      console.log('constrain refresh');
+      this.elw = sel.core.container.width();
+      this.elh = sel.core.container.height();
+      this.bound = {
+        minx: 0 + sel.bound.w,
+        miny: 0 + sel.bound.n,
+        maxx: this.elw + sel.bound.e,
+        maxy: this.elh + sel.bound.s
+      };
+    }
+  });
+  // }}}
   // RatioFilter {{{
   /**
    *  RatioFilter
@@ -524,6 +595,7 @@
   };
   
   StageDrag.defaults = {
+    offset: [ 0, 0 ],
     active: true,
     max: null,
     minsize: [ 20, 20 ],
@@ -536,8 +608,8 @@
       if (this.max && (this.core.ui.multi.length >= this.max)) return false;
 
       var o = $(e.currentTarget).offset();
-      var origx = e.pageX - o.left;
-      var origy = e.pageY - o.top;
+      var origx = e.pageX - o.left + this.offset[0];
+      var origy = e.pageY - o.top + this.offset[1];
       var m = this.core.ui.multi;
 
       if (!this.multi) {
@@ -895,6 +967,7 @@
     //filter: built-in filter collection {{{
     filter: {
       constrain: ConstrainFilter,
+      extent: ExtentFilter,
       shader: ShadeFilter,
       ratio: RatioFilter,
       round: RoundFilter
