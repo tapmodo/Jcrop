@@ -175,7 +175,6 @@
   $.extend(ConstrainFilter.prototype,{
     priority: 5,
     filter: function(b,ord){
-      console.log('constrain filter');
       if (ord == 'move') {
         if (b.x < this.minx) { b.x = this.minx; b.x2 = b.w + b.x; }
         if (b.y < this.miny) { b.y = this.miny; b.y2 = b.h + b.y; }
@@ -192,7 +191,6 @@
       return b;
     },
     refresh: function(sel){
-      console.log('constrain refresh');
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
       this.minx = 0 + sel.bound.w;
@@ -261,7 +259,6 @@
       return b;
     },
     refresh: function(sel){
-      console.log('constrain refresh');
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
       this.bound = {
