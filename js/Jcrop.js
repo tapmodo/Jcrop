@@ -299,7 +299,7 @@
     this.core = null;
   };
   $.extend(BackoffFilter.prototype,{
-    priority: 20,
+    priority: 22,
     filter: function(b){
       var r = this.bound;
 
