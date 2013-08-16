@@ -1026,6 +1026,7 @@
       return null;
     },
     fireCallback: function(){
+      this.element.onload = null;
       if (typeof this.callback == 'function')
         this.callback.apply(this,this.getDimensions());
     },
