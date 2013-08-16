@@ -1039,8 +1039,10 @@
 
       el.src = t.src;
 
-      if (t.isLoaded()) this.fireCallback();
-        else this.element.onload = function(e){ t.fireCallback(); };
+      if (t.isLoaded()) t.fireCallback();
+        else t.element.onload = function(e){
+          t.fireCallback();
+        };
     }
   });
   // }}}
