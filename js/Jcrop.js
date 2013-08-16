@@ -648,7 +648,7 @@
     active: true,
     max: null,
     minsize: [ 20, 20 ],
-    multi: true
+    multi: false
   };
 
   $.extend(StageDrag.prototype,{
