@@ -759,6 +759,7 @@
       });
     },
     // }}}
+    // refresh: function(){{{
     refresh: function(){
       this.allowResize();
       this.allowDrag();
@@ -766,11 +767,14 @@
       this.callFilterFunction('refresh');
       this.update(this.get(),'se');
     },
+    // }}}
+    // callFilterFunction: function(f,args){{{
     callFilterFunction: function(f,args){
       for(var i=0;i<this.filters.length;i++)
         if (this.filters[i][f]) this.filters[i][f](this);
       return this;
     },
+    // }}}
     //addFilter: function(filter){{{
     addFilter: function(filter){
       filter.core = this.core;
@@ -818,11 +822,13 @@
       this.filters = n;
     },
     // }}}
+    // runFilters: function(b,ord){{{
     runFilters: function(b,ord){
       for(var i=0;i<this.filters.length;i++)
         b = this.filters[i].filter(b,ord,this);
       return b;
     },
+    // }}}
     //endDrag: function(){{{
     endDrag: function(){
       if (this.state) {
@@ -838,6 +844,7 @@
       this.state = new Jcrop.component.DragState(x,y,this.core.container,b.x,b.y,b.w,b.h,ord,this.filters);
     },
     //}}}
+    // startDrag: function(e,ord){{{
     startDrag: function(e,ord){
       var t = this;
       var m = t.core;
@@ -852,6 +859,7 @@
       this.state = new Jcrop.component.DragState(e,this,ord);
       return false;
     },
+    // }}}
     // allowSelect: function(v){{{
     allowSelect: function(v){
       if (v === undefined) v = this.canSelect;
@@ -882,9 +890,12 @@
       return this;
     },
     // }}}
+    // remove: function(){{{
     remove: function(){
       this.element.remove();
     },
+    // }}}
+    // toBack: function(){{{
     toBack: function(){
       this.active = false;
       this.element
@@ -892,6 +903,8 @@
         .removeClass('jcrop-focus')
         .css({zIndex:20});
     },
+    // }}}
+    // toFront: function(){{{
     toFront: function(){
       this.active = true;
       this.element
@@ -899,12 +912,15 @@
         .css({zIndex:30});
       this.callFilterFunction('refresh');
     },
+    // }}}
+    // update: function(b,ord){{{
     update: function(b,ord){
       b = this.runFilters(b,ord);
       this.moveTo(b.x,b.y);
       this.resize(b.w,b.h);
       return this;
     },
+    // }}}
     // animateTo: function(box,cb){{{
     animateTo: function(box,cb){
       var ca = new Jcrop.component.Animator(this);
@@ -984,6 +1000,7 @@
     //}}}
   });
   // }}}
+  // ImageLoader {{{
   var ImageLoader = function(src,element,cb){
     this.src = src;
     if (!element) element = new Image;
@@ -1020,6 +1037,7 @@
         else this.element.onload = function(e){ t.fireCallback(); };
     }
   });
+  // }}}
 
   /**
    *  Jcrop
