@@ -1008,6 +1008,11 @@
     this.callback = cb;
     this.load();
   };
+
+  ImageLoader.attach = function(el,cb){
+    return new ImageLoader(el.src,el,cb);
+  };
+
   $.extend(ImageLoader.prototype,{
     getDimensions: function(){
       var el = this.element;
