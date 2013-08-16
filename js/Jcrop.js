@@ -841,12 +841,6 @@
       }
     },
     //}}}
-    //createDragState: function(x,y,ord){{{
-    createDragState: function(x,y,ord){
-      var b = this.get();
-      this.state = new Jcrop.component.DragState(x,y,this.core.container,b.x,b.y,b.w,b.h,ord,this.filters);
-    },
-    //}}}
     // startDrag: function(e,ord){{{
     startDrag: function(e,ord){
       var t = this;
