@@ -666,7 +666,7 @@
         this.core.ui.multi = [];
       }
 
-      var sel = cb.newSelection().update(Jcrop.wrapFromXywh([origx,origy,1,1]));
+      var sel = this.core.newSelection().update(Jcrop.wrapFromXywh([origx,origy,1,1]));
       return sel.startDrag(e,'se');
     },
     end: function(x,y){
