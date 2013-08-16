@@ -697,7 +697,7 @@
     startDragHandler: function(){
       var t = this;
       return function(e){
-        return t.dragger.start(e);
+        if (!e.button) return t.dragger.start(e);
       };
     },
     removeEvents: function(){
