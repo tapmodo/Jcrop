@@ -718,8 +718,9 @@
   Selection.defaults = {
     limitmax: [ 0, 0 ],
     limitmin: [ 8, 8 ],
-    state: null,
     aspect: 0,
+
+    state: null,
     active: true,
     canDelete: true,
     canDrag: true,
