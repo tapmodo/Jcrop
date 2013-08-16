@@ -430,7 +430,7 @@
       if (!t.attached) {
         t.visible = false;
 
-        t.container = $('<div />').addClass('jcrop-shades')
+        t.container = $('<div />').addClass(t.core.opt.cssclass.shades)
           .prependTo(this.core.container).hide();
 
         t.elh = this.core.container.height();
@@ -731,12 +731,15 @@
   $.extend(Selection.prototype,{
     // init: function(){{{
     init: function(){
-      var t = this;
+      this.startup();
+    },
+    startup: function(){
+      var t = this, css = t.core.opt.cssclass;
       $.extend(t,Selection.defaults);
-      t.filters = t.core.getDefaultFilters();
+      t.filter = t.core.getDefaultFilters();
 
-      t.element = $('<div />').addClass('jcrop-selection').data({ selection: t });
-      t.frame = $('<button />').addClass('jcrop-box jcrop-drag').data('ord','move');
+      t.element = $('<div />').addClass(css.selection).data({ selection: t });
+      t.frame = $('<button />').addClass(css.button).data('ord','move');
       t.element.append(t.frame).appendTo(t.core.container);
 
       // IE background/draggable hack
@@ -770,8 +773,8 @@
     // }}}
     // callFilterFunction: function(f,args){{{
     callFilterFunction: function(f,args){
-      for(var i=0;i<this.filters.length;i++)
-        if (this.filters[i][f]) this.filters[i][f](this);
+      for(var i=0;i<this.filter.length;i++)
+        if (this.filter[i][f]) this.filter[i][f](this);
       return this;
     },
     // }}}
@@ -779,7 +782,7 @@
     addFilter: function(filter){
       filter.core = this.core;
       if (!this.hasFilter(filter)) {
-        this.filters.push(filter);
+        this.filter.push(filter);
         this.sortFilters();
         if (filter.init) filter.init();
         this.refresh();
@@ -788,30 +791,30 @@
     //}}}
     // hasFilter: function(filter){{{
     hasFilter: function(filter){
-      var i, f = this.filters, n = [];
+      var i, f = this.filter, n = [];
       for(i=0;i<f.length;i++) if (f[i] === filter) return true;
     },
     // }}}
     // sortFilters: function(){{{
     sortFilters: function(){
-      this.filters.sort(
+      this.filter.sort(
         function(x,y){ return x.priority - y.priority; }
       );
     },
     // }}}
     //clearFilters: function(){{{
     clearFilters: function(){
-      var i, f = this.filters;
+      var i, f = this.filter;
 
       for(var i=0;i<f.length;i++)
         if (f[i].destroy) f[i].destroy();
 
-      this.filters = [];
+      this.filter = [];
     },
     //}}}
     // removeFiltersByTag: function(tag){{{
     removeFilter: function(tag){
-      var i, f = this.filters, n = [];
+      var i, f = this.filter, n = [];
 
       for(var i=0;i<f.length;i++)
         if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
@@ -819,13 +822,13 @@
         }
         else n.push(f[i]);
 
-      this.filters = n;
+      this.filter = n;
     },
     // }}}
     // runFilters: function(b,ord){{{
     runFilters: function(b,ord){
-      for(var i=0;i<this.filters.length;i++)
-        b = this.filters[i].filter(b,ord,this);
+      for(var i=0;i<this.filter.length;i++)
+        b = this.filter[i].filter(b,ord,this);
       return b;
     },
     // }}}
@@ -853,7 +856,7 @@
 
       this.focus();
 
-      if ((ord == 'move') && t.element.hasClass('jcrop-nodrag'))
+      if ((ord == 'move') && t.element.hasClass(t.core.opt.cssclass.nodrag))
         return false;
 
       this.state = new Jcrop.component.DragState(e,this,ord);
@@ -872,20 +875,22 @@
     // }}}
     // allowDrag: function(v){{{
     allowDrag: function(v){
-      if (v == undefined) v = this.canDrag;
+      var t = this, css = t.core.opt.cssclass;
+      if (v == undefined) v = t.canDrag;
 
-      if (v && this.canDrag) this.element.removeClass('jcrop-nodrag');
-        else this.element.addClass('jcrop-nodrag');
+      if (v && t.canDrag) t.element.removeClass(css.nodrag);
+        else t.element.addClass(css.nodrag);
 
       return this;
     },
     // }}}
     // allowResize: function(v){{{
     allowResize: function(v){
-      if (v == undefined) v = this.canResize;
+      var t = this, css = t.core.opt.cssclass;
+      if (v == undefined) v = t.canResize;
 
-      if (v && this.canResize) this.element.removeClass('jcrop-noresize');
-        else this.element.addClass('jcrop-noresize');
+      if (v && t.canResize) t.element.removeClass(css.noresize);
+        else t.element.addClass(css.noresize);
 
       return this;
     },
@@ -937,7 +942,7 @@
     // }}}
     //createElement: function(type,ord){{{
     createElement: function(type,ord){
-      return $('<div />').addClass('jcrop-'+type+' ord-'+ord).data('ord',ord);
+      return $('<div />').addClass(type+' ord-'+ord).data('ord',ord);
     },
     //}}}
     //moveTo: function(x,y){{{
@@ -984,18 +989,19 @@
       var t = this, i,
         m = t.core,
         fr = t.element,
-        b = m.opt.borders,
-        h = m.opt.handles,
-        d = m.opt.dragbars;
+        o = t.core.opt,
+        b = o.borders,
+        h = o.handles,
+        d = o.dragbars;
 
       for(i=0; i<b.length; i++)
-        fr.append(t.createElement('border',b[i]));
+        fr.append(t.createElement(o.cssclass.borders,b[i]));
 
       for(i=0; i<d.length; i++)
-        fr.append(t.createElement('dragbar jcrop-drag',d[i]));
+        fr.append(t.createElement(o.cssclass.dragbars,d[i]));
 
       for(i=0; i<h.length; i++)
-        fr.append(t.createElement('handle jcrop-drag',h[i]));
+        fr.append(t.createElement(o.cssclass.handles,h[i]));
     }
     //}}}
   });
@@ -1048,8 +1054,8 @@
     this.opt = $.extend(true,{},Jcrop.defaults,opt);
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
+    this.container.addClass(this.opt.cssclass.container);
 
-    this.container = $(element).addClass('jcrop-active');
     this.ui = {};
     this.state = null;
     this.ui.multi = [];
@@ -1067,7 +1073,19 @@
       animDuration: 400,
       borders:  [ 'n', 's', 'e', 'w' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
-      dragbars: [ 'n', 'e', 'w', 's' ]
+      dragbars: [ 'n', 'e', 'w', 's' ],
+      cssclass: {
+        container: 'jcrop-active',
+        shades: 'jcrop-shade',
+        selection: 'jcrop-selection',
+        borders: 'jcrop-border',
+        handles: 'jcrop-handle jcrop-drag',
+        button: 'jcrop-box jcrop-drag',
+        drag: 'jcrop-drag',
+        nodrag: 'jcrop-nodrag',
+        noresize: 'jcrop-noresize',
+        dragbars: 'jcrop-dragbar jcrop-drag'
+      }
     },
     //}}}
     //filter: built-in filter collection {{{
@@ -1192,7 +1210,7 @@
     initEvents: function(){
       var t = this;
       t.container.on('selectstart',function(e){ return false; })
-        .on('mousedown','.jcrop-drag',t.startDrag());
+        .on('mousedown','.'+t.opt.cssclass.drag,t.startDrag());
     },
     //}}}
     // maxSelect: function(){{{
@@ -1261,7 +1279,7 @@
       var t = this;
       return function(e){
         var $targ = $(e.target);
-        var selection = $targ.closest('.jcrop-selection').data('selection');
+        var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
         var ord = $targ.data('ord');
         return selection.startDrag(e,ord);
         return false;
