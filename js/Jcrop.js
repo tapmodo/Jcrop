@@ -424,6 +424,8 @@
     fadeEasing: 'easeInOutSine',
     fadeSpeed: 320,
     priority: 95,
+    setOptions: function(){
+    },
     init: function(){
       var t = this;
 
@@ -647,8 +649,7 @@
     offset: [ -8, -8 ],
     active: true,
     max: null,
-    minsize: [ 20, 20 ],
-    multi: false
+    minsize: [ 20, 20 ]
   };
 
   $.extend(StageDrag.prototype,{
@@ -661,7 +662,7 @@
       var origy = e.pageY - o.top + this.offset[1];
       var m = this.core.ui.multi;
 
-      if (!this.multi) {
+      if (!this.core.opt.multi) {
         for(var i=0;i<m.length;i++) m[i].remove();
         this.core.ui.multi = [];
       }
@@ -1053,26 +1054,31 @@
    */
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
-    this.opt = $.extend(true,{},Jcrop.defaults,opt);
+    this.opt = $.extend(true,{},Jcrop.defaults);
+
+    this.container = $(element);
+    this.setOptions(opt);
+
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
+
     this.container.addClass(this.opt.cssclass.container);
 
     this.ui = {};
     this.state = null;
     this.ui.multi = [];
-    this.filters = [];
-    this.newSelection();
-    this.init();
+    this.filter = {};
   };
 
   $.extend(Jcrop,{
     //defaults: default settings {{{
     defaults: {
+      multi: false,
       resizable: true,
       draggable: true,
       animEasing: 'easeOutBack',
       animDuration: 400,
+      applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'shader', 'round' ],
       borders:  [ 'n', 's', 'e', 'w' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
       dragbars: [ 'n', 'e', 'w', 's' ],
@@ -1094,12 +1100,22 @@
     filter: {
       constrain: ConstrainFilter,
       extent: ExtentFilter,
+      grid: GridFilter,
       backoff: BackoffFilter,
       shader: ShadeFilter,
       ratio: RatioFilter,
       round: RoundFilter
     },
     //}}}
+    canvasClone: function(imgel){
+      var canvas = document.createElement('canvas'),
+          $canvas = $(canvas).width(imgel.width).height(imgel.height),
+          ctx = canvas.getContext('2d');
+      canvas.width = imgel.naturalWidth;
+      canvas.height = imgel.naturalHeight;
+      ctx.drawImage(imgel,0,0);
+      return $canvas;
+    },
     //component: internal components {{{
     component: {
       ImageLoader: ImageLoader,
@@ -1126,11 +1142,31 @@
       this.initEvents();
       this.ui.keyboard = new $.Jcrop.component.Keyboard(this);
       this.ui.stage = new $.Jcrop.component.StageManager(this);
+      this.applyFilters();
+      this.newSelection();
     },
     //}}}
+    setOptions: function(opt){
+      if (!opt) opt = {};
+      $.extend(this.opt,opt);
+      this.container.trigger('cropconfig');
+      return this;
+    },
+    applyFilters: function(){
+      var obj;
+      for(var i=0,f=this.opt.applyFilters,l=f.length; i<l; i++){
+        if ($.Jcrop.filter[f[i]])
+          obj = new $.Jcrop.filter[f[i]];
+          obj.core = this;
+          if (obj.init) obj.init();
+          this.filter[f[i]] = obj;
+      }
+    },
     // getDefaultFilters: function(){{{
     getDefaultFilters: function(){
-      for(var rv=[],i=0,f=this.filters,l=f.length; i<l; i++) rv.push(f[i]);
+      var rv = [];
+      $.each(this.filter,function(u,i){ rv.push(i); });
+      rv.sort(function(x,y){ return x.priority - y.priority; });
       return rv;
     },
     // }}}
@@ -1294,6 +1330,46 @@
     }
     // }}}
   });
+
+  // $.fn.Jcrop = function(options,callback) {{{
+  $.fn.Jcrop = function(options,callback){
+    this.each(function(){
+      var t = this, $t = $(this);
+      var obj;
+
+      if (this.tagName == 'IMG')
+
+        $.Jcrop.component.ImageLoader.attach(this,function(w,h){
+          var $wrapper = $t.wrap('<div />').parent();
+          var setopt =
+
+          $wrapper.width(w).height(h);
+
+          obj = new $.Jcrop($wrapper,$.extend({},options,{
+            eventTarget: $t
+          }));
+
+          obj.init();
+          $t.data('Jcrop',obj);
+
+          if (typeof callback == 'function')
+            callback.call(obj);
+        });
+
+      else {
+        obj = new $.Jcrop(this,options);
+        obj.init();
+
+        $t.data('Jcrop',obj);
+
+        if (typeof callback == 'function')
+          callback.call(obj);
+      }
+
+      return this;
+    });
+  };
+  // }}}
 
   $.Jcrop = Jcrop;
 
