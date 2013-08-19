@@ -1429,33 +1429,53 @@
 
   // $.fn.Jcrop = function(options,callback) {{{
   $.fn.Jcrop = function(options,callback){
+
+    var first = this.eq(0).data('Jcrop');
+    var args = Array.prototype.slice.call(arguments);
+
+    // Return API if requested
+    if (options == 'api') { return first; }
+
+    // Allow calling API methods (with arguments)
+    else if (typeof options == 'string') {
+      args.shift();
+
+      if (first[options])
+        first[options].apply(first,args);
+    }
+
+    // Otherwise, loop over selected elements
     this.each(function(){
       var t = this, $t = $(this);
+      var exists = $t.data('Jcrop');
       var obj;
 
-      if (this.tagName == 'IMG')
+      // If Jcrop already exists on this element only setOptions()
+      if (exists)
+        exists.setOptions(options);
+
+      // Otherwise, if it's an IMG, create a wrapper
+      else if (this.tagName == 'IMG')
 
         $.Jcrop.component.ImageLoader.attach(this,function(w,h){
           var $wrapper = $t.wrap('<div />').parent();
-          var setopt =
 
           $wrapper.width(w).height(h);
 
-          obj = new $.Jcrop($wrapper,$.extend({},options,{
+          obj = $.Jcrop.attach($wrapper,$.extend({},options,{
             eventTarget: $t
           }));
 
-          obj.init();
           $t.data('Jcrop',obj);
 
           if (typeof callback == 'function')
             callback.call(obj);
         });
 
+      // Or hope it's a block element, because we're attaching
       else {
-        obj = new $.Jcrop(this,options);
-        obj.init();
 
+        obj = $.Jcrop.attach(this,options);
         $t.data('Jcrop',obj);
 
         if (typeof callback == 'function')
