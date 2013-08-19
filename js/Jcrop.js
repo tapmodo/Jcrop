@@ -1,197 +1,6 @@
 (function($){
 
-  // DragState {{{
-  /**
-   *  DragState
-   *  an object that handles dragging events
-   *
-   *  This object is used by the built-in selection object to
-   *  track a dragging operation on a selection
-   */
-  //var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
-  var DragState = function(e,selection,ord){
-    var t = this;
-
-    t.x = e.pageX;
-    t.y = e.pageY;
-
-    t.selection = selection;
-    t.orig = selection.get();
-
-    selection.callFilterFunction('refresh');
-
-    var p = selection.core.container.position();
-    t.elx = p.left;
-    t.ely = p.top;
-
-    t.offsetx = 0;
-    t.offsety = 0;
-    t.ord = ord;
-    t.opposite = t.getOppositeCornerOffset();
-
-    $(document.body).on('mousemove.jcrop',t.createDragHandler())
-      .on('mouseup.jcrop',t.createStopHandler());
-
-  };
-
-  $.extend(DragState.prototype,{
-    // getOppositeCornerOffset: function(){{{
-    // Calculate relative offset of locked corner
-    getOppositeCornerOffset: function(){
-
-      var o = this.orig;
-      var relx = this.x - this.elx - o.x;
-      var rely = this.y - this.ely - o.y;
-
-      switch(this.ord){
-        case 'nw':
-        case 'w':
-          return [ o.w - relx, o.h - rely ];
-          return [ o.x + o.w, o.y + o.h ];
-
-        case 'sw':
-          return [ o.w - relx, -rely ];
-          return [ o.x + o.w, o.y ];
-
-        case 'se':
-        case 's':
-        case 'e':
-          return [ -relx, -rely ];
-          return [ o.x, o.y ];
-
-        case 'ne':
-        case 'n':
-          return [ -relx, o.h - rely ];
-          return [ o.w, o.y + o.h ];
-      }
-
-      return [ null, null ];
-    },
-    // }}}
-    dragEvent: function(e){
-      this.offsetx = e.pageX - this.x;
-      this.offsety = e.pageY - this.y;
-      this.selection.update(this.getBox(),this.ord);
-    },
-    endDragEvent: function(e){
-      this.selection.element.trigger('cropend',this.selection.get());
-    },
-    createStopHandler: function(){
-      var t = this;
-      return function(e){
-        $(document.body).off('.jcrop');
-        t.endDragEvent(e);
-        return false;
-      };
-    },
-    createDragHandler: function(){
-      var t = this;
-      return function(e){
-        t.dragEvent(e);
-        return false;
-      };
-    },
-    //update: function(x,y){{{
-    update: function(x,y){
-      var t = this;
-      t.offsetx = x - t.x;
-      t.offsety = y - t.y;
-    },
-    //}}}
-    //resultWrap: function(d){{{
-    resultWrap: function(d){
-      var b = {
-          x: Math.min(d[0],d[2]),
-          y: Math.min(d[1],d[3]),
-          x2: Math.max(d[0],d[2]),
-          y2: Math.max(d[1],d[3])
-        };
-
-      b.w = b.x2 - b.x;
-      b.h = b.y2 - b.y;
-
-      return b;
-    },
-    //}}}
-    //getBox: function(){{{
-    getBox: function(){
-      var t = this;
-      var o = t.orig;
-      var _c = { x2: o.x + o.w, y2: o.y + o.h };
-      switch(t.ord){
-        case 'n': return t.resultWrap([ o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
-        case 's': return t.resultWrap([ o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
-        case 'e': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, _c.y2 ]);
-        case 'w': return t.resultWrap([ o.x + t.offsetx, o.y, _c.x2, _c.y2 ]);
-        case 'sw': return t.resultWrap([ t.offsetx + o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
-        case 'se': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, t.offsety + _c.y2 ]);
-        case 'ne': return t.resultWrap([ o.x, t.offsety + o.y, t.offsetx + _c.x2, _c.y2 ]);
-        case 'nw': return t.resultWrap([ t.offsetx + o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
-        case 'move':
-          _c.nx = o.x + t.offsetx;
-          _c.ny = o.y + t.offsety;
-          return t.resultWrap([ _c.nx, _c.ny, _c.nx + o.w, _c.ny + o.h ]);
-      }
-    }
-    //}}}
-  });
-  // }}}
-  // RoundFilter {{{
-  /**
-   *  RoundFilter
-   *  a filter to constrain crop selection to bounding element
-   *  This filter simply rounds coordinate values to integers
-   */
-  var RoundFilter = function(){
-    this.core = null;
-  };
-  $.extend(RoundFilter.prototype,{
-    priority: 90,
-    filter: function(b){
-      
-      var n = {
-        x: Math.round(b.x),
-        y: Math.round(b.y),
-        x2: Math.round(b.x2),
-        y2: Math.round(b.y2)
-      };
-      
-      n.w = n.x2 - n.x;
-      n.h = n.y2 - n.y;
-
-      return n;
-    }
-  });
-  // }}}
-  // GridFilter {{{
-  /**
-   *  GridFilter
-   *  a filter to constrain crop selection to bounding element
-   *  This filter simply rounds coordinate values to integers
-   */
-  var GridFilter = function(){
-    this.stepx = 1;
-    this.stepy = 1;
-    this.core = null;
-  };
-  $.extend(GridFilter.prototype,{
-    priority: 19,
-    filter: function(b){
-      
-      var n = {
-        x: Math.round(b.x / this.stepx) * this.stepx,
-        y: Math.round(b.y / this.stepy) * this.stepy,
-        x2: Math.round(b.x2 / this.stepx) * this.stepx,
-        y2: Math.round(b.y2 / this.stepy) * this.stepy
-      };
-      
-      n.w = n.x2 - n.x;
-      n.h = n.y2 - n.y;
-
-      return n;
-    }
-  });
-  // }}}
+  // Jcrop Filters
   // ConstrainFilter {{{
   /**
    *  ConstrainFilter
@@ -403,6 +212,33 @@
     }
   });
   // }}}
+  // RoundFilter {{{
+  /**
+   *  RoundFilter
+   *  a filter to constrain crop selection to bounding element
+   *  This filter simply rounds coordinate values to integers
+   */
+  var RoundFilter = function(){
+    this.core = null;
+  };
+  $.extend(RoundFilter.prototype,{
+    priority: 90,
+    filter: function(b){
+      
+      var n = {
+        x: Math.round(b.x),
+        y: Math.round(b.y),
+        x2: Math.round(b.x2),
+        y2: Math.round(b.y2)
+      };
+      
+      n.w = n.x2 - n.x;
+      n.h = n.y2 - n.y;
+
+      return n;
+    }
+  });
+  // }}}
   // ShadeFilter {{{
   /**
    *  ShadeFilter
@@ -523,6 +359,173 @@
 
       return b;
     }
+  });
+  // }}}
+  // GridFilter {{{
+  /**
+   *  GridFilter
+   *  a filter to constrain crop selection to bounding element
+   *  This filter simply rounds coordinate values to integers
+   */
+  var GridFilter = function(){
+    this.stepx = 1;
+    this.stepy = 1;
+    this.core = null;
+  };
+  $.extend(GridFilter.prototype,{
+    priority: 19,
+    filter: function(b){
+      
+      var n = {
+        x: Math.round(b.x / this.stepx) * this.stepx,
+        y: Math.round(b.y / this.stepy) * this.stepy,
+        x2: Math.round(b.x2 / this.stepx) * this.stepx,
+        y2: Math.round(b.y2 / this.stepy) * this.stepy
+      };
+      
+      n.w = n.x2 - n.x;
+      n.h = n.y2 - n.y;
+
+      return n;
+    }
+  });
+  // }}}
+
+  // Jcrop Components
+  // DragState {{{
+  /**
+   *  DragState
+   *  an object that handles dragging events
+   *
+   *  This object is used by the built-in selection object to
+   *  track a dragging operation on a selection
+   */
+  //var DragState = function(cx,cy,$box,bx,by,bw,bh,ord,filters){
+  var DragState = function(e,selection,ord){
+    var t = this;
+
+    t.x = e.pageX;
+    t.y = e.pageY;
+
+    t.selection = selection;
+    t.orig = selection.get();
+
+    selection.callFilterFunction('refresh');
+
+    var p = selection.core.container.position();
+    t.elx = p.left;
+    t.ely = p.top;
+
+    t.offsetx = 0;
+    t.offsety = 0;
+    t.ord = ord;
+    t.opposite = t.getOppositeCornerOffset();
+
+    $(document.body).on('mousemove.jcrop',t.createDragHandler())
+      .on('mouseup.jcrop',t.createStopHandler());
+
+  };
+
+  $.extend(DragState.prototype,{
+    // getOppositeCornerOffset: function(){{{
+    // Calculate relative offset of locked corner
+    getOppositeCornerOffset: function(){
+
+      var o = this.orig;
+      var relx = this.x - this.elx - o.x;
+      var rely = this.y - this.ely - o.y;
+
+      switch(this.ord){
+        case 'nw':
+        case 'w':
+          return [ o.w - relx, o.h - rely ];
+          return [ o.x + o.w, o.y + o.h ];
+
+        case 'sw':
+          return [ o.w - relx, -rely ];
+          return [ o.x + o.w, o.y ];
+
+        case 'se':
+        case 's':
+        case 'e':
+          return [ -relx, -rely ];
+          return [ o.x, o.y ];
+
+        case 'ne':
+        case 'n':
+          return [ -relx, o.h - rely ];
+          return [ o.w, o.y + o.h ];
+      }
+
+      return [ null, null ];
+    },
+    // }}}
+    dragEvent: function(e){
+      this.offsetx = e.pageX - this.x;
+      this.offsety = e.pageY - this.y;
+      this.selection.update(this.getBox(),this.ord);
+    },
+    endDragEvent: function(e){
+      this.selection.element.trigger('cropend',this.selection.get());
+    },
+    createStopHandler: function(){
+      var t = this;
+      return function(e){
+        $(document.body).off('.jcrop');
+        t.endDragEvent(e);
+        return false;
+      };
+    },
+    createDragHandler: function(){
+      var t = this;
+      return function(e){
+        t.dragEvent(e);
+        return false;
+      };
+    },
+    //update: function(x,y){{{
+    update: function(x,y){
+      var t = this;
+      t.offsetx = x - t.x;
+      t.offsety = y - t.y;
+    },
+    //}}}
+    //resultWrap: function(d){{{
+    resultWrap: function(d){
+      var b = {
+          x: Math.min(d[0],d[2]),
+          y: Math.min(d[1],d[3]),
+          x2: Math.max(d[0],d[2]),
+          y2: Math.max(d[1],d[3])
+        };
+
+      b.w = b.x2 - b.x;
+      b.h = b.y2 - b.y;
+
+      return b;
+    },
+    //}}}
+    //getBox: function(){{{
+    getBox: function(){
+      var t = this;
+      var o = t.orig;
+      var _c = { x2: o.x + o.w, y2: o.y + o.h };
+      switch(t.ord){
+        case 'n': return t.resultWrap([ o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
+        case 's': return t.resultWrap([ o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
+        case 'e': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, _c.y2 ]);
+        case 'w': return t.resultWrap([ o.x + t.offsetx, o.y, _c.x2, _c.y2 ]);
+        case 'sw': return t.resultWrap([ t.offsetx + o.x, o.y, _c.x2, t.offsety + _c.y2 ]);
+        case 'se': return t.resultWrap([ o.x, o.y, t.offsetx + _c.x2, t.offsety + _c.y2 ]);
+        case 'ne': return t.resultWrap([ o.x, t.offsety + o.y, t.offsetx + _c.x2, _c.y2 ]);
+        case 'nw': return t.resultWrap([ t.offsetx + o.x, t.offsety + o.y, _c.x2, _c.y2 ]);
+        case 'move':
+          _c.nx = o.x + t.offsetx;
+          _c.ny = o.y + t.offsety;
+          return t.resultWrap([ _c.nx, _c.ny, _c.nx + o.w, _c.ny + o.h ]);
+      }
+    }
+    //}}}
   });
   // }}}
   // CropAnimator {{{
@@ -1080,10 +1083,8 @@
   });
   // }}}
 
-  /**
-   *  Jcrop
-   *  core cropping code
-   */
+  // Jcrop constructor
+  // var Jcrop = function(element,opt){{{
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
     this.opt = $.extend(true,{},Jcrop.defaults);
@@ -1105,7 +1106,10 @@
     this.setOptions(opt);
       
   };
+  // }}}
 
+  // Jcrop component storage
+  // Jcrop.component = {{{
   Jcrop.component = {
     ImageLoader: ImageLoader,
     DragState: DragState,
@@ -1114,7 +1118,9 @@
     Selection: Selection,
     Keyboard: KeyWatcher
   };
+  // }}}
 
+  // Jcrop static functions
   $.extend(Jcrop,{
     //defaults: default settings {{{
     defaults: {
@@ -1185,10 +1191,13 @@
       round: RoundFilter
     },
     //}}}
+    // attach: function(element,opt){{{
     attach: function(element,opt){
       var obj = new $.Jcrop(element,opt);
       return obj;
     },
+    // }}}
+    // canvasClone: function(imgel){{{
     canvasClone: function(imgel){
       var canvas = document.createElement('canvas'),
           $canvas = $(canvas).width(imgel.width).height(imgel.height),
@@ -1198,11 +1207,14 @@
       ctx.drawImage(imgel,0,0);
       return $canvas;
     },
+    // }}}
+    // propagate: function(plist,config,obj){{{
     propagate: function(plist,config,obj){
       for(var i=0,l=plist.length;i<l;i++)
         if (config.hasOwnProperty(plist[i]))
           obj[plist[i]] = config[plist[i]];
     },
+    // }}}
     // wrapFromXywh: function(xywh){{{
     wrapFromXywh: function(xywh){
       var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
@@ -1213,6 +1225,7 @@
     // }}}
   });
 
+  // Jcrop API methods
   $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
@@ -1427,6 +1440,7 @@
     // }}}
   });
 
+  // Jcrop jQuery plugin function
   // $.fn.Jcrop = function(options,callback) {{{
   $.fn.Jcrop = function(options,callback){
 
@@ -1487,6 +1501,7 @@
   };
   // }}}
 
+  // Attach to jQuery object
   $.Jcrop = Jcrop;
 
 })(jQuery);
