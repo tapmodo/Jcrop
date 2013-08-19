@@ -85,12 +85,6 @@
   /* disable cut copy paste */ -webkit-user-select: none;
 }
 
-.jcrop-shades {
-  position: absolute;
-  top: 0;
-  z-index: 10;
-}
-
 .jcrop-selection {
   position: absolute;
 }
@@ -151,7 +145,16 @@
 .jcrop-noresize {
   .jcrop-dragbar, .jcrop-handle { display: none; }
 }
-.jcrop-nodrag .jcrop-box { cursor: no-drop; }
+.jcrop-selection.jcrop-nodrag .jcrop-box { cursor: default; }
+.jcrop-nodrag .jcrop-shades div { cursor: default; }
+
+.jcrop-shades {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  div { cursor: crosshair; }
+}
 
 /* The "jcrop-light" class/extension */
 .jcrop-light {
