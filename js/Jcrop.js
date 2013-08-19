@@ -72,10 +72,9 @@
       this.offsetx = e.pageX - this.x;
       this.offsety = e.pageY - this.y;
       this.selection.update(this.getBox(),this.ord);
-      this.selection.element.trigger('cropmove');
     },
     endDragEvent: function(e){
-      this.selection.element.trigger('cropend');
+      this.selection.element.trigger('cropend',this.selection.get());
     },
     createStopHandler: function(){
       var t = this;
@@ -222,10 +221,10 @@
     refresh: function(sel){
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
-      this.minx = 0 + sel.bound.w;
-      this.miny = 0 + sel.bound.n;
-      this.maxx = this.elw + sel.bound.e;
-      this.maxy = this.elh + sel.bound.s;
+      this.minx = 0 + sel.edge.w;
+      this.miny = 0 + sel.edge.n;
+      this.maxx = this.elw + sel.edge.e;
+      this.maxy = this.elh + sel.edge.s;
     }
   });
   // }}}
@@ -278,10 +277,10 @@
       this.elh = sel.core.container.height();
 
       this.limits = {
-        minw: sel.limitmin[0],
-        minh: sel.limitmin[1],
-        maxw: sel.limitmax[0],
-        maxh: sel.limitmax[1]
+        minw: sel.minSize[0],
+        minh: sel.minSize[1],
+        maxw: sel.maxSize[0],
+        maxh: sel.maxSize[1]
       };
     }
   });
@@ -314,10 +313,10 @@
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
       this.bound = {
-        minx: 0 + sel.bound.w,
-        miny: 0 + sel.bound.n,
-        maxx: this.elw + sel.bound.e,
-        maxy: this.elh + sel.bound.s
+        minx: 0 + sel.edge.w,
+        miny: 0 + sel.edge.n,
+        maxx: this.elw + sel.edge.e,
+        maxy: this.elh + sel.edge.s
       };
     }
   });
@@ -398,7 +397,7 @@
       return this.getBoundRatio(b,quad);
     },
     refresh: function(sel){
-      this.ratio = sel.aspect;
+      this.ratio = sel.aspectRatio;
       this.elw = sel.core.container.width();
       this.elh = sel.core.container.height();
     }
@@ -421,11 +420,9 @@
   $.extend(ShadeFilter.prototype,{
     tag: 'shader',
     fade: true,
-    fadeEasing: 'easeInOutSine',
+    fadeEasing: 'swing',
     fadeSpeed: 320,
     priority: 95,
-    setOptions: function(){
-    },
     init: function(){
       var t = this;
 
@@ -538,7 +535,7 @@
 
   $.extend(CropAnimator.prototype,{
     getElement: function(){
-      var b = this.core.getSelection(1);
+      var b = this.selection.get();
 
       return $('<div />')
         .css({
@@ -551,7 +548,9 @@
     },
     animate: function(x,y,w,h,cb){
       var t = this;
+
       t.selection.allowResize(false);
+
       t.getElement().animate({
         top: y+'px',
         left: x+'px',
@@ -580,7 +579,7 @@
           b.x2 = b.x + b.w;
           b.y2 = b.y + b.h;
 
-          t.selection.update(b);
+          t.selection.update(b,'se');
         }
       });
     }
@@ -648,14 +647,13 @@
   StageDrag.defaults = {
     offset: [ -8, -8 ],
     active: true,
-    max: null,
     minsize: [ 20, 20 ]
   };
 
   $.extend(StageDrag.prototype,{
     start: function(e){
-      if (!this.active) return false;
-      if (this.max && (this.core.ui.multi.length >= this.max)) return false;
+      if (!this.core.opt.allowSelect) return false;
+      if (this.core.opt.multiMax && (this.core.ui.multi.length >= this.core.opt.multiMax)) return false;
 
       var o = $(e.currentTarget).offset();
       var origx = e.pageX - o.left + this.offset[0];
@@ -684,16 +682,26 @@
   // StageManager {{{
   var StageManager = function(core){
     this.core = core;
+    this.ui = core.ui;
     this.init();
-  };
-
-  StageManager.defaults = {
   };
 
   $.extend(StageManager.prototype,{
     init: function(){
       this.setupEvents();
       this.dragger = new StageDrag(this);
+    },
+    tellConfigUpdate: function(){
+      for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
+        if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
+          m[i].setOptions(this.core.opt);
+    },
+    configUpdateHandler: function(){
+      var t = this;
+      return function(e,noprop){
+        if (noprop) return false;
+        t.tellConfigUpdate();
+      };
     },
     startDragHandler: function(){
       var t = this;
@@ -706,299 +714,315 @@
     },
     setupEvents: function(){
       this.core.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
+      this.core.container.on('cropconfig.jcrop-stage',this.configUpdateHandler());
     }
   });
   // }}}
   // Selection {{{
   var Selection = function(core){
     this.core = core;
-    this.init();
-    this.bound = { n: 0, s: 0, e: 0, w: 0 };
   };
 
-  Selection.defaults = {
-    limitmax: [ 0, 0 ],
-    limitmin: [ 8, 8 ],
-    aspect: 0,
+  $.extend(Selection,{
+    defaults: {
+      minSize: [ 8, 8 ],
+      maxSize: [ 0, 0 ],
+      aspectRatio: 0,
+      edge: { n: 0, s: 0, e: 0, w: 0 },
 
-    state: null,
-    active: true,
-    canDelete: true,
-    canDrag: true,
-    canResize: true,
-    canSelect: true
-  };
-
-  $.extend(Selection.prototype,{
-    // init: function(){{{
-    init: function(){
-      this.startup();
+      state: null,
+      active: true,
+      linked: true,
+      canDelete: true,
+      canDrag: true,
+      canResize: true,
+      canSelect: true
     },
-    startup: function(){
-      var t = this, css = t.core.opt.cssclass;
-      $.extend(t,Selection.defaults);
-      t.filter = t.core.getDefaultFilters();
+    prototype: {
+      // init: function(){{{
+      init: function(){
+        this.startup();
+        this.linked = this.core.opt.linked;
+        this.setOptions(this.core.opt);
+      },
+      // }}}
+      // startup: function(){{{
+      startup: function(){
+        var t = this, css = t.core.opt.cssclass;
+        $.extend(t,Selection.defaults);
+        t.filter = t.core.getDefaultFilters();
 
-      t.element = $('<div />').addClass(css.selection).data({ selection: t });
-      t.frame = $('<button />').addClass(css.button).data('ord','move');
-      t.element.append(t.frame).appendTo(t.core.container);
+        t.element = $('<div />').addClass(css.selection).data({ selection: t });
+        t.frame = $('<button />').addClass(css.button).data('ord','move');
+        t.element.append(t.frame).appendTo(t.core.container);
 
-      // IE background/draggable hack
-      if (t.core.opt.is_msie) t.frame.css({
-        opacity: 0,
-        backgroundColor: 'white'
-      });
+        // IE background/draggable hack
+        if (t.core.opt.is_msie) t.frame.css({
+          opacity: 0,
+          backgroundColor: 'white'
+        });
 
-      t.insertElements();
+        t.insertElements();
 
-      // Bind focus and blur events for this selection
-      t.frame.on('focus.jcrop',function(e){
-        t.element.trigger('cropfocus');
-        t.core.setSelection(t);
-        t.element.addClass('jcrop-focus');
-        t.core.redraw();
-      }).on('blur.jcrop',function(e){
-        t.element.removeClass('jcrop-focus');
-        t.element.trigger('cropblur');
-      });
-    },
-    // }}}
-    // refresh: function(){{{
-    refresh: function(){
-      this.allowResize();
-      this.allowDrag();
-      this.allowSelect();
-      this.callFilterFunction('refresh');
-      this.update(this.get(),'se');
-    },
-    // }}}
-    // callFilterFunction: function(f,args){{{
-    callFilterFunction: function(f,args){
-      for(var i=0;i<this.filter.length;i++)
-        if (this.filter[i][f]) this.filter[i][f](this);
-      return this;
-    },
-    // }}}
-    //addFilter: function(filter){{{
-    addFilter: function(filter){
-      filter.core = this.core;
-      if (!this.hasFilter(filter)) {
-        this.filter.push(filter);
-        this.sortFilters();
-        if (filter.init) filter.init();
+        // Bind focus and blur events for this selection
+        t.frame.on('focus.jcrop',function(e){
+          t.element.trigger('cropfocus');
+          t.core.setSelection(t);
+          t.element.addClass('jcrop-focus');
+        }).on('blur.jcrop',function(e){
+          t.element.removeClass('jcrop-focus');
+          t.element.trigger('cropblur');
+        });
+      },
+      // }}}
+      propagate: [
+        'canDelete', 'canDrag', 'canResize', 'canSelect',
+        'minSize', 'maxSize', 'aspectRatio', 'edge'
+      ],
+      setOptions: function(opt){
+        Jcrop.propagate(this.propagate,opt,this);
         this.refresh();
-      }
-    },
-    //}}}
-    // hasFilter: function(filter){{{
-    hasFilter: function(filter){
-      var i, f = this.filter, n = [];
-      for(i=0;i<f.length;i++) if (f[i] === filter) return true;
-    },
-    // }}}
-    // sortFilters: function(){{{
-    sortFilters: function(){
-      this.filter.sort(
-        function(x,y){ return x.priority - y.priority; }
-      );
-    },
-    // }}}
-    //clearFilters: function(){{{
-    clearFilters: function(){
-      var i, f = this.filter;
-
-      for(var i=0;i<f.length;i++)
-        if (f[i].destroy) f[i].destroy();
-
-      this.filter = [];
-    },
-    //}}}
-    // removeFiltersByTag: function(tag){{{
-    removeFilter: function(tag){
-      var i, f = this.filter, n = [];
-
-      for(var i=0;i<f.length;i++)
-        if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
-          if (f[i].destroy) f[i].destroy();
+        return this;
+      },
+      // refresh: function(){{{
+      refresh: function(){
+        this.allowResize();
+        this.allowDrag();
+        this.allowSelect();
+        this.callFilterFunction('refresh');
+        this.update(this.get(),'se');
+      },
+      // }}}
+      // callFilterFunction: function(f,args){{{
+      callFilterFunction: function(f,args){
+        for(var i=0;i<this.filter.length;i++)
+          if (this.filter[i][f]) this.filter[i][f](this);
+        return this;
+      },
+      // }}}
+      //addFilter: function(filter){{{
+      addFilter: function(filter){
+        filter.core = this.core;
+        if (!this.hasFilter(filter)) {
+          this.filter.push(filter);
+          this.sortFilters();
+          if (filter.init) filter.init();
+          this.refresh();
         }
-        else n.push(f[i]);
+      },
+      //}}}
+      // hasFilter: function(filter){{{
+      hasFilter: function(filter){
+        var i, f = this.filter, n = [];
+        for(i=0;i<f.length;i++) if (f[i] === filter) return true;
+      },
+      // }}}
+      // sortFilters: function(){{{
+      sortFilters: function(){
+        this.filter.sort(
+          function(x,y){ return x.priority - y.priority; }
+        );
+      },
+      // }}}
+      //clearFilters: function(){{{
+      clearFilters: function(){
+        var i, f = this.filter;
 
-      this.filter = n;
-    },
-    // }}}
-    // runFilters: function(b,ord){{{
-    runFilters: function(b,ord){
-      for(var i=0;i<this.filter.length;i++)
-        b = this.filter[i].filter(b,ord,this);
-      return b;
-    },
-    // }}}
-    //endDrag: function(){{{
-    endDrag: function(){
-      if (this.state) {
-        $(document.body).off('.jcrop');
+        for(var i=0;i<f.length;i++)
+          if (f[i].destroy) f[i].destroy();
+
+        this.filter = [];
+      },
+      //}}}
+      // removeFiltersByTag: function(tag){{{
+      removeFilter: function(tag){
+        var i, f = this.filter, n = [];
+
+        for(var i=0;i<f.length;i++)
+          if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
+            if (f[i].destroy) f[i].destroy();
+          }
+          else n.push(f[i]);
+
+        this.filter = n;
+      },
+      // }}}
+      // runFilters: function(b,ord){{{
+      runFilters: function(b,ord){
+        for(var i=0;i<this.filter.length;i++)
+          b = this.filter[i].filter(b,ord,this);
+        return b;
+      },
+      // }}}
+      //endDrag: function(){{{
+      endDrag: function(){
+        if (this.state) {
+          $(document.body).off('.jcrop');
+          this.focus();
+          this.state = null;
+        }
+      },
+      //}}}
+      // startDrag: function(e,ord){{{
+      startDrag: function(e,ord){
+        var t = this;
+        var m = t.core;
+
+        ord = ord || $(e.target).data('ord');
+
         this.focus();
-        this.state = null;
-      }
-    },
-    //}}}
-    // startDrag: function(e,ord){{{
-    startDrag: function(e,ord){
-      var t = this;
-      var m = t.core;
 
-      ord = ord || $(e.target).data('ord');
+        if ((ord == 'move') && t.element.hasClass(t.core.opt.cssclass.nodrag))
+          return false;
 
-      this.focus();
-
-      if ((ord == 'move') && t.element.hasClass(t.core.opt.cssclass.nodrag))
+        this.state = new Jcrop.component.DragState(e,this,ord);
         return false;
+      },
+      // }}}
+      // allowSelect: function(v){{{
+      allowSelect: function(v){
+        if (v === undefined) v = this.canSelect;
 
-      this.state = new Jcrop.component.DragState(e,this,ord);
-      return false;
-    },
-    // }}}
-    // allowSelect: function(v){{{
-    allowSelect: function(v){
-      if (v === undefined) v = this.canSelect;
+        if (v && this.canSelect) this.frame.attr('disabled',false);
+          else this.frame.attr('disabled','disabled');
 
-      if (v && this.canSelect) this.frame.attr('disabled',false);
-        else this.frame.attr('disabled','disabled');
+        return this;
+      },
+      // }}}
+      // allowDrag: function(v){{{
+      allowDrag: function(v){
+        var t = this, css = t.core.opt.cssclass;
+        if (v == undefined) v = t.canDrag;
 
-      return this;
-    },
-    // }}}
-    // allowDrag: function(v){{{
-    allowDrag: function(v){
-      var t = this, css = t.core.opt.cssclass;
-      if (v == undefined) v = t.canDrag;
+        if (v && t.canDrag) t.element.removeClass(css.nodrag);
+          else t.element.addClass(css.nodrag);
 
-      if (v && t.canDrag) t.element.removeClass(css.nodrag);
-        else t.element.addClass(css.nodrag);
+        return this;
+      },
+      // }}}
+      // allowResize: function(v){{{
+      allowResize: function(v){
+        var t = this, css = t.core.opt.cssclass;
+        if (v == undefined) v = t.canResize;
 
-      return this;
-    },
-    // }}}
-    // allowResize: function(v){{{
-    allowResize: function(v){
-      var t = this, css = t.core.opt.cssclass;
-      if (v == undefined) v = t.canResize;
+        if (v && t.canResize) t.element.removeClass(css.noresize);
+          else t.element.addClass(css.noresize);
 
-      if (v && t.canResize) t.element.removeClass(css.noresize);
-        else t.element.addClass(css.noresize);
+        return this;
+      },
+      // }}}
+      // remove: function(){{{
+      remove: function(){
+        this.element.remove();
+      },
+      // }}}
+      // toBack: function(){{{
+      toBack: function(){
+        this.active = false;
+        this.element
+          .removeClass('jcrop-current')
+          .removeClass('jcrop-focus')
+          .css({zIndex:20});
+      },
+      // }}}
+      // toFront: function(){{{
+      toFront: function(){
+        this.active = true;
+        this.element
+          .addClass('jcrop-current')
+          .css({zIndex:30});
+        this.callFilterFunction('refresh');
+        this.refresh();
+      },
+      // }}}
+      // update: function(b,ord){{{
+      update: function(b,ord){
+        b = this.runFilters(b,ord);
+        this.moveTo(b.x,b.y);
+        this.resize(b.w,b.h);
+        this.element.trigger('cropmove',b);
+        return this;
+      },
+      // }}}
+      // animateTo: function(box,cb){{{
+      animateTo: function(box,cb){
+        var ca = new Jcrop.component.Animator(this);
+        ca.animate(box[0],box[1],box[2],box[3],cb);
+      },
+      // }}}
+      // center: function(instant){{{
+      center: function(instant){
+        var b = this.get(), m = this.core;
+        var elw = m.container.width(), elh = m.container.height();
+        var box = [ (elw-b.w)/2, (elh-b.h)/2, b.w, b.h ];
+        return this[instant?'setSelect':'animateTo'](box);
+      },
+      // }}}
+      //createElement: function(type,ord){{{
+      createElement: function(type,ord){
+        return $('<div />').addClass(type+' ord-'+ord).data('ord',ord);
+      },
+      //}}}
+      //moveTo: function(x,y){{{
+      moveTo: function(x,y){
+        this.element.css({top: y+'px', left: x+'px'});
+      },
+      //}}}
+      // blur: function(){{{
+      blur: function(){
+        this.element.blur();
+        return this;
+      },
+      // }}}
+      // focus: function(){{{
+      focus: function(){
+        this.core.setSelection(this);
+        this.frame.focus();
+        return this;
+      },
+      // }}}
+      //resize: function(w,h){{{
+      resize: function(w,h){
+        this.element.css({width: w+'px', height: h+'px'});
+      },
+      //}}}
+      //get: function(){{{
+      get: function(){
+        var b = this.element,
+          o = b.position(),
+          w = b.width(),
+          h = b.height(),
+          rv = { x: o.left, y: o.top };
 
-      return this;
-    },
-    // }}}
-    // remove: function(){{{
-    remove: function(){
-      this.element.remove();
-    },
-    // }}}
-    // toBack: function(){{{
-    toBack: function(){
-      this.active = false;
-      this.element
-        .removeClass('jcrop-current')
-        .removeClass('jcrop-focus')
-        .css({zIndex:20});
-    },
-    // }}}
-    // toFront: function(){{{
-    toFront: function(){
-      this.active = true;
-      this.element
-        .addClass('jcrop-current')
-        .css({zIndex:30});
-      this.callFilterFunction('refresh');
-    },
-    // }}}
-    // update: function(b,ord){{{
-    update: function(b,ord){
-      b = this.runFilters(b,ord);
-      this.moveTo(b.x,b.y);
-      this.resize(b.w,b.h);
-      return this;
-    },
-    // }}}
-    // animateTo: function(box,cb){{{
-    animateTo: function(box,cb){
-      var ca = new Jcrop.component.Animator(this);
-      ca.animate(box[0],box[1],box[2],box[3],cb);
-    },
-    // }}}
-    // center: function(instant){{{
-    center: function(instant){
-      var b = this.get(), m = this.core;
-      var elw = m.container.width(), elh = m.container.height();
-      var box = [ (elw-b.w)/2, (elh-b.h)/2, b.w, b.h ];
-      return this[instant?'setSelect':'animateTo'](box);
-    },
-    // }}}
-    //createElement: function(type,ord){{{
-    createElement: function(type,ord){
-      return $('<div />').addClass(type+' ord-'+ord).data('ord',ord);
-    },
-    //}}}
-    //moveTo: function(x,y){{{
-    moveTo: function(x,y){
-      this.element.css({top: y+'px', left: x+'px'});
-    },
-    //}}}
-    // blur: function(){{{
-    blur: function(){
-      this.element.blur();
-      return this;
-    },
-    // }}}
-    // focus: function(){{{
-    focus: function(){
-      this.core.setSelection(this);
-      this.frame.focus();
-      return this;
-    },
-    // }}}
-    //resize: function(w,h){{{
-    resize: function(w,h){
-      this.element.css({width: w+'px', height: h+'px'});
-    },
-    //}}}
-    //get: function(){{{
-    get: function(){
-      var b = this.element,
-        o = b.position(),
-        w = b.width(),
-        h = b.height(),
-        rv = { x: o.left, y: o.top };
+        rv.x2 = rv.x + w;
+        rv.y2 = rv.y + h;
+        rv.w = w;
+        rv.h = h;
 
-      rv.x2 = o.left + w;
-      rv.y2 = o.top + h;
-      rv.w = w;
-      rv.h = h;
+        return rv;
+      },
+      //}}}
+      //insertElements: function(){{{
+      insertElements: function(){
+        var t = this, i,
+          m = t.core,
+          fr = t.element,
+          o = t.core.opt,
+          b = o.borders,
+          h = o.handles,
+          d = o.dragbars;
 
-      return rv;
-    },
-    //}}}
-    //insertElements: function(){{{
-    insertElements: function(){
-      var t = this, i,
-        m = t.core,
-        fr = t.element,
-        o = t.core.opt,
-        b = o.borders,
-        h = o.handles,
-        d = o.dragbars;
+        for(i=0; i<b.length; i++)
+          fr.append(t.createElement(o.cssclass.borders,b[i]));
 
-      for(i=0; i<b.length; i++)
-        fr.append(t.createElement(o.cssclass.borders,b[i]));
+        for(i=0; i<d.length; i++)
+          fr.append(t.createElement(o.cssclass.dragbars,d[i]));
 
-      for(i=0; i<d.length; i++)
-        fr.append(t.createElement(o.cssclass.dragbars,d[i]));
-
-      for(i=0; i<h.length; i++)
-        fr.append(t.createElement(o.cssclass.handles,h[i]));
+        for(i=0; i<h.length; i++)
+          fr.append(t.createElement(o.cssclass.handles,h[i]));
+      }
+      //}}}
     }
-    //}}}
   });
   // }}}
   // ImageLoader {{{
@@ -1010,40 +1034,41 @@
     this.load();
   };
 
-  ImageLoader.attach = function(el,cb){
-    return new ImageLoader(el.src,el,cb);
-  };
-
-  $.extend(ImageLoader.prototype,{
-    getDimensions: function(){
-      var el = this.element;
-
-      if (el.naturalWidth)
-        return [ el.naturalWidth, el. naturalHeight ];
-
-      if (el.width)
-        return [ el.width, el.height ];
-
-      return null;
+  $.extend(ImageLoader,{
+    attach: function(el,cb){
+      return new ImageLoader(el.src,el,cb);
     },
-    fireCallback: function(){
-      this.element.onload = null;
-      if (typeof this.callback == 'function')
-        this.callback.apply(this,this.getDimensions());
-    },
-    isLoaded: function(){
-      return this.element.complete;
-    },
-    load: function(){
-      var t = this;
-      var el = t.element;
+    prototype: {
+      getDimensions: function(){
+        var el = this.element;
 
-      el.src = t.src;
+        if (el.naturalWidth)
+          return [ el.naturalWidth, el. naturalHeight ];
 
-      if (t.isLoaded()) t.fireCallback();
-        else t.element.onload = function(e){
-          t.fireCallback();
-        };
+        if (el.width)
+          return [ el.width, el.height ];
+
+        return null;
+      },
+      fireCallback: function(){
+        this.element.onload = null;
+        if (typeof this.callback == 'function')
+          this.callback.apply(this,this.getDimensions());
+      },
+      isLoaded: function(){
+        return this.element.complete;
+      },
+      load: function(){
+        var t = this;
+        var el = t.element;
+
+        el.src = t.src;
+
+        if (t.isLoaded()) t.fireCallback();
+          else t.element.onload = function(e){
+            t.fireCallback();
+          };
+      }
     }
   });
   // }}}
@@ -1057,7 +1082,6 @@
     this.opt = $.extend(true,{},Jcrop.defaults);
 
     this.container = $(element);
-    this.setOptions(opt);
 
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
@@ -1067,24 +1091,71 @@
     this.ui = {};
     this.state = null;
     this.ui.multi = [];
+    this.ui.selection = null;
     this.filter = {};
+
+    this.init();
+    this.setOptions(opt);
+      
+  };
+
+  Jcrop.component = {
+    ImageLoader: ImageLoader,
+    DragState: DragState,
+    StageManager: StageManager,
+    Animator: CropAnimator,
+    Selection: Selection,
+    Keyboard: KeyWatcher
   };
 
   $.extend(Jcrop,{
     //defaults: default settings {{{
     defaults: {
+
+      // Selection Behavior
+      edge: { n: 0, s: 0, e: 0, w: 0 },
+      setSelect: null,
+      linked: true,
+      linkCurrent: true,
+      canDelete: true,
+      canSelect: true,
+      canDrag: true,
+      canResize: true,
+
+      // Component constructors
+      keyboardComponent:      Jcrop.component.Keyboard,
+      dragstateComponent:     Jcrop.component.DragState,
+      stagemanagerComponent:  Jcrop.component.StageManager,
+      animatorComponent:      Jcrop.component.Animator,
+      selectionComponent:     Jcrop.component.Selection,
+
+      // Stage Behavior
+      allowSelect: true,
       multi: false,
-      resizable: true,
-      draggable: true,
-      animEasing: 'easeOutBack',
+      multiMax: false,
+      animation: true,
+      animEasing: 'swing',
       animDuration: 400,
+      fading: true,
+      fadeDuration: 300,
+      fadeEasing: 'swing',
+      bgColor: 'black',
+      bgOpacity: .5,
+
+      // Startup options
       applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'shader', 'round' ],
       borders:  [ 'n', 's', 'e', 'w' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
       dragbars: [ 'n', 'e', 'w', 's' ],
+
+      // CSS Classes
+      // @todo: These need to be moved to top-level object keys
+      // for better customization. Currently if you try to extend one
+      // via an options object to Jcrop, it will wipe out all
+      // the others you don't specify. Be careful for now!
       cssclass: {
         container: 'jcrop-active',
-        shades: 'jcrop-shade',
+        shades: 'jcrop-shades',
         selection: 'jcrop-selection',
         borders: 'jcrop-border',
         handles: 'jcrop-handle jcrop-drag',
@@ -1139,19 +1210,37 @@
   $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
-      this.initEvents();
-      this.ui.keyboard = new $.Jcrop.component.Keyboard(this);
-      this.ui.stage = new $.Jcrop.component.StageManager(this);
+      this.ui.keyboard = new this.opt.keyboardComponent(this);
+      this.ui.stage = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
-      this.newSelection();
+      this.initEvents();
+      //this.newSelection();
     },
     //}}}
+    // setOptions: function(opt){{{
     setOptions: function(opt){
-      if (!opt) opt = {};
+      if (!$.isPlainObject(opt)) opt = {};
       $.extend(this.opt,opt);
+
+      // Handle a setSelect value
+      if (this.opt.setSelect) {
+
+        // If there is no current selection
+        // passing setSelect will create one
+        if (!this.ui.multi.length)
+          this.newSelection();
+
+        // Use these values to update the current selection
+        this.ui.multi[0].update(Jcrop.wrapFromXywh(this.opt.setSelect));
+        // Set to null so it doesn't get called again
+        this.opt.setSelect = null;
+      }
+
       this.container.trigger('cropconfig');
       return this;
     },
+    // }}}
+    // applyFilters: function(){{{
     applyFilters: function(){
       var obj;
       for(var i=0,f=this.opt.applyFilters,l=f.length; i<l; i++){
@@ -1162,6 +1251,7 @@
           this.filter[f[i]] = obj;
       }
     },
+    // }}}
     // getDefaultFilters: function(){{{
     getDefaultFilters: function(){
       var rv = [];
@@ -1188,14 +1278,13 @@
     // getSelection: function(raw){{{
     getSelection: function(raw){
       var b = this.ui.selection.get();
-      if (raw) return b;
-      // @todo scaled coordinates
       return b;
     },
     // }}}
     // newSelection: function(){{{
     newSelection: function(){
-      var sel = new $.Jcrop.component.Selection(this);
+      var sel = new this.opt.selectionComponent(this);
+      sel.init();
       return this.setSelection(sel);
     },
     // }}}
@@ -1270,12 +1359,13 @@
       if (b.y < 0) { b.y2 = b.h; b.y = 0; }
         else if (b.y2 > this.elh) { b.y2 = this.elh; b.y = b.y2 - b.h; }
       
-      this.update(b);
+      this.ui.selection.update(b,'move');
     },
     // }}}
-    // redraw: function(){{{
-    redraw: function(){
-      this.update(this.getSelection(1));
+    // refresh: function(){{{
+    refresh: function(){
+      for(var i=0,s=this.ui.multi,l=s.length;i<l;i++)
+        s[i].refresh();
     },
     // }}}
     // blurAll: function(){{{
@@ -1297,7 +1387,7 @@
     deleteSelection: function(){
       this.removeSelection(this.ui.selection);
       this.ui.multi[0].focus();
-      this.redraw();
+      this.refresh();
     },
     // }}}
     // animateTo: function(box){{{
