@@ -478,6 +478,13 @@
     },
     refresh: function(){
       var m = this.core, s = this.shades;
+
+      if (this.color != this.core.opt.bgColor)
+        this.setColor(this.core.opt.bgColor);
+
+      if (this.opactiy != this.core.opt.bgOpacity)
+        this.setOpacity(this.core.opt.bgOpacity);
+        
       this.elh = m.container.height();
       this.elw = m.container.width();
       s.right.css('height',this.elh+'px');
