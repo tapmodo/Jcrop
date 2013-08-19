@@ -1198,16 +1198,11 @@
       ctx.drawImage(imgel,0,0);
       return $canvas;
     },
-    //component: internal components {{{
-    component: {
-      ImageLoader: ImageLoader,
-      DragState: DragState,
-      StageManager: StageManager,
-      Animator: CropAnimator,
-      Selection: Selection,
-      Keyboard: KeyWatcher
+    propagate: function(plist,config,obj){
+      for(var i=0,l=plist.length;i<l;i++)
+        if (config.hasOwnProperty(plist[i]))
+          obj[plist[i]] = config[plist[i]];
     },
-    //}}}
     // wrapFromXywh: function(xywh){{{
     wrapFromXywh: function(xywh){
       var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
