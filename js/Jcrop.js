@@ -1185,6 +1185,10 @@
       round: RoundFilter
     },
     //}}}
+    attach: function(element,opt){
+      var obj = new $.Jcrop(element,opt);
+      return obj;
+    },
     canvasClone: function(imgel){
       var canvas = document.createElement('canvas'),
           $canvas = $(canvas).width(imgel.width).height(imgel.height),
