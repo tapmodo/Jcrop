@@ -141,11 +141,6 @@
   };
   $.extend(RatioFilter.prototype,{
     priority: 15,
-    getLargestBox: function(ratio,w,h){
-      if ((w/h) > ratio)
-        return [ h * ratio, h ];
-          else return [ w, w / ratio ];
-    },
     offsetFromCorner: function(corner,box,b){
       var w = box[0], h = box[1];
       switch(corner){
@@ -156,7 +151,7 @@
       }
     },
     getBoundRatio: function(b,quad){
-      var box = this.getLargestBox(this.ratio,b.w,b.h);
+      var box = Jcrop.getLargestBox(this.ratio,b.w,b.h);
       return Jcrop.wrapFromXywh(this.offsetFromCorner(quad,box,b));
     },
     getQuadrant: function(s){
@@ -1213,6 +1208,13 @@
       for(var i=0,l=plist.length;i<l;i++)
         if (config.hasOwnProperty(plist[i]))
           obj[plist[i]] = config[plist[i]];
+    },
+    // }}}
+    // getLargestBox: function(ratio,w,h){{{
+    getLargestBox: function(ratio,w,h){
+      if ((w/h) > ratio)
+        return [ h * ratio, h ];
+          else return [ w, w / ratio ];
     },
     // }}}
     // wrapFromXywh: function(xywh){{{
