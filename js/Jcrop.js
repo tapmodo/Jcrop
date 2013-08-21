@@ -284,16 +284,23 @@
     },
     setColor: function(color,instant){
       var t = this;
+
+      if (color == t.color) return t;
+
       this.color = color;
+      var colorfade = Jcrop.supportsColorFade();
       $.each(t.shades,function(u,i){
-        if (!t.fade || instant) i.css('backgroundColor',color);
+        if (!t.fade || instant || !colorfade) i.css('backgroundColor',color);
           else i.animate({backgroundColor:color},{queue:false,duration:t.fadeSpeed,easing:t.fadeEasing});
       });
       return t;
     },
     setOpacity: function(opacity,instant){
       var t = this;
-      this.opacity = opacity;
+
+      if (opacity == t.opacity) return t;
+
+      t.opacity = opacity;
       $.each(t.shades,function(u,i){
         if (!t.fade || instant) i.css({opacity:opacity});
           else i.animate({opacity:opacity},{queue:false,duration:t.fadeSpeed,easing:t.fadeEasing});
@@ -307,14 +314,11 @@
         opacity: this.opacity
       }).appendTo(this.container);
     },
-    refresh: function(){
+    refresh: function(sel){
       var m = this.core, s = this.shades;
 
-      if (this.color != this.core.opt.bgColor)
-        this.setColor(this.core.opt.bgColor);
-
-      if (this.opactiy != this.core.opt.bgOpacity)
-        this.setOpacity(this.core.opt.bgOpacity);
+      this.setColor(sel.bgColor?sel.bgColor:this.core.opt.bgColor);
+      this.setOpacity(sel.bgOpacity?sel.bgOpacity:this.core.opt.bgOpacity);
         
       this.elh = m.container.height();
       this.elw = m.container.width();
@@ -733,6 +737,8 @@
       maxSize: [ 0, 0 ],
       aspectRatio: 0,
       edge: { n: 0, s: 0, e: 0, w: 0 },
+      bgColor: null,
+      bgOpacity: null,
 
       state: null,
       active: true,
@@ -1221,6 +1227,11 @@
       if ((w/h) > ratio)
         return [ h * ratio, h ];
           else return [ w, w / ratio ];
+    },
+    // }}}
+    // supportsColorFade: function(){{{
+    supportsColorFade: function(){
+      return $.fx.step.hasOwnProperty('backgroundColor');
     },
     // }}}
     // wrapFromXywh: function(xywh){{{
