@@ -276,7 +276,7 @@
         t.attached = true;
       }
 
-      t.refresh();
+      //t.refresh();
       //t.filter(this.core.getSelection(1),null,this.core.ui.selection);
     },
     destroy: function(){
