@@ -724,8 +724,7 @@
   });
   // }}}
   // Selection {{{
-  var Selection = function(core){
-    this.core = core;
+  var Selection = function(){
   };
 
   $.extend(Selection,{
@@ -744,11 +743,18 @@
       canSelect: true
     },
     prototype: {
-      // init: function(){{{
-      init: function(){
+      // init: function(core){{{
+      init: function(core){
+        this.core = core;
         this.startup();
         this.linked = this.core.opt.linked;
+        this.attach();
         this.setOptions(this.core.opt);
+      },
+      // }}}
+      // attach: function(){{{
+      attach: function(){
+        // For extending init() sequence
       },
       // }}}
       // startup: function(){{{
