@@ -1309,9 +1309,11 @@
     },
     // }}}
     // newSelection: function(){{{
-    newSelection: function(){
-      var sel = new this.opt.selectionComponent(this);
-      sel.init();
+    newSelection: function(sel){
+      if (!sel)
+        sel = new this.opt.selectionComponent();
+
+      sel.init(this);
       return this.setSelection(sel);
     },
     // }}}
