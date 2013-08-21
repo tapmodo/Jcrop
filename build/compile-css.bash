@@ -16,6 +16,14 @@ else
   echo "FAILED"
 fi
 
+echo -n "Building Additional CSS..."
+if lessc less/extras.less > ../demos/demo_files/extras.css
+then
+  echo "OK"
+else
+  echo "FAILED"
+fi
+
 popd > /dev/null
 
 echo "Jcrop CSS compilation finished"
