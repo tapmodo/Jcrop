@@ -471,7 +471,8 @@
       this.selection.update(this.getBox(),this.ord);
     },
     endDragEvent: function(e){
-      this.selection.element.trigger('cropend',this.selection.get());
+      var sel = this.selection;
+      sel.element.trigger('cropend',[sel,sel.get()]);
     },
     createStopHandler: function(){
       var t = this;
@@ -706,16 +707,15 @@
       this.setupEvents();
       this.dragger = new StageDrag(this);
     },
-    tellConfigUpdate: function(){
+    tellConfigUpdate: function(options,proptype){
       for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
         if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
-          m[i].setOptions(this.core.opt);
+          m[i].setOptions(options);
     },
     configUpdateHandler: function(){
       var t = this;
-      return function(e,noprop){
-        if (noprop) return false;
-        t.tellConfigUpdate();
+      return function(e,instance,options,proptype){
+        t.tellConfigUpdate(options,proptype);
       };
     },
     startDragHandler: function(){
@@ -761,7 +761,9 @@
         this.startup();
         this.linked = this.core.opt.linked;
         this.attach();
+        this.element.trigger('cropcreate',this);
         this.setOptions(this.core.opt);
+        this.element.trigger('cropstart',[this,this.get()]);
       },
       // }}}
       // attach: function(){{{
@@ -789,12 +791,12 @@
 
         // Bind focus and blur events for this selection
         t.frame.on('focus.jcrop',function(e){
-          t.element.trigger('cropfocus');
+          t.element.trigger('cropfocus',t);
           t.core.setSelection(t);
           t.element.addClass('jcrop-focus');
         }).on('blur.jcrop',function(e){
           t.element.removeClass('jcrop-focus');
-          t.element.trigger('cropblur');
+          t.element.trigger('cropblur',t);
         });
       },
       // }}}
@@ -936,6 +938,7 @@
       // }}}
       // remove: function(){{{
       remove: function(){
+        this.element.trigger('cropremove',this);
         this.element.remove();
       },
       // }}}
@@ -963,7 +966,7 @@
         b = this.runFilters(b,ord);
         this.moveTo(b.x,b.y);
         this.resize(b.w,b.h);
-        this.element.trigger('cropmove',b);
+        this.element.trigger('cropmove',[this,b]);
         return this;
       },
       // }}}
@@ -1258,12 +1261,14 @@
       this.ui.stage = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
       this.initEvents();
-      //this.newSelection();
+      this.container.trigger('cropinit',this);
     },
     //}}}
     // setOptions: function(opt){{{
-    setOptions: function(opt){
+    setOptions: function(opt,proptype){
+
       if (!$.isPlainObject(opt)) opt = {};
+
       $.extend(this.opt,opt);
 
       // Handle a setSelect value
@@ -1280,7 +1285,7 @@
         this.opt.setSelect = null;
       }
 
-      this.container.trigger('cropconfig');
+      this.container.trigger('cropconfig',[this,opt,proptype]);
       return this;
     },
     // }}}
@@ -1331,7 +1336,9 @@
         sel = new this.opt.selectionComponent();
 
       sel.init(this);
-      return this.setSelection(sel);
+      this.setSelection(sel);
+
+      return sel;
     },
     // }}}
     // hasSelection: function(sel){{{
@@ -1433,7 +1440,7 @@
     deleteSelection: function(){
       this.removeSelection(this.ui.selection);
       this.ui.multi[0].focus();
-      this.refresh();
+      this.ui.selection.refresh();
     },
     // }}}
     // animateTo: function(box){{{
@@ -1455,6 +1462,7 @@
         var $targ = $(e.target);
         var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
         var ord = $targ.data('ord');
+        t.container.trigger('cropstart',selection);
         return selection.startDrag(e,ord);
         return false;
       };
