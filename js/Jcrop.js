@@ -10,6 +10,7 @@
     this.core = null;
   };
   $.extend(ConstrainFilter.prototype,{
+    tag: 'constrain',
     priority: 5,
     filter: function(b,ord){
       if (ord == 'move') {
@@ -46,6 +47,7 @@
     this.core = null;
   };
   $.extend(ExtentFilter.prototype,{
+    tag: 'extent',
     priority: 12,
     offsetFromCorner: function(corner,box,b){
       var w = box[0], h = box[1];
@@ -107,6 +109,7 @@
     this.core = null;
   };
   $.extend(BackoffFilter.prototype,{
+    tag: 'backoff',
     priority: 22,
     filter: function(b){
       var r = this.bound;
@@ -140,6 +143,7 @@
     this.core = null;
   };
   $.extend(RatioFilter.prototype,{
+    tag: 'ratio',
     priority: 15,
     offsetFromCorner: function(corner,box,b){
       var w = box[0], h = box[1];
@@ -217,6 +221,7 @@
     this.core = null;
   };
   $.extend(RoundFilter.prototype,{
+    tag: 'round',
     priority: 90,
     filter: function(b){
       
@@ -372,6 +377,7 @@
     this.core = null;
   };
   $.extend(GridFilter.prototype,{
+    tag: 'grid',
     priority: 19,
     filter: function(b){
       
