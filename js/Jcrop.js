@@ -1431,7 +1431,8 @@
     // }}}
     // nudge: function(x,y){{{
     nudge: function(x,y){
-      var b = this.getSelection(1);
+      var s = this.ui.selection, b = s.get();
+
       b.x += x;
       b.x2 += x;
       b.y += y;
@@ -1443,7 +1444,9 @@
       if (b.y < 0) { b.y2 = b.h; b.y = 0; }
         else if (b.y2 > this.elh) { b.y2 = this.elh; b.y = b.y2 - b.h; }
       
-      this.ui.selection.update(b,'move');
+      s.element.trigger('cropstart',[s,b]);
+      s.update(b,'move');
+      s.element.trigger('cropend',[s,b]);
     },
     // }}}
     // refresh: function(){{{
