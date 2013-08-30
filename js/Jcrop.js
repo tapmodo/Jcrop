@@ -408,6 +408,7 @@
     t.y = e.pageY;
 
     t.selection = selection;
+    t.eventTarget = selection.core.opt.dragEventTarget;
     t.orig = selection.get();
 
     selection.callFilterFunction('refresh');
@@ -421,8 +422,8 @@
     t.ord = ord;
     t.opposite = t.getOppositeCornerOffset();
 
-    $(document.body).on('mousemove.jcrop',t.createDragHandler())
-      .on('mouseup.jcrop',t.createStopHandler());
+    $(t.eventTarget).on('mousemove.jcrop',t.createDragHandler());
+    $(t.eventTarget).on('mouseup.jcrop',t.createStopHandler());
 
   };
 
@@ -472,7 +473,7 @@
     createStopHandler: function(){
       var t = this;
       return function(e){
-        $(document.body).off('.jcrop');
+        $(t.eventTarget).off('.jcrop');
         t.endDragEvent(e);
         return false;
       };
@@ -1171,6 +1172,8 @@
       borders:  [ 'n', 's', 'e', 'w' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
       dragbars: [ 'n', 'e', 'w', 's' ],
+
+      dragEventTarget: window,
 
       // CSS Classes
       // @todo: These need to be moved to top-level object keys
