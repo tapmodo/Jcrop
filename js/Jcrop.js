@@ -640,7 +640,9 @@
             return false;
             break;
 
-          default: if (t.debug) console.log('keycode: ' + e.keyCode);
+          default:
+            if (t.debug) console.log('keycode: ' + e.keyCode);
+            break;
         }
 
         if (!e.metaKey && !e.ctrlKey)
