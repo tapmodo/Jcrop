@@ -1310,6 +1310,16 @@
       return this;
     },
     // }}}
+    destroy: function(){
+      if (this.opt.imgTarget) {
+        this.container.before(this.opt.imgTarget);
+        this.container.remove();
+        $(this.opt.imgTarget).removeData('Jcrop');
+      } else {
+        // @todo: more elegant destroy() process for non-image containers
+        this.container.remove();
+      }
+    },
     // applyFilters: function(){{{
     applyFilters: function(){
       var obj;
