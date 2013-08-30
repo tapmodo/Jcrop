@@ -761,6 +761,7 @@
       edge: { n: 0, s: 0, e: 0, w: 0 },
       bgColor: null,
       bgOpacity: null,
+      last: null,
 
       state: null,
       active: true,
@@ -982,6 +983,7 @@
         b = this.runFilters(b,ord);
         this.moveTo(b.x,b.y);
         this.resize(b.w,b.h);
+        this.last = b;
         this.element.trigger('cropmove',[this,b]);
         return this;
       },
