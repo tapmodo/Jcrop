@@ -1533,7 +1533,7 @@
           $wrapper.width(w).height(h);
 
           obj = $.Jcrop.attach($wrapper,$.extend({},options,{
-            eventTarget: $t
+            imgTarget: t
           }));
 
           $t.data('Jcrop',obj);
