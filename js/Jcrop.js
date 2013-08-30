@@ -1497,7 +1497,7 @@
         var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
         var ord = $targ.data('ord');
         t.container.trigger('cropstart',selection);
-        return selection.startDrag(e,ord);
+        selection.startDrag(e,ord);
         return false;
       };
     },
