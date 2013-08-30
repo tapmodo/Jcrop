@@ -99,7 +99,7 @@
   // BackoffFilter {{{
   /**
    *  BackoffFilter
-   *  a filter to implement minimum or maximum size
+   *  move out-of-bounds selection into allowed position at same size
    */
   var BackoffFilter = function(){
     this.minw = 40;
@@ -136,7 +136,7 @@
   // RatioFilter {{{
   /**
    *  RatioFilter
-   *  a filter to implement aspect ratio (partially working)
+   *  implements aspectRatio locking
    */
   var RatioFilter = function(){
     this.ratio = 0;
@@ -214,8 +214,7 @@
   // RoundFilter {{{
   /**
    *  RoundFilter
-   *  a filter to constrain crop selection to bounding element
-   *  This filter simply rounds coordinate values to integers
+   *  rounds coordinate values to integers
    */
   var RoundFilter = function(){
     this.core = null;
@@ -368,8 +367,7 @@
   // GridFilter {{{
   /**
    *  GridFilter
-   *  a filter to constrain crop selection to bounding element
-   *  This filter simply rounds coordinate values to integers
+   *  a rudimentary grid effect
    */
   var GridFilter = function(){
     this.stepx = 1;
