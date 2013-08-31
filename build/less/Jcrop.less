@@ -36,53 +36,27 @@
   A better method for styling can be seen below with .jcrop-light
   (Add a class to the holder and style elements for that extended class)
 */
-.jcrop-holder {
+.jcrop-active {
   direction: ltr;
   text-align: left;
 
   /* IE10 touch compatibility */ -ms-touch-action: none;
 }
 
-/* Selection Border */
-.jcrop-vline, .jcrop-hline {
-  background: @selectionBackground;
-  font-size: 0;
-  position: absolute;
-}
-.jcrop-vline {
-  height: 100%;
-  width: @selectionBorderWidth !important;
-  &.right { right: 0; }
-}
-.jcrop-hline{
-  height: @selectionBorderWidth !important;
-  width: 100%;
-  &.bottom { bottom: 0; }
-}
-
-/* Crop Borders */
+/* Selection Borders */
 .jcrop-border {
   background: @selectionBackground;
-  font-size: 0;
+  line-height: 1px !important;
+  font-size: 0 !important;
+  overflow: hidden;
   position: absolute;
   filter: Alpha(opacity=50) !important;
   opacity: 0.5 !important;
   &.ord-w, &.ord-e, &.ord-n { top: 0px; }
-  &.ord-n, &.ord-s { width: 100%; height: @selectionBorderWidth !important; }
+  &.ord-n, &.ord-s { left: 0px !important; width: 100%; height: @selectionBorderWidth !important; }
   &.ord-w, &.ord-e { height: 100%; width: @selectionBorderWidth !important; }
   &.ord-e { right: 0; }
   &.ord-s { bottom: 0; }
-}
-
-/* Invisible click targets */
-
-.jcrop-tracker
-{
-  height: 100%; 
-  width: 100%;
-  /* "turn off" link highlight */ -webkit-tap-highlight-color: transparent;
-  /* disable callout, image save panel */ -webkit-touch-callout: none;
-  /* disable cut copy paste */ -webkit-user-select: none;
 }
 
 .jcrop-selection {
@@ -108,6 +82,7 @@
 
 .jcrop-handle {
 
+  font-size: 0;
   z-index: 10;
   background-color: @handleBackgroundColor;
   border: @handleBorderWidth @handleBorderColor @handleBorderStyle;
@@ -129,12 +104,16 @@
 
 }
 
-/* Dragbars */
+/* Selection Dragbars */
+
 .jcrop-dragbar {
+
+  font-size: 0;
   z-index: 8;
   position: absolute;
+
   &.ord-n, &.ord-s {height:@dragbarWidth !important;width:100%;}
-  &.ord-e,&.ord-w { top:0px; height:100%;width:@dragbarWidth !important;}
+  &.ord-e, &.ord-w { top:0px; height:100%;width:@dragbarWidth !important;}
   &.ord-n {margin-top:@dragbarOffset;cursor:n-resize; top:0px; }
   &.ord-s {bottom:0;margin-bottom:@dragbarOffset;cursor:s-resize;}
   &.ord-e {margin-right:@dragbarOffset;right:0;cursor:e-resize;}
@@ -142,11 +121,7 @@
 
 }
 
-.jcrop-noresize {
-  .jcrop-dragbar, .jcrop-handle { display: none; }
-}
-.jcrop-selection.jcrop-nodrag .jcrop-box { cursor: default; }
-.jcrop-nodrag .jcrop-shades div { cursor: default; }
+/* Shading panels */
 
 .jcrop-shades {
   position: relative;
@@ -156,7 +131,20 @@
   div { cursor: crosshair; }
 }
 
+/* Various special states */
+
+.jcrop-noresize {
+  .jcrop-dragbar,
+  .jcrop-handle
+    { display: none; }
+}
+
+.jcrop-selection.jcrop-nodrag .jcrop-box,
+.jcrop-nodrag .jcrop-shades div
+  { cursor: default; }
+
 /* The "jcrop-light" class/extension */
+
 .jcrop-light {
   .jcrop-border {
     background: @white;
@@ -173,6 +161,7 @@
 }
 
 /* The "jcrop-dark" class/extension */
+
 .jcrop-dark {
   .jcrop-border {
     background: @black;
@@ -189,14 +178,31 @@
 }
 
 /* Simple macro to turn off the antlines */
+
 .solid-line {
-  .jcrop-vline, .jcrop-hline {
+  .jcrop-border {
     background: @selectionBackgroundColor;
   }
 }
 
+.jcrop-thumb {
+  position: absolute;
+  overflow: hidden;
+  z-index: 35;
+}
+
 /* Fix for twitter bootstrap et al. */
-.jcrop-holder img,img.jcrop-preview{ max-width: none; }
+
+.jcrop-active img,
+.jcrop-thumb img,
+.jcrop-thumb canvas {
+  min-width: none;
+  min-height: none;
+  max-width: none;
+  max-height: none;
+}
+
+/* Improved multiple selection styles - in progress */
 
 .jcrop-hl-active {
   .jcrop-border {
@@ -245,3 +251,4 @@
     }
   }
 }
+

@@ -1,0 +1,46 @@
+/* Jcrop.min.css v2.0.0 (build:20130831) */
+.jcrop-active{-ms-touch-action:none;direction:ltr;text-align:left;}
+.jcrop-border{background:#FFF url(Jcrop.gif);filter:alpha(opacity=50)!important;font-size:0!important;line-height:1px!important;opacity:.5!important;overflow:hidden;position:absolute;}
+.jcrop-border.ord-w,.jcrop-border.ord-e,.jcrop-border.ord-n{top:0;}
+.jcrop-border.ord-n,.jcrop-border.ord-s{height:1px!important;left:0!important;width:100%;}
+.jcrop-border.ord-w,.jcrop-border.ord-e{height:100%;width:1px!important;}
+.jcrop-border.ord-e{right:0;}
+.jcrop-border.ord-s{bottom:0;}
+.jcrop-selection{position:absolute;}
+.jcrop-box{background:none;border:none;cursor:move;display:block;font-size:0;height:100%;padding:0;width:100%;z-index:2;}
+.jcrop-box:focus{outline:1px rgba(128,128,128,0.65) dotted;}
+.jcrop-active,.jcrop-box{position:relative;}
+.jcrop-handle{background-color:#333;border:1px #EEE solid;filter:alpha(opacity=70)!important;font-size:0;height:7px;opacity:.7!important;position:absolute;width:7px;z-index:10;}
+.jcrop-handle.ord-n{cursor:n-resize;left:50%;margin-left:-4px;margin-top:-4px;top:0;}
+.jcrop-handle.ord-s{bottom:0;cursor:s-resize;left:50%;margin-bottom:-4px;margin-left:-4px;}
+.jcrop-handle.ord-e{cursor:e-resize;margin-right:-4px;margin-top:-4px;right:0;top:50%;}
+.jcrop-handle.ord-w{cursor:w-resize;left:0;margin-left:-4px;margin-top:-4px;top:50%;}
+.jcrop-handle.ord-nw{cursor:nw-resize;left:0;margin-left:-4px;margin-top:-4px;top:0;}
+.jcrop-handle.ord-ne{cursor:ne-resize;margin-right:-4px;margin-top:-4px;right:0;top:0;}
+.jcrop-handle.ord-se{bottom:0;cursor:se-resize;margin-bottom:-4px;margin-right:-4px;right:0;}
+.jcrop-handle.ord-sw{bottom:0;cursor:sw-resize;left:0;margin-bottom:-4px;margin-left:-4px;}
+.jcrop-dragbar{font-size:0;position:absolute;z-index:8;}
+.jcrop-dragbar.ord-n,.jcrop-dragbar.ord-s{height:7px!important;width:100%;}
+.jcrop-dragbar.ord-e,.jcrop-dragbar.ord-w{height:100%;top:0;width:7px!important;}
+.jcrop-dragbar.ord-n{cursor:n-resize;margin-top:-4px;top:0;}
+.jcrop-dragbar.ord-s{bottom:0;cursor:s-resize;margin-bottom:-4px;}
+.jcrop-dragbar.ord-e{cursor:e-resize;margin-right:-4px;right:0;}
+.jcrop-dragbar.ord-w{cursor:w-resize;margin-left:-4px;}
+.jcrop-shades{left:0;position:relative;top:0;z-index:10;}
+.jcrop-shades div{cursor:crosshair;}
+.jcrop-noresize .jcrop-dragbar,.jcrop-noresize .jcrop-handle{display:none;}
+.jcrop-selection.jcrop-nodrag .jcrop-box,.jcrop-nodrag .jcrop-shades div{cursor:default;}
+.jcrop-light .jcrop-border{background:#FFF;filter:alpha(opacity=70)!important;opacity:.70!important;}
+.jcrop-light .jcrop-handle{-moz-border-radius:3px;-webkit-border-radius:3px;background-color:#000;border-color:#FFF;border-radius:3px;}
+.jcrop-dark .jcrop-border{background:#000;filter:alpha(opacity=70)!important;opacity:.7!important;}
+.jcrop-dark .jcrop-handle{-moz-border-radius:3px;-webkit-border-radius:3px;background-color:#FFF;border-color:#000;border-radius:3px;}
+.solid-line .jcrop-border{background:#FFF;}
+.jcrop-thumb{overflow:hidden;position:absolute;z-index:35;}
+.jcrop-active img,.jcrop-thumb img,.jcrop-thumb canvas{max-height:none;max-width:none;min-height:none;min-width:none;}
+.jcrop-hl-active .jcrop-border{filter:alpha(opacity=20)!important;opacity:.20!important;}
+.jcrop-hl-active .jcrop-handle{filter:alpha(opacity=10)!important;opacity:.10!important;}
+.jcrop-hl-active .jcrop-selection:hover .jcrop-border{background-color:#ccc;filter:alpha(opacity=50)!important;opacity:.50!important;}
+.jcrop-hl-active .jcrop-selection.jcrop-current .jcrop-border{background:url(Jcrop.gif);background-color:gray;filter:alpha(opacity=35)!important;opacity:.35!important;}
+.jcrop-hl-active .jcrop-selection.jcrop-current .jcrop-handle{filter:alpha(opacity=30)!important;opacity:.30!important;}
+.jcrop-hl-active .jcrop-selection.jcrop-focus .jcrop-border{background:url(Jcrop.gif);background-color:#000;filter:alpha(opacity=65)!important;opacity:.65!important;}
+.jcrop-hl-active .jcrop-selection.jcrop-focus .jcrop-handle{filter:alpha(opacity=60)!important;opacity:.60!important;}
