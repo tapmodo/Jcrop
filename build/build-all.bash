@@ -15,33 +15,6 @@ $BASH compile-css.bash
 $BASH minimize-css.bash
 $BASH minimize-js.bash
 
-echo -n "Building main CSS..."
-
-if lessc less/main.less > ../demos/demo_files/main.css
-then
-  echo "OK"
-else
-  echo "FAILED"
-fi
-
-echo -n "Building additional Jcrop demo CSS..."
-
-if lessc less/demos.less > ../demos/demo_files/demos.css
-then
-  echo "OK"
-else
-  echo "FAILED"
-fi
-
-pushd demos > /dev/null
-
-echo "Now building demo HTML"
-php -q build.php;
-echo "Done building demo HTML"
-
-#lessc less/docs.less > ../demos/demo_files/docs.css
-
-popd > /dev/null
 popd > /dev/null
 
 echo "Done processing Jcrop build"

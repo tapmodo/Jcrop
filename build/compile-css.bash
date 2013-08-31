@@ -9,15 +9,7 @@ export JCROP_VERSION=${JCROP_VERSION-`cat VERSION`}
 export JCROP_BUILD=${JCROP_BUILD-`date +"%Y%m%d"`}
 
 echo -n "Building Jcrop CSS..."
-if lessc less/Jcrop.less > ../css/jquery.Jcrop.css
-then
-  echo "OK"
-else
-  echo "FAILED"
-fi
-
-echo -n "Building Additional CSS..."
-if lessc less/extras.less > ../demos/demo_files/extras.css
+if lessc less/Jcrop.less > ../css/Jcrop.css
 then
   echo "OK"
 else
