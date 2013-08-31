@@ -1141,6 +1141,10 @@
     this.init();
     this.setOptions(opt);
       
+    if (/msie [1-8]\./.test(_ua)) {
+      this.opt.dragEventTarget = document.body;
+    }
+
   };
   // }}}
 
