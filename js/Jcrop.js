@@ -1236,6 +1236,20 @@
       return obj;
     },
     // }}}
+    supportsCanvas: function(){
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+    },
+    imgCopy: function(imgel){
+      var img = new Image;
+      img.src = imgel.src;
+      return img;
+    },
+    imageClone: function(imgel){
+      return Jcrop.supportsCanvas()?
+        Jcrop.canvasClone(imgel):
+        Jcrop.imgCopy(imgel);
+    },
     // canvasClone: function(imgel){{{
     canvasClone: function(imgel){
       var canvas = document.createElement('canvas'),
