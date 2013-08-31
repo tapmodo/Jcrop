@@ -1522,6 +1522,24 @@
       };
     },
     //}}}
+    resizeContainer: function(w,h){
+      this.container.width(w).height(h);
+      this.refresh();
+    },
+    setImage: function(src,cb){
+      var t = this;
+
+      if (!t.opt.imgTarget) return false;
+
+      new $.Jcrop.component.ImageLoader(src,null,function(w,h){
+        t.resizeContainer(w,h);
+        $(t.opt.imgTarget).before(this.element).remove();
+        t.opt.imgTarget = this.element;
+
+        if (typeof cb == 'function')
+          cb.call(t,w,h);
+      });
+    },
     // update: function(b){{{
     update: function(b){
       this.ui.selection.update(b);
