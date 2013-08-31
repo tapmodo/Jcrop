@@ -422,8 +422,9 @@
     t.ord = ord;
     t.opposite = t.getOppositeCornerOffset();
 
-    $(t.eventTarget).on('mousemove.jcrop',t.createDragHandler());
-    $(t.eventTarget).on('mouseup.jcrop',t.createStopHandler());
+    $(t.eventTarget)
+      .on('mousemove.jcrop',t.createDragHandler())
+      .on('mouseup.jcrop',t.createStopHandler());
 
   };
 
@@ -1121,6 +1122,7 @@
   // var Jcrop = function(element,opt){{{
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
+
     this.opt = $.extend(true,{},Jcrop.defaults);
 
     this.container = $(element);
