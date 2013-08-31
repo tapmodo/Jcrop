@@ -1,4 +1,4 @@
-/* Jcrop.min.css v2.0.0 (build:20130831) */
+/* Jcrop.min.css v2.0.0-RC1 (build:20130831) */
 .jcrop-active{-ms-touch-action:none;direction:ltr;text-align:left;}
 .jcrop-border{background:#FFF url(Jcrop.gif);filter:alpha(opacity=50)!important;font-size:0!important;line-height:1px!important;opacity:.5!important;overflow:hidden;position:absolute;}
 .jcrop-border.ord-w,.jcrop-border.ord-e,.jcrop-border.ord-n{top:0;}
