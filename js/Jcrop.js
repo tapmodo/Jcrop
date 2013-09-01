@@ -469,7 +469,7 @@
     },
     endDragEvent: function(e){
       var sel = this.selection;
-      sel.element.trigger('cropend',[sel,sel.get()]);
+      sel.element.trigger('cropend',[sel,sel.core.unscale(sel.get())]);
     },
     createStopHandler: function(){
       var t = this;
@@ -698,6 +698,8 @@
       var sel = c.newSelection()
         // and position it
         .update(Jcrop.wrapFromXywh([origx,origy,1,1]));
+
+      sel.element.trigger('cropstart',[sel,this.core.unscale(sel.get())]);
       
       return sel.startDrag(e,'se');
     },
@@ -985,7 +987,7 @@
         this.moveTo(b.x,b.y);
         this.resize(b.w,b.h);
         this.last = b;
-        this.element.trigger('cropmove',[this,b]);
+        this.element.trigger('cropmove',[this,this.core.unscale(b)]);
         return this;
       },
       // }}}
@@ -1140,6 +1142,8 @@
 
     this.init();
     this.setOptions(opt);
+    this.applySizeConstraints();
+    this.container.trigger('cropinit',this);
       
     if (/msie [1-8]\./.test(_ua)) {
       this.opt.dragEventTarget = document.body;
@@ -1204,6 +1208,12 @@
 
       dragEventTarget: window,
 
+      xscale: 1,
+      yscale: 1,
+
+      boxWidth: null,
+      boxHeight: null,
+
       // CSS Classes
       // @todo: These need to be moved to top-level object keys
       // for better customization. Currently if you try to extend one
@@ -1261,7 +1271,7 @@
           ctx = canvas.getContext('2d');
       canvas.width = imgel.naturalWidth;
       canvas.height = imgel.naturalHeight;
-      ctx.drawImage(imgel,0,0);
+      ctx.drawImage(imgel,0,0,imgel.naturalWidth,imgel.naturalHeight);
       return $canvas;
     },
     // }}}
@@ -1302,9 +1312,29 @@
       this.ui.stage = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
       this.initEvents();
-      this.container.trigger('cropinit',this);
     },
     //}}}
+    applySizeConstraints: function(){
+      var o = this.opt,
+          img = this.opt.imgTarget;
+
+      if (img){
+
+        var iw = img.naturalWidth,
+            ih = img.naturalHeight,
+            bw = o.boxWidth || iw,
+            bh = o.boxHeight || ih;
+
+        if (img && ((iw > bw) || (ih > bh))){
+          var bx = Jcrop.getLargestBox(iw/ih,bw,bh);
+          $(img).width(bx[0]).height(bx[1]);
+          this.resizeContainer(bx[0],bx[1]);
+          this.opt.xscale = iw / bx[0];
+          this.opt.yscale = ih / bx[1];
+        }
+          
+      }
+    },
     // setOptions: function(opt){{{
     setOptions: function(opt,proptype){
 
@@ -1464,9 +1494,9 @@
       if (b.y < 0) { b.y2 = b.h; b.y = 0; }
         else if (b.y2 > this.elh) { b.y2 = this.elh; b.y = b.y2 - b.h; }
       
-      s.element.trigger('cropstart',[s,b]);
+      s.element.trigger('cropstart',[s,this.unscale(b)]);
       s.update(b,'move');
-      s.element.trigger('cropend',[s,b]);
+      s.element.trigger('cropend',[s,this.unscale(b)]);
     },
     // }}}
     // refresh: function(){{{
@@ -1484,6 +1514,19 @@
       }
     },
     // }}}
+    unscale: function(b){
+      var xs = this.opt.xscale,
+          ys = this.opt.yscale;
+
+      return {
+        x: b.x * xs,
+        y: b.y * ys,
+        x2: b.x2 * xs,
+        y2: b.y2 * ys,
+        w: b.w * xs,
+        h: b.h * ys
+      };
+    },
     // requestDelete: function(){{{
     requestDelete: function(){
       if ((this.ui.multi.length > 1) && (this.ui.selection.canDelete))
@@ -1516,7 +1559,7 @@
         var $targ = $(e.target);
         var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
         var ord = $targ.data('ord');
-        t.container.trigger('cropstart',selection);
+        t.container.trigger('cropstart',[selection,t.unscale(selection.get())]);
         selection.startDrag(e,ord);
         return false;
       };
@@ -1527,14 +1570,19 @@
       this.refresh();
     },
     setImage: function(src,cb){
-      var t = this;
+      var t = this, targ = t.opt.imgTarget;
 
-      if (!t.opt.imgTarget) return false;
+      if (!targ) return false;
 
       new $.Jcrop.component.ImageLoader(src,null,function(w,h){
         t.resizeContainer(w,h);
-        $(t.opt.imgTarget).before(this.element).remove();
-        t.opt.imgTarget = this.element;
+
+        targ.src = src;
+        $(targ).width(w).height(h);
+        t.applySizeConstraints();
+
+        //$(t.opt.imgTarget).before(this.element).remove();
+        //t.opt.imgTarget = this.element;
 
         if (typeof cb == 'function')
           cb.call(t,w,h);
