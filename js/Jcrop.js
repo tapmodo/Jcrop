@@ -740,7 +740,7 @@
     startDragHandler: function(){
       var t = this;
       return function(e){
-        if (!e.button) return t.dragger.start(e);
+        if (!e.button || t.core.opt.is_ie_lt9) return t.dragger.start(e);
       };
     },
     removeEvents: function(){
@@ -1130,7 +1130,7 @@
     this.container = $(element);
 
     this.opt.is_msie = /msie/.test(_ua);
-    this.opt.is_ie6 = /msie [1-6]\./.test(_ua);
+    this.opt.is_ie_lt9 = /msie [1-8]\./.test(_ua);
 
     this.container.addClass(this.opt.cssclass.container);
 
