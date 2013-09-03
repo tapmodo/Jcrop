@@ -468,7 +468,7 @@
     dragEvent: function(e){
       this.offsetx = e.pageX - this.x;
       this.offsety = e.pageY - this.y;
-      this.selection.update(this.getBox(),this.ord);
+      this.selection.updateRaw(this.getBox(),this.ord);
     },
     endDragEvent: function(e){
       var sel = this.selection;
@@ -551,6 +551,7 @@
 
   $.extend(CropAnimator.prototype,{
     getElement: function(){
+      //var b = this.core.unscale(this.selection.get());
       var b = this.selection.get();
 
       return $('<div />')
@@ -595,7 +596,7 @@
           b.x2 = b.x + b.w;
           b.y2 = b.y + b.h;
 
-          t.selection.update(b,'se');
+          t.selection.updateRaw(b,'se');
         }
       });
     }
@@ -700,7 +701,7 @@
       // Create the new selection
       var sel = c.newSelection()
         // and position it
-        .update(Jcrop.wrapFromXywh([origx,origy,1,1]));
+        .updateRaw(Jcrop.wrapFromXywh([origx,origy,1,1]));
 
       sel.element.trigger('cropstart',[sel,this.core.unscale(sel.get())]);
       
@@ -838,7 +839,7 @@
         this.allowDrag();
         this.allowSelect();
         this.callFilterFunction('refresh');
-        this.update(this.get(),'se');
+        this.updateRaw(this.get(),'se');
       },
       // }}}
       // callFilterFunction: function(f,args){{{
@@ -984,20 +985,29 @@
         this.refresh();
       },
       // }}}
-      // update: function(b,ord){{{
-      update: function(b,ord){
-        b = this.runFilters(b,ord);
+      redraw: function(b){
         this.moveTo(b.x,b.y);
         this.resize(b.w,b.h);
         this.last = b;
+        return this;
+      },
+      update: function(b,ord){
+        return this.updateRaw(this.core.scale(b),ord);
+      },
+      // update: function(b,ord){{{
+      updateRaw: function(b,ord){
+        b = this.runFilters(b,ord);
+        this.redraw(b);
         this.element.trigger('cropmove',[this,this.core.unscale(b)]);
         return this;
       },
       // }}}
       // animateTo: function(box,cb){{{
       animateTo: function(box,cb){
-        var ca = new Jcrop.component.Animator(this);
-        ca.animate(box[0],box[1],box[2],box[3],cb);
+        var ca = new Jcrop.component.Animator(this),
+            b = this.core.scale(Jcrop.wrapFromXywh(box));
+
+        ca.animate(b.x,b.y,b.w,b.h,cb);
       },
       // }}}
       // center: function(instant){{{
@@ -1498,7 +1508,7 @@
         else if (b.y2 > this.elh) { b.y2 = this.elh; b.y = b.y2 - b.h; }
       
       s.element.trigger('cropstart',[s,this.unscale(b)]);
-      s.update(b,'move');
+      s.updateRaw(b,'move');
       s.element.trigger('cropend',[s,this.unscale(b)]);
     },
     // }}}
@@ -1517,6 +1527,19 @@
       }
     },
     // }}}
+    scale: function(b){
+      var xs = this.opt.xscale,
+          ys = this.opt.yscale;
+
+      return {
+        x: b.x / xs,
+        y: b.y / ys,
+        x2: b.x2 / xs,
+        y2: b.y2 / ys,
+        w: b.w / xs,
+        h: b.h / ys
+      };
+    },
     unscale: function(b){
       var xs = this.opt.xscale,
           ys = this.opt.yscale;
