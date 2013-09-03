@@ -1334,8 +1334,8 @@
 
       if (img){
 
-        var iw = img.naturalWidth,
-            ih = img.naturalHeight,
+        var iw = img.naturalWidth || img.width,
+            ih = img.naturalHeight || img.height,
             bw = o.boxWidth || iw,
             bh = o.boxHeight || ih;
 
