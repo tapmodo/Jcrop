@@ -1635,11 +1635,17 @@
     if (options == 'api') { return first; }
 
     // Allow calling API methods (with arguments)
-    else if (typeof options == 'string') {
-      args.shift();
+    else if (first && (typeof options == 'string')) {
 
-      if (first[options])
+      // Call method if it exists
+      if (first[options]) {
+        args.shift();
         first[options].apply(first,args);
+        return first;
+      }
+
+      // Unknown input/method does not exist
+      return false;
     }
 
     // Otherwise, loop over selected elements
