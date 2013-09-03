@@ -751,8 +751,9 @@
       this.core.container.off('.jcrop-stage');
     },
     setupEvents: function(){
-      this.core.container.on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
-      this.core.container.on('cropconfig.jcrop-stage',this.configUpdateHandler());
+      this.core.container
+        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler())
+        .on('cropconfig.jcrop-stage',this.configUpdateHandler());
     }
   });
   // }}}
