@@ -1607,6 +1607,8 @@
         targ.src = src;
         $(targ).width(w).height(h);
         t.applySizeConstraints();
+        t.refresh();
+        t.container.trigger('cropimage',[t,targ]);
 
         //$(t.opt.imgTarget).before(this.element).remove();
         //t.opt.imgTarget = this.element;
