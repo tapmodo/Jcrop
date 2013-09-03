@@ -422,9 +422,7 @@
     t.ord = ord;
     t.opposite = t.getOppositeCornerOffset();
 
-    $(t.eventTarget)
-      .on('mousemove.jcrop',t.createDragHandler())
-      .on('mouseup.jcrop',t.createStopHandler());
+    t.initEvents();
 
   };
 
@@ -462,6 +460,11 @@
       return [ null, null ];
     },
     // }}}
+    initEvents: function(){
+      $(this.eventTarget)
+        .on('mousemove.jcrop',this.createDragHandler())
+        .on('mouseup.jcrop',this.createStopHandler());
+    },
     dragEvent: function(e){
       this.offsetx = e.pageX - this.x;
       this.offsety = e.pageY - this.y;
