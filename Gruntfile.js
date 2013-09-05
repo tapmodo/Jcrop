@@ -43,7 +43,7 @@ module.exports = function(grunt) {
     less: {
       css: {
         files: {
-          "css/Jcrop.css": "build/less/Jcrop.less"
+          "css/Jcrop.css": "src/css/Jcrop.less"
         }
       }
     },
