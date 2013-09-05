@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     'src/outro.js'
   ];
 
-  // Project configuration.
+  // Project configuration
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
@@ -64,12 +64,13 @@ module.exports = function(grunt) {
     }
   });
 
+  // Load grunt plugins
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
-  // Default task(s).
+  // Default tasks
   grunt.registerTask('default', ['js','css']);
   grunt.registerTask('js', ['concat','uglify']);
   grunt.registerTask('css', ['less','cssmin']);
