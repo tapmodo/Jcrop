@@ -1,22 +1,12 @@
 module.exports = function(grunt) {
 
+  // These are the files used in order to build the Jcrop.js source
+  // variable is used in initConfig concat rule below
+  // also used for the watch task
   var jcrop_sources = [
     'src/intro.js',
-    'src/filter/ConstrainFilter.js',
-    'src/filter/ExtentFilter.js',
-    'src/filter/BackoffFilter.js',
-    'src/filter/RatioFilter.js',
-    'src/filter/RoundFilter.js',
-    'src/filter/ShadeFilter.js',
-    'src/filter/GridFilter.js',
-    'src/DragState.js',
-    'src/CropAnimator.js',
-    'src/KeyWatcher.js',
-    'src/StageDrag.js',
-    'src/StageManager.js',
-    'src/Selection.js',
-    'src/ImageLoader.js',
-    'src/JcropTouch.js',
+    'src/filter/*.js',
+    'src/component/*.js',
     'src/constructor.js',
     'src/static.js',
     'src/api.js',
