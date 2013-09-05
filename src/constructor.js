@@ -1,4 +1,5 @@
   // Jcrop constructor
+  // var Jcrop = function(element,opt){{{
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
 
@@ -27,3 +28,4 @@
     }
 
   };
+  // }}}

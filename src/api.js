@@ -12,6 +12,7 @@
       this.initEvents();
     },
     //}}}
+    // applySizeConstraints: function(){{{
     applySizeConstraints: function(){
       var o = this.opt,
           img = this.opt.imgTarget;
@@ -33,6 +34,7 @@
           
       }
     },
+    // }}}
     // setOptions: function(opt){{{
     setOptions: function(opt,proptype){
 
@@ -58,6 +60,7 @@
       return this;
     },
     // }}}
+    //destroy: function(){{{
     destroy: function(){
       if (this.opt.imgTarget) {
         this.container.before(this.opt.imgTarget);
@@ -68,6 +71,7 @@
         this.container.remove();
       }
     },
+    // }}}
     // applyFilters: function(){{{
     applyFilters: function(){
       var obj;
@@ -212,6 +216,7 @@
       }
     },
     // }}}
+    // scale: function(b){{{
     scale: function(b){
       var xs = this.opt.xscale,
           ys = this.opt.yscale;
@@ -225,6 +230,8 @@
         h: b.h / ys
       };
     },
+    // }}}
+    // unscale: function(b){{{
     unscale: function(b){
       var xs = this.opt.xscale,
           ys = this.opt.yscale;
@@ -238,6 +245,7 @@
         h: b.h * ys
       };
     },
+    // }}}
     // requestDelete: function(){{{
     requestDelete: function(){
       if ((this.ui.multi.length > 1) && (this.ui.selection.canDelete))
@@ -276,10 +284,13 @@
       };
     },
     //}}}
+    // resizeContainer: function(w,h){{{
     resizeContainer: function(w,h){
       this.container.width(w).height(h);
       this.refresh();
     },
+    // }}}
+    // setImage: function(src,cb){{{
     setImage: function(src,cb){
       var t = this, targ = t.opt.imgTarget;
 
@@ -301,6 +312,7 @@
           cb.call(t,w,h);
       });
     },
+    // }}}
     // update: function(b){{{
     update: function(b){
       this.ui.selection.update(b);

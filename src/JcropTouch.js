@@ -2,17 +2,22 @@
    * JcropTouch
    * Detects and enables mobile touch support
    */
+  // var JcropTouch = function(core){{{
   var JcropTouch = function(core){
     this.core = core;
     this.init();
   };
+  // }}}
 
   $.extend(JcropTouch,{
+    // support: function(){{{
     support: function(){
       if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch)
         return true;
     },
+    // }}}
     prototype: {
+      // init: function(){{{
       init: function(){
         var t = this,
           p = $.Jcrop.component.DragState.prototype;
@@ -26,6 +31,8 @@
           p.touch = true;
         }
       },
+      // }}}
+      // shimDragState: function(){{{
       shimDragState: function(){
         var t = this;
         $.Jcrop.component.DragState.prototype.initEvents = function(e){
@@ -53,11 +60,15 @@
 
         };
       },
+      // }}}
+      // shimStageDrag: function(){{{
       shimStageDrag: function(){
         this.core.container
           .addClass('jcrop-touch')
           .on('touchstart.jcrop.jcrop-stage',this.dragWrap(this.core.ui.stage.startDragHandler()));
       },
+      // }}}
+      // dragWrap: function(cb){{{
       dragWrap: function(cb){
         return function(e){
           e.preventDefault();
@@ -70,6 +81,8 @@
           return false;
         };
       },
+      // }}}
+      // initEvents: function(){{{
       initEvents: function(){
         var t = this, c = t.core;
 
@@ -79,5 +92,6 @@
           t.dragWrap(c.startDrag())
         );
       }
+      // }}}
     }
   });

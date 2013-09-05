@@ -2,19 +2,23 @@
    * StageDrag
    * Facilitates dragging
    */
+  // var StageDrag = function(manager,opt){{{
   var StageDrag = function(manager,opt){
     $.extend(this,StageDrag.defaults,opt || {});
     this.manager = manager;
     this.core = manager.core;
   };
-  
+  // }}}
+  // StageDrag.defaults = {{{
   StageDrag.defaults = {
     offset: [ -8, -8 ],
     active: true,
     minsize: [ 20, 20 ]
   };
+  // }}}
 
   $.extend(StageDrag.prototype,{
+    // start: function(e){{{
     start: function(e){
       var c = this.core;
 
@@ -52,6 +56,8 @@
       
       return sel.startDrag(e,'se');
     },
+    // }}}
+    // end: function(x,y){{{
     end: function(x,y){
       this.drag(x,y);
       var b = this.sel.get();
@@ -61,4 +67,5 @@
 
         else this.sel.focus();
     }
+    // }}}
   });

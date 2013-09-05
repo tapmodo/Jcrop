@@ -2,24 +2,32 @@
    *  KeyWatcher
    *  provides keyboard support
    */
+  // var KeyWatcher = function(core){{{
   var KeyWatcher = function(core){
     this.core = core;
     this.init();
   };
-
+  // }}}
+  // KeyWatcher.defaults = {{{
   KeyWatcher.defaults = {
     passthru: [ 9 ],
     debug: false
   };
+  // }}}
 
   $.extend(KeyWatcher.prototype,{
+    // init: function(){{{
     init: function(){
       $.extend(this,KeyWatcher.defaults);
       this.enable();
     },
+    // }}}
+    // disable: function(){{{
     disable: function(){
       this.core.container.off('keydown.jcrop');
     },
+    // }}}
+    // enable: function(){{{
     enable: function(){
       var t = this, m = t.core;
       m.container.on('keydown.jcrop',function(e){
@@ -49,4 +57,5 @@
           e.preventDefault();
       });
     }
+    // }}}
   });

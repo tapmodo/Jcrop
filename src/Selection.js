@@ -5,6 +5,7 @@
   var Selection = function(){};
 
   $.extend(Selection,{
+    // defaults: {{{
     defaults: {
       minSize: [ 8, 8 ],
       maxSize: [ 0, 0 ],
@@ -22,6 +23,7 @@
       canResize: true,
       canSelect: true
     },
+    // }}}
     prototype: {
       // init: function(core){{{
       init: function(core){
@@ -66,15 +68,19 @@
         });
       },
       // }}}
+      // propagate: [{{{
       propagate: [
         'canDelete', 'canDrag', 'canResize', 'canSelect',
         'minSize', 'maxSize', 'aspectRatio', 'edge'
       ],
+      // }}}
+      // setOptions: function(opt){{{
       setOptions: function(opt){
         Jcrop.propagate(this.propagate,opt,this);
         this.refresh();
         return this;
       },
+      // }}}
       // refresh: function(){{{
       refresh: function(){
         this.allowResize();
@@ -227,15 +233,19 @@
         this.refresh();
       },
       // }}}
+      // redraw: function(b){{{
       redraw: function(b){
         this.moveTo(b.x,b.y);
         this.resize(b.w,b.h);
         this.last = b;
         return this;
       },
+      // }}}
+      // update: function(b,ord){{{
       update: function(b,ord){
         return this.updateRaw(this.core.scale(b),ord);
       },
+      // }}}
       // update: function(b,ord){{{
       updateRaw: function(b,ord){
         b = this.runFilters(b,ord);

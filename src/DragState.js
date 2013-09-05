@@ -5,6 +5,7 @@
    *  This object is used by the built-in selection object to
    *  track a dragging operation on a selection
    */
+  // var DragState = function(e,selection,ord){{{
   var DragState = function(e,selection,ord){
     var t = this;
 
@@ -29,6 +30,7 @@
     t.initEvents(e);
 
   };
+  // }}}
 
   $.extend(DragState.prototype,{
     // getOppositeCornerOffset: function(){{{
@@ -64,20 +66,27 @@
       return [ null, null ];
     },
     // }}}
+    // initEvents: function(e){{{
     initEvents: function(e){
       $(this.eventTarget)
         .on('mousemove.jcrop',this.createDragHandler())
         .on('mouseup.jcrop',this.createStopHandler());
     },
+    // }}}
+    // dragEvent: function(e){{{
     dragEvent: function(e){
       this.offsetx = e.pageX - this.x;
       this.offsety = e.pageY - this.y;
       this.selection.updateRaw(this.getBox(),this.ord);
     },
+    // }}}
+    // endDragEvent: function(e){{{
     endDragEvent: function(e){
       var sel = this.selection;
       sel.element.trigger('cropend',[sel,sel.core.unscale(sel.get())]);
     },
+    // }}}
+    // createStopHandler: function(){{{
     createStopHandler: function(){
       var t = this;
       return function(e){
@@ -86,6 +95,8 @@
         return false;
       };
     },
+    // }}}
+    // createDragHandler: function(){{{
     createDragHandler: function(){
       var t = this;
       return function(e){
@@ -93,6 +104,7 @@
         return false;
       };
     },
+    // }}}
     //update: function(x,y){{{
     update: function(x,y){
       var t = this;

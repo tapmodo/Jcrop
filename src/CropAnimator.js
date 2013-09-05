@@ -7,14 +7,16 @@
    *  is used to update the selection coordinates of the
    *  visible selection in realtime.
    */
+  // var CropAnimator = function(selection){{{
   var CropAnimator = function(selection){
     this.selection = selection;
     this.core = selection.core;
   };
+  // }}}
 
   $.extend(CropAnimator.prototype,{
+    // getElement: function(){{{
     getElement: function(){
-      //var b = this.core.unscale(this.selection.get());
       var b = this.selection.get();
 
       return $('<div />')
@@ -26,6 +28,8 @@
           height: b.h+'px'
         });
     },
+    // }}}
+    // animate: function(x,y,w,h,cb){{{
     animate: function(x,y,w,h,cb){
       var t = this;
 
@@ -63,4 +67,5 @@
         }
       });
     }
+    // }}}
   });
