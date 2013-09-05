@@ -6,40 +6,41 @@ your web application. It combines the ease-of-use of a typical jQuery
 plugin with a powerful cross-platform DHTML cropping engine that is
 faithful to familiar desktop graphics applications.
 
-Cross-platform Compatibility
-----------------------------
+### Feature Overview
 
-* Firefox 2+
-* Safari 3+
-* Opera 9.5+
-* Google Chrome 0.2+
-* Internet Explorer 6+
+  * Attaches unobtrusively to any image or block element
+  * Completely based on true prototypical Javascript objects for extreme flexibility
+  * Supports multiple active selections, per-selection customization
+  * Supports aspect ratio locking, minimum/maximum size, and other features
+  * Acts as in-line form element, can receive focus, tab through
+  * Keyboard support for nuding selections and trapping other keys
+  * Inherently API-driven and stylable with CSS
+  * Mobile touch support for iOS and Android
 
-Feature Overview
-----------------
+### Cross-platform Compatibility
 
-* Attaches unobtrusively to any image
-* Supports aspect ratio locking
-* Supports minSize/maxSize setting
-* Callbacks for selection done, or while moving
-* Keyboard support for nudging selection
-* API features to create interactivity, including animation
-* Support for CSS styling
-* Experimental touch-screen support (iOS, Android, etc)
+The current version of Jcrop has been cross-platform tested and core functionality
+works in all the following browsers:
 
-Contributors
-============
+  * Firefox 3+
+  * Safari 4+
+  * Opera 9.5+
+  * Google Chrome 14+
+  * Internet Explorer 7+
 
-**Special thanks to the following contributors:**
+Older versions of some browsers may also work.
 
-* [Bruno Agutoli](mailto:brunotla1@gmail.com)
-* dhorrigan
-* Phil-B
-* jaymecd
-* all others who have committed their time and effort to help improve Jcrop
+Always thoroughly test any desired functionality on all target platforms and devices.
 
-MIT License
-===========
+##### Legacy IE Compatibility
+
+Internet Explorer 6 suffers some visual problems with the new CSS structure
+and will not be explicitly supported from v2.x and up. Currently Jcrop can still
+be used in IE6, it just looks ugly. IE7 and newer versions deliver a nearly flawless
+Jcrop experience.
+
+-------------
+## MIT License
 
 **Jcrop is free software under MIT License.**
 
