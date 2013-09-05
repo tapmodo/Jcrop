@@ -80,6 +80,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
 
   // Default task(s).
-  grunt.registerTask('default', ['less','concat','uglify','cssmin']);
+  grunt.registerTask('default', ['js','css']);
+  grunt.registerTask('js', ['concat','uglify']);
+  grunt.registerTask('css', ['less','cssmin']);
 
 };
