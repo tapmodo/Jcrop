@@ -11,7 +11,7 @@
 // Setting some variables to 
 // Used to set handle and dragbar size/width
 // To center on a 1px selection line, use an odd number
-@grabSize: 7px;
+@grabSize: 8px;
 
 // Used to offset handles and dragbar
 // Default value will center on 1px selection line
@@ -22,7 +22,8 @@
 @handleBorderWidth: 1px;
 @handleBorderColor: #eee;
 @handleBorderStyle: solid;
-@handleBackgroundColor: #333;
+@handleBackgroundColor: rgba(49,28,28,0.58);
+@handleOpacity: 0.8;
 
 @dragbarWidth: @grabSize;
 @dragbarOffset: @grabOffset;
@@ -78,20 +79,19 @@
 .jcrop-active, .jcrop-box { position: relative; }
 .jcrop-box { z-index: 2; width: 100%; height: 100%; cursor: move; }
 
-/* Selection Handles */
+.handles (@handleSize;@handleOffset;@bgColor;@bgOpacity;@borderWidth;@borderColor;@borderStyle) {
 
-.jcrop-handle {
-
+  @ieopacity: @bgOpacity * 100;
   font-size: 0;
   z-index: 10;
-  background-color: @handleBackgroundColor;
-  border: @handleBorderWidth @handleBorderColor @handleBorderStyle;
+  background-color: @bgColor;
+  border: @borderWidth @borderColor @borderStyle;
   width: @handleSize;
   height: @handleSize;
   font-size: 0;
   position: absolute;
-  filter: Alpha(opacity=70) !important;
-  opacity: 0.7 !important;
+  filter: Alpha(opacity=@ieopacity) !important;
+  opacity: @bgOpacity !important;
 
   &.ord-n {left:50%;margin-left:@handleOffset;margin-top:@handleOffset;top:0;cursor:n-resize;}
   &.ord-s {bottom:0;left:50%;margin-bottom:@handleOffset;margin-left:@handleOffset;cursor:s-resize;}
@@ -102,6 +102,23 @@
   &.ord-se {bottom:0;margin-bottom:@handleOffset;margin-right:@handleOffset;right:0;cursor:se-resize;}
   &.ord-sw {bottom:0;left:0;margin-bottom:@handleOffset;margin-left:@handleOffset;cursor:sw-resize;}
 
+}
+
+.standard-handles (@handleSize;@bgColor;@bgOpacity;@borderColor) {
+  @handleOffset: (floor(@handleSize/2)+1) * -1;
+  .handles(@handleSize;@handleOffset;@bgColor;@bgOpacity;@handleBorderWidth;@borderColor;@handleBorderStyle);
+}
+
+/* Selection Handles */
+
+.jcrop-handle {
+  .standard-handles(@handleSize;@handleBackgroundColor;@handleOpacity;@handleBorderColor);
+}
+
+/* Larger Selection Handles for Touch */
+
+.jcrop-touch .jcrop-handle {
+  .standard-handles(@handleSize * 2;@handleBackgroundColor;@handleOpacity;@handleBorderColor);
 }
 
 /* Selection Dragbars */
@@ -228,10 +245,9 @@
   }
   .jcrop-selection.jcrop-current {
     .jcrop-border {
-      background-color: gray;
-      background: url('Jcrop.gif');
-      filter:Alpha(opacity=35)!important;
+      background: gray url('Jcrop.gif');
       opacity:.35!important;
+      filter:Alpha(opacity=35)!important;
     }
     .jcrop-handle {
       filter:Alpha(opacity=30)!important;
@@ -240,10 +256,9 @@
   }
   .jcrop-selection.jcrop-focus {
     .jcrop-border {
-      background-color: black;
       background: url('Jcrop.gif');
-      filter:Alpha(opacity=65)!important;
       opacity:.65!important;
+      filter:Alpha(opacity=65)!important;
     }
     .jcrop-handle {
       filter:Alpha(opacity=60)!important;
