@@ -17,6 +17,16 @@ module.exports = function(grunt) {
   // Project configuration
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    watch: {
+      css: {
+        files: [ 'src/**/*.less' ],
+        tasks: [ 'css' ]
+      },
+      js: {
+        files: [ 'src/**/*.js' ],
+        tasks: [ 'js' ]
+      }
+    },
     concat: {
       options: {
         banner: '/*! <%= pkg.name %>.js v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
@@ -69,6 +79,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Default tasks
   grunt.registerTask('default', ['js','css']);
