@@ -31,14 +31,14 @@ module.exports = function(grunt) {
       }
     },
     less: {
-      css: {
+      dist: {
         files: {
           "css/Jcrop.css": "src/css/Jcrop.less"
         }
       }
     },
     cssmin: {
-      main: {
+      dist: {
         options: {
           banner: '/*! <%= pkg.name %>.min.css v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
             ' *  Copyright 2008-2013 Tapmodo Interactive LLC\n' +
@@ -57,7 +57,7 @@ module.exports = function(grunt) {
           ' *  Free software under MIT License\n'+
           ' **/\n'
       },
-      build: {
+      dist: {
         src: 'js/<%= pkg.name %>.js',
         dest: 'js/<%= pkg.name %>.min.js'
       }
