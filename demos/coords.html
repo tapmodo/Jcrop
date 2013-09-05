@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dimensions | Jcrop Demos</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../js/Jcrop.js"></script>
+    <script src="/Jcrop/js/jquery.color.js"></script>
+    <script type="text/javascript">
+      var cb, filter;
+      
+      jQuery(function($){
+      
+        // Create a new Selection object extended from Selection
+        var CoordsSel = function(){ };
+        
+        // Extend this object's prototype with the Selection.prototype
+        // And extend with some additional/updated methods
+        $.extend(CoordsSel.prototype,$.Jcrop.component.Selection.prototype,{
+          attach: function(){
+            // Prepend an element to Selection.element (selection container)
+            this.coords = $('<div> x </div>').addClass('jcrop-coords');
+            this.element.prepend(this.coords);
+          },
+          redraw: function(b){
+          
+            // Call original redraw() method first, with arguments
+            $.Jcrop.component.Selection.prototype.redraw.call(this,b);
+            
+            // Update coordinates
+            this.coords.html(this.last.w+' &times '+this.last.h);
+            
+            return this;
+          }
+        });
+        
+        // Now set it as the component that is used for new selections
+        $('#target').Jcrop({
+          selectionComponent: CoordsSel,
+          bgColor: 'rgba(145,176,241)',
+          bgOpacity: 0.5
+        },function(){
+          this.container.addClass('jcrop-hl-active');
+          interface_load(this);
+        });
+        
+        function interface_load(obj){
+          cb = obj;
+          
+          cb.newSelection().update($.Jcrop.wrapFromXywh([ 147, 55, 456, 390 ])).refresh();
+          //cb.ui.selection.removeFilter(cb.filter.shader);
+          cb.ui.selection.refresh();
+          
+          function random_coords() {
+            return [
+              Math.random()*300,
+              Math.random()*200,
+              (Math.random()*540)+50,
+              (Math.random()*340)+60
+            ];
+          }
+          
+          // Animate button event
+          $(document.body).on('click','[data-action]',function(e){
+            var $targ = $(e.target);
+            var action = $targ.data('action');
+            
+            switch(action){
+              case 'random-move':
+                cb.ui.selection.animateTo(random_coords());
+                break;
+            }
+            
+            cb.ui.selection.refresh();
+            
+          }).on('selectstart',function(e){
+            e.preventDefault();
+          }).on('click','a[data-action]',function(e){
+            e.preventDefault();
+          });
+        }
+        
+        $.Jcrop.component.CoordsSel = CoordsSel;
+        
+      });
+      
+    </script>
+    <link rel="stylesheet" href="demo_files/main.css">
+    <link rel="stylesheet" href="demo_files/demos.css">
+    <link rel="stylesheet" href="../css/Jcrop.css">
+    <style type="text/css">
+      .jcrop-border {
+        background: rgba(0,0,0,0.8);
+      }
+      
+      .jcrop-handle {
+        border-color: rgba(0,0,0,0.8);
+      }
+      
+      .jcrop-coords {
+        display: none;
+        position: absolute;
+        bottom: -24px;
+        right: 7px;
+        color: rgba(255, 255, 255, 0.8);
+        padding: 1px 4px 0;
+        font-size: 10px;
+        white-space: nowrap;
+        font-family: "Lucida Console", Monaco, monospace;
+        background: rgba(0, 0, 0, 0.8);
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+        border-radius: 4px;
+      }
+      
+      .jcrop-current .jcrop-coords {
+        display: block;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" data-toggle="collapse" data-target="nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="../" class="brand">Jcrop</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="./basic.html">Demos</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/doc/">Docs</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/contact/">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+          <div class="jc-demo-box">
+            <div class="page-header">
+              <h1>Dimensions</h1>
+            </div>
+            <div class="demo-nav menu-box">
+              <h3>Jcrop Demos</h3>
+              <ul class="links">
+                <li><a href="basic.html">Hello World</a></li>
+                <li><a href="thumbnail.html">Thumbnail Preview</a></li>
+                <li><a href="panel.html">Feature Panel</a></li>
+                <li><b>Dimensions</b></li>
+                <li><a href="circle.html">Circles</a></li>
+              </ul>
+            </div>
+            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/sierra-750.jpg" id="target">
+              <div class="btn-toolbar"><a href="#" data-action="random-move" id="moveselection" class="btn btn-small">Move</a></div>
+            </div>
+            <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
+                <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

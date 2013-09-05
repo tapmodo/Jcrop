@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Thumbnail Preview | Jcrop Demos</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../js/Jcrop.js"></script>
+    <script src="/Jcrop/js/Thumbnailer.js"></script>
+    <script type="text/javascript">
+      jQuery(function($){
+      
+        // Create a scope-wide variable to hold the Thumbnailer instance
+        var thumbnail;
+        
+        // Instantiate Jcrop
+        $('#target').Jcrop({
+          aspectRatio: 1,
+          setSelect: [ 175, 100, 400, 300 ]
+        },function(){
+          var jcrop_api = this;
+          thumbnail = new $.Jcrop.component.Thumbnailer(jcrop_api,{ width: 130, height: 130 });
+        });
+        
+        // Wire up the auto-hide checkbox/toggle
+        $('#autohide').attr('checked',false).on('change',function(e){
+          var chk = this.checked;
+          if (thumbnail) {
+            thumbnail.autoHide = chk? true: false;
+            thumbnail[chk?'hide':'show']();
+          }
+        });
+        
+      });
+      
+    </script>
+    <link rel="stylesheet" href="demo_files/main.css">
+    <link rel="stylesheet" href="demo_files/demos.css">
+    <link rel="stylesheet" href="../css/Jcrop.css">
+    <style>
+      .jcrop-thumb {
+        top: -25px;
+        right: 20px;
+        border: 1px black solid;
+      }
+      
+      #text-inputs { margin: 10px 8px 0; }
+      .input-group { margin-right: 1.5em; }
+      .nav-box { width: 748px; padding: 0 !important; margin: 4px 0; background-color: #f8f8f7; }
+      
+    </style>
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" data-toggle="collapse" data-target="nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="../" class="brand">Jcrop</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="./basic.html">Demos</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/doc/">Docs</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/contact/">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+          <div class="jc-demo-box">
+            <div class="page-header">
+              <h1>Thumbnail Preview</h1>
+            </div>
+            <div class="demo-nav menu-box">
+              <h3>Jcrop Demos</h3>
+              <ul class="links">
+                <li><a href="basic.html">Hello World</a></li>
+                <li><b>Thumbnail Preview</b></li>
+                <li><a href="panel.html">Feature Panel</a></li>
+                <li><a href="coords.html">Dimensions</a></li>
+                <li><a href="circle.html">Circles</a></li>
+              </ul>
+            </div>
+            <div id="interface" class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/sierra2-750.jpg" id="target">
+              <div style="margin-top:0.7em">
+                <label class="checkbox">
+                  <input type="checkbox" id="autohide"><b>Auto-hide Thumbnail Preview</b>
+                </label>
+              </div>
+            </div>
+            <h3>Built-in Preview Support</h3><p><strong>Thumbnail previews just got much easier!</strong> Used to be, if you wanted to
+include a dynamic preview with Jcrop, you had to write client code.
+A number of people had difficulty adapting that code to their needs.
+No more! Now just attach a Thumbnailer object. Pass in the Jcrop instance,
+desired width, and height, and you&#39;re done.</p>
+
+<h5>Invocation Code (for this demo)</h5>
+
+<pre><code>$(&#39;#target&#39;).Jcrop({
+  aspectRatio: 1,
+  setSelect: [ 175, 100, 400, 300 ]
+},function(){
+  var jcrop_api = this;
+  new $.Jcrop.component.Thumbnailer(jcrop_api,{ width: 130, height: 130 });
+});</code></pre>
+
+<p>The constructor takes a reference to the Jcrop instance, and allows
+passage of various options such as initial width and height.</p>
+
+<h5>Customize Position and Styling with CSS</h5>
+
+<pre><code>.jcrop-thumb {
+  top: -25px;
+  right: 20px;
+  border: 1px black solid;
+}</code></pre>
+
+<p>The absolutely-positioned, sized thumbnail is appended to the Jcrop
+instance container automatically. It can then be positioned relatively
+to the container by using top/left/bottom/right CSS values. Styling
+such as a border or a box shadow can be added if desired.</p>
+
+<h3>Additional Features</h3>
+
+<ul><li>Can be locked to an individual Selection object.</li><li>Can be resized using <code>resize(w,h)</code> method.</li></ul>
+            <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
+                <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,40 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Non-image Cropping | Jcrop Demos</title>
+    <title>All Jcrop Demos | Jcrop Demos</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="../js/Jcrop.js"></script>
     <script type="text/javascript">
       jQuery(function($){
-        // I did JSON.stringify(jcrop_api.ui.selection.get()) on a crop I liked:
-        var c = {"x":186,"y":218,"x2":564,"y2":281,"w":378,"h":63};
+      
+        // Most basic attachment example
+        $('#target').Jcrop({});
         
-        $('#target').Jcrop({
-          setSelect: [c.x,c.y,c.w,c.h]
-        },function(){
-          this.animateTo([ 18, 11, 713, 170 ]);
-        });
       });
       
     </script>
     <link rel="stylesheet" href="demo_files/main.css">
     <link rel="stylesheet" href="demo_files/demos.css">
     <link rel="stylesheet" href="../css/Jcrop.css">
-    <style>
-      #target {
-        background-color: #ccc;
-        width: 750px;
-        height: 500px;
-        display: block;
-      }
-      #target p {
-        padding: .5em 1em;
-        line-height: 1;
-        font-size: 36px;
-        display: block;
-      }
-      
-    </style>
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -59,24 +40,14 @@
         <div class="span12">
           <div class="jc-demo-box">
             <div class="page-header">
-              <h1>Non-image Cropping</h1>
+              <h1>All Jcrop Demos</h1>
             </div>
-            <div class="demo-nav menu-box">
-              <h3>Jcrop Demos</h3>
-              <ul class="links">
-                <li><a href="basic.html">Hello World</a></li>
-                <li><a href="thumbnail.html">Thumbnail Preview</a></li>
-                <li><a href="panel.html">Feature Panel</a></li>
-                <li><a href="coords.html">Dimensions</a></li>
-                <li><a href="circle.html">Circles</a></li>
-              </ul>
-            </div>
-            <div id="target" class="jcrop-dark jcrop-hl-active"><p><strong>This is an example of attaching Jcrop to a target that is not an image.</strong>
-You are now cropping over &lt;div&gt; content.</p>
-            </div>
-            <div class="description"><p><strong>Attaching Jcrop to a non-image element.</strong><br/>This is mostly useful to implement other interfaces, such as
-<code>canvas</code> or over an arbitrary <code>div</code>.</p>
-            </div>
+            <ul></ul>
+            <li><a href="basic.html">Hello World</a></li>
+            <li><a href="thumbnail.html">Thumbnail Preview</a></li>
+            <li><a href="panel.html">Feature Panel</a></li>
+            <li><a href="coords.html">Dimensions</a></li>
+            <li><a href="circle.html">Circles</a></li>
             <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
               <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
                 <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>

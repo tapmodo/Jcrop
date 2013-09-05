@@ -1,19 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Non-image Cropping | Jcrop Demos</title>
+    <title>Hello World | Jcrop Demos</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="../js/Jcrop.js"></script>
     <script type="text/javascript">
       jQuery(function($){
-        // I did JSON.stringify(jcrop_api.ui.selection.get()) on a crop I liked:
-        var c = {"x":186,"y":218,"x2":564,"y2":281,"w":378,"h":63};
+        var d = document, ge = 'getElementById';
         
-        $('#target').Jcrop({
-          setSelect: [c.x,c.y,c.w,c.h]
-        },function(){
-          this.animateTo([ 18, 11, 713, 170 ]);
+        $('#interface').on('cropmove cropend',function(e,s,c){
+          d[ge]('crop-x').value = c.x;
+          d[ge]('crop-y').value = c.y;
+          d[ge]('crop-w').value = c.w;
+          d[ge]('crop-h').value = c.h;
         });
+        
+        // Most basic attachment example
+        $('#target').Jcrop({
+          boxWidth: 750,
+          setSelect: [ 175, 100, 400, 300 ]
+        });
+        
+        $('#text-inputs').on('change','input',function(e){
+          $('#target').Jcrop('api').animateTo([
+            parseInt(d[ge]('crop-x').value),
+            parseInt(d[ge]('crop-y').value),
+            parseInt(d[ge]('crop-w').value),
+            parseInt(d[ge]('crop-h').value)
+          ]);
+        });
+        
       });
       
     </script>
@@ -21,18 +37,9 @@
     <link rel="stylesheet" href="demo_files/demos.css">
     <link rel="stylesheet" href="../css/Jcrop.css">
     <style>
-      #target {
-        background-color: #ccc;
-        width: 750px;
-        height: 500px;
-        display: block;
-      }
-      #target p {
-        padding: .5em 1em;
-        line-height: 1;
-        font-size: 36px;
-        display: block;
-      }
+      #text-inputs { margin: 10px 8px 0; }
+      .input-group { margin-right: 1.5em; }
+      .nav-box { width: 748px; padding: 0 !important; margin: 4px 0; background-color: #f8f8f7; }
       
     </style>
   </head>
@@ -59,23 +66,26 @@
         <div class="span12">
           <div class="jc-demo-box">
             <div class="page-header">
-              <h1>Non-image Cropping</h1>
+              <h1>Hello World</h1>
             </div>
             <div class="demo-nav menu-box">
               <h3>Jcrop Demos</h3>
               <ul class="links">
-                <li><a href="basic.html">Hello World</a></li>
+                <li><b>Hello World</b></li>
                 <li><a href="thumbnail.html">Thumbnail Preview</a></li>
                 <li><a href="panel.html">Feature Panel</a></li>
                 <li><a href="coords.html">Dimensions</a></li>
                 <li><a href="circle.html">Circles</a></li>
               </ul>
             </div>
-            <div id="target" class="jcrop-dark jcrop-hl-active"><p><strong>This is an example of attaching Jcrop to a target that is not an image.</strong>
-You are now cropping over &lt;div&gt; content.</p>
-            </div>
-            <div class="description"><p><strong>Attaching Jcrop to a non-image element.</strong><br/>This is mostly useful to implement other interfaces, such as
-<code>canvas</code> or over an arbitrary <code>div</code>.</p>
+            <div id="interface" class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/lake4-1500.jpg" id="target"></div>
+            <div class="nav-box">
+              <form onsubmit="return false;" id="text-inputs"><span class="input-group"><b>X</b>
+                  <input type="text" name="cx" id="crop-x" class="span1"></span><span class="input-group"><b>Y</b>
+                  <input type="text" name="cy" id="crop-y" class="span1"></span><span class="input-group"><b>W</b>
+                  <input type="text" name="cw" id="crop-w" class="span1"></span><span class="input-group"><b>H</b>
+                  <input type="text" name="ch" id="crop-h" class="span1"></span>
+              </form>
             </div>
             <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
               <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>

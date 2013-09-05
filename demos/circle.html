@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Circles | Jcrop Demos</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="../js/Jcrop.js"></script>
+    <script type="text/javascript">
+      var cb, filter;
+      
+      jQuery(function($){
+      
+        // Create a new Selection object extended from Selection
+        var CircleSel = function(core){
+          this.core = core;
+        };
+        
+        // Extend this object's prototype with the Selection.prototype
+        // And extend with some additional/updated methods
+        $.extend(CircleSel.prototype,$.Jcrop.component.Selection.prototype,{
+          zoomscale: 1.4,
+          attach: function(){
+            this.frame.css({
+              background: 'url(' + $('#target')[0].src.replace('750','1050') + ')'
+            });
+          },
+          positionBg: function(b){
+            var midx = ( b.x + b.x2 ) / 2;
+            var midy = ( b.y + b.y2 ) / 2;
+            var ox = (-midx*this.zoomscale)+(b.w/2);
+            var oy = (-midy*this.zoomscale)+(b.h/2);
+            this.frame.css({ backgroundPosition: ox+'px '+oy+'px' });
+          },
+          redraw: function(b){
+          
+            // Call original update() method first, with arguments
+            $.Jcrop.component.Selection.prototype.redraw.call(this,b);
+            
+            this.positionBg(this.last);
+            return this;
+          },
+          prototype: $.Jcrop.component.Selection.prototype
+        });
+        
+        // Now set it as the component that is used for new selections
+        
+        $('#target').Jcrop({
+          selectionComponent: CircleSel,
+          aspectRatio: 1,
+          handles: [ 'n','s','e','w' ],
+          dragbars: [ ],
+          borders: [ ]
+        },function(){
+          this.container.addClass('jcrop-circle-demo');
+          interface_load(this);
+        });
+        
+        function interface_load(obj){
+          cb = obj;
+          
+          cb.ui.stage.dragger.multi = false;
+          //cb.ui.stage.dragger.offset = [ -10, -10 ];
+          
+          cb.container.append($('<div />').css({
+            position: 'absolute',
+            top: '0px',
+            left: '0px',
+            backgroundColor: 'black',
+            width: '100%',
+            height: '100%',
+            opacity: .4
+          }));
+          
+          cb.newSelection().update($.Jcrop.wrapFromXywh([ 147, 55, 456, 390 ])).refresh();
+          cb.ui.selection.removeFilter(cb.filter.shader);
+          cb.ui.selection.refresh();
+          
+          function random_coords() {
+            return [
+              Math.random()*300,
+              Math.random()*200,
+              (Math.random()*540)+50,
+              (Math.random()*340)+60
+            ];
+          }
+          
+          // Settings Buttons
+          $(document.body).on('click','[data-setting]',function(e){
+            var $targ = $(e.target),
+                setting = $targ.data('setting'),
+                value = $targ.data('value'),
+                opt = {};
+                
+            opt[setting] = value;
+            cb.setOptions(opt);
+            
+            $targ.closest('.btn-group').find('.active').removeClass('active');
+            $targ.addClass('active');
+            
+            if ((setting == 'multi') && !value) {
+              var m = cb.ui.multi, s = cb.ui.selection;
+              
+              for(var i=0;i<m.length;i++)
+                if (s !== m[i]) m[i].remove();
+                
+              cb.ui.multi = [ s ];
+              s.focus();
+            }
+            
+            e.preventDefault();
+          });
+          
+          // Animate button event
+          $(document.body).on('click','[data-action]',function(e){
+            var $targ = $(e.target);
+            var action = $targ.data('action');
+            
+            switch(action){
+              case 'random-move':
+                cb.ui.selection.animateTo(random_coords());
+                break;
+            }
+            
+            cb.ui.selection.refresh();
+            
+          }).on('selectstart',function(e){
+            e.preventDefault();
+          }).on('click','a[data-action]',function(e){
+            e.preventDefault();
+          });
+        }
+        
+      });
+      
+    </script>
+    <link rel="stylesheet" href="demo_files/main.css">
+    <link rel="stylesheet" href="demo_files/demos.css">
+    <link rel="stylesheet" href="../css/Jcrop.css">
+    <link rel="stylesheet" href="http://jcrop-dev.tapmodo.com/Jcrop/demos/demo_files/extras.css">
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" data-toggle="collapse" data-target="nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="../" class="brand">Jcrop</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active"><a href="./basic.html">Demos</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/doc/">Docs</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/contact/">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+          <div class="jc-demo-box">
+            <div class="page-header">
+              <h1>Circles</h1>
+            </div>
+            <div class="demo-nav menu-box">
+              <h3>Jcrop Demos</h3>
+              <ul class="links">
+                <li><a href="basic.html">Hello World</a></li>
+                <li><a href="thumbnail.html">Thumbnail Preview</a></li>
+                <li><a href="panel.html">Feature Panel</a></li>
+                <li><a href="coords.html">Dimensions</a></li>
+                <li><b>Circles</b></li>
+              </ul>
+            </div>
+            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/lake3-750.jpg" id="target">
+              <div class="btn-toolbar"><a href="#" data-action="random-move" id="moveselection" class="btn btn-small">Move</a><span class="btn-group"><a href="#" data-setting="aspectRatio" data-value="1" class="btn active btn-small">Circle</a><a href="#" data-setting="aspectRatio" data-value="0" class="btn btn-small">Ellipse</a></span><span class="btn-group"><a href="#" data-setting="multi" data-value="0" class="btn active btn-small">Single </a><a href="#" data-setting="multi" data-value="1" class="btn btn-small">Multi</a></span></div>
+              <h3>About This Demo</h3><p><strong>And you thought Jcrop could only do rectangles!</strong> Well, that&#39;s still
+mostly true. This demo implements a custom <code>Selection</code> object that
+uses CSS properties to create the appearance of circles and ellipses.</p>
+
+<h4>Custom CSS and Shading</h4>
+
+<p>By setting the CSS property <code>border-radius: 50%</code>, we can give the
+selection an appearance of a circle or an ellipse. The built-in
+shader filter has been disabled, and a semi-opaque <code>&lt;div&gt;</code> has been
+inserted over the image to give the appearance of shading.</p>
+
+<h4>Magnification Illusion</h4>
+
+<p>The custom <code>Selection</code> object also inserts an image as its background
+to enable the shading effect. In this case, the image is similar to
+the original image but slightly larger, to provide the illusion of
+magnification. As the selection is moved, the background position is
+updated to reflect the correct position over the underlying image.</p>
+
+<h4>Cropping Irregular Selections</h4>
+
+<p>If you actually want to <em>crop</em> a circle or an ellipse, you&#39;re on
+your own. Jcrop will provide the rectangular coordinates for these
+crops, and further processing can be done to extract the circle
+or ellipse from the image.</p>
+            </div>
+            <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
+                <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
