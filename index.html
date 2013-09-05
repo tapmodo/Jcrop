@@ -1,84 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Jcrop: the jQuery Image Cropping Plugin</title>
-  <link rel="stylesheet" href="demos/demo_files/main.css" type="text/css" />
-  <link rel="stylesheet" href="demos/demo_files/demos.css" type="text/css" />
-  <script src="js/jquery.min.js"></script>
-  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-</head>
-<body>
+  <head>
+    <title>Jcrop v2.0.0-RC1 | Jcrop Jcrop</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="demos/demo_files/main.css">
+    <link rel="stylesheet" href="demos/demo_files/demos.css">
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" data-toggle="collapse" data-target="nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a class="brand">Jcrop</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="demos/">Demos</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/doc/">Docs</a>
+              </li>
+              <li><a href="http://beta.jcrop.org/contact/">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="span12">
+          <div class="jc-demo-box">
+            <div class="page-header">
+              <ul class="breadcrumb first">
+                <li><a href="http://jcrop.org/">Jcrop.org</a><span class="divider">/</span></li>
+                <li class="active">Jcrop v2.0.0-RC1</li>
+              </ul>
+              <h1>Jcrop v2.0.0-RC1</h1>
+            </div>
+            <div class="main-menu menu-box">
+              <h3>Jcrop Demos</h3>
+              <ul class="links">
+                <li><a href="demos/basic.html">Hello World</a></li>
+                <li><a href="demos/thumbnail.html">Thumbnail Preview</a></li>
+                <li><a href="demos/panel.html">Feature Panel</a></li>
+                <li><a href="demos/coords.html">Dimensions</a></li>
+                <li><a href="demos/circle.html">Circles</a></li>
+              </ul>
+            </div>
+            <p><b>Build Date:</b> Thu Sep 05 2013 15:13:22 GMT+0000 (UTC)</p><h3>What&#39;s Included</h3>
 
-<div class="container">
-<div class="row">
-<div class="span12">
-<div class="jc-demo-box">
+<p>The this archive contains the latest version of <strong>Jcrop</strong>,
+comprised of the following:</p>
 
-<div class="page-header">
-<ul class="breadcrumb first">
-  <li><a href="http://tapmodo.com/">Tapmodo</a> <span class="divider">/</span></li>
-  <li class="active">Jcrop Plugin</li>
-</ul>
-<h1>Jcrop Image Cropping Plugin</h1>
-</div>
+<ul><li>Latest version of <a href="js/Jcrop.js"><strong>Jcrop.js</strong></a> and <a href="css/Jcrop.css"><strong>Jcrop.css</strong></a>, the primary requisite files</li><li>Minimized versions of both of the above (<a href="js/Jcrop.min.js">Jcrop.min.js</a>, <a href="css/Jcrop.min.css">Jcrop.min.css</a>)</li><li>Several demos are also included, see links in menu at right</li></ul>
+            <hr><h1>Jcrop Image Cropping Plugin</h1>
 
+<p>Jcrop is the quick and easy way to add image cropping functionality to
+your web application. It combines the ease-of-use of a typical jQuery
+plugin with a powerful cross-platform DHTML cropping engine that is
+faithful to familiar desktop graphics applications.</p>
 
-<big>
-	<a href="http://deepliquid.com/content/Jcrop.html"><b>Jcrop</b></a>
-	is the image cropping plugin for
-	<a href="http://jquery.com/">jQuery</a>.<br />
-	You've successfully unpacked Jcrop.
-</big>
+<h3>Feature Overview</h3>
 
-<h3>Static Demos</h3>
+<ul><li>Attaches unobtrusively to any image or block element</li><li>Completely based on true prototypical Javascript objects for extreme flexibility</li><li>Supports multiple active selections, per-selection customization</li><li>Supports aspect ratio locking, minimum/maximum size, and other features</li><li>Acts as in-line form element, can receive focus, tab through</li><li>Keyboard support for nuding selections and trapping other keys</li><li>Inherently API-driven and stylable with CSS</li></ul>
 
-<ul>
-	<li><a href="demos/tutorial1.html">Hello World</a>
-		&mdash; default behavior</li>
-	<li><a href="demos/tutorial2.html">Basic Handler</a>
-		&mdash; basic form integration</li>
-	<li><a href="demos/tutorial3.html">Aspect Ratio w/ Preview Pane</a>
-		&mdash; nice visual example</li>
-	<li><a href="demos/tutorial4.html">Animation/Transitions</a>
-		&mdash; animation/fading demo</li>
-	<li><a href="demos/tutorial5.html">API Interface</a>
-		&mdash; real-time API example</li>
-	<li><a href="demos/styling.html">Styling Example</a>
-		&mdash; style Jcrop dynamically with CSS
-    <small>New in 0.9.10</small>
-    </li>
-  <li><a href="demos/non-image.html">Non-Image Elements</a>
-    &mdash; attach to other DOM block elements
-    <small>New in 0.9.10</small>
-    </li>
-</ul>
+<h3>Cross-platform Compatibility</h3>
 
-<h3>Live Demo</h3>
+<p>The current version of Jcrop has been cross-platform tested and core functionality
+works in all the following browsers:</p>
 
-<ul>
-	<li><a href="demos/crop.php">PHP Cropping Demo</a>
-		&mdash; requires PHP/gd support</li>
-</ul>
+<ul><li>Firefox 3+</li><li>Safari 4+</li><li>Opera 9.5+</li><li>Google Chrome 14+</li><li>Internet Explorer 7+</li></ul>
 
-<h3>Jcrop Links</h3>
+<p>Older versions of some browsers may also work.</p>
 
-<ul>
-	<li><a href="http://deepliquid.com/content/Jcrop.html">Jcrop Home</a></li>
-	<li><a href="http://deepliquid.com/content/Jcrop_Manual.html">Jcrop Manual</a></li>
-</ul>
+<p>Always thoroughly test any desired functionality on all target platforms and devices.</p>
 
-<div class="tapmodo-footer">
-  <a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
-  <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b><br />
-    Jcrop is free software released under <a href="MIT-LICENSE.txt">MIT License</a>
-  </div>
-</div>
-<div class="clearfix"></div>
+<h5>Legacy IE Compatibility</h5>
 
-</div>
-</div>
-</div>
-</div>
+<p>Internet Explorer 6 suffers some visual problems with the new CSS structure
+and will not be explicitly supported from v2.x and up. Currently Jcrop can still
+be used in IE6, it just looks ugly. IE7 and newer versions deliver a nearly flawless
+Jcrop experience.</p>
 
-</body>
+<hr/>
+
+<h2>MIT License</h2>
+
+<p><strong>Jcrop is free software under MIT License.</strong></p>
+
+<h4>Copyright (c) 2008-2013 Tapmodo Interactive LLC</h4>
+
+<h5><a href="http://github.com/tapmodo/Jcrop">http://github.com/tapmodo/Jcrop</a></h5>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+&quot;Software&quot;), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+            <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
+                <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
