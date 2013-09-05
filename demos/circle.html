@@ -17,10 +17,10 @@
         // Extend this object's prototype with the Selection.prototype
         // And extend with some additional/updated methods
         $.extend(CircleSel.prototype,$.Jcrop.component.Selection.prototype,{
-          zoomscale: 1.4,
+          zoomscale: 1,
           attach: function(){
             this.frame.css({
-              background: 'url(' + $('#target')[0].src.replace('750','1050') + ')'
+              background: 'url(' + $('#target')[0].src.replace('750','750') + ')'
             });
           },
           positionBg: function(b){
@@ -28,7 +28,8 @@
             var midy = ( b.y + b.y2 ) / 2;
             var ox = (-midx*this.zoomscale)+(b.w/2);
             var oy = (-midy*this.zoomscale)+(b.h/2);
-            this.frame.css({ backgroundPosition: ox+'px '+oy+'px' });
+            //this.frame.css({ backgroundPosition: ox+'px '+oy+'px' });
+            this.frame.css({ backgroundPosition: -(b.x+1)+'px '+(-b.y-1)+'px' });
           },
           redraw: function(b){
           
@@ -41,9 +42,11 @@
           prototype: $.Jcrop.component.Selection.prototype
         });
         
-        // Now set it as the component that is used for new selections
+        $.Jcrop.defaults.applyFilters = [ 'constrain', 'extent', 'backoff', 'ratio', 'round' ];
         
+        // Now set it as the component that is used for new selections
         $('#target').Jcrop({
+          setSelect: [ 147, 55, 456, 390 ],
           selectionComponent: CircleSel,
           aspectRatio: 1,
           handles: [ 'n','s','e','w' ],
@@ -57,9 +60,7 @@
         function interface_load(obj){
           cb = obj;
           
-          cb.ui.stage.dragger.multi = false;
-          //cb.ui.stage.dragger.offset = [ -10, -10 ];
-          
+          // Add in a custom shading element...
           cb.container.append($('<div />').css({
             position: 'absolute',
             top: '0px',
@@ -69,10 +70,6 @@
             height: '100%',
             opacity: .4
           }));
-          
-          cb.newSelection().update($.Jcrop.wrapFromXywh([ 147, 55, 456, 390 ])).refresh();
-          cb.ui.selection.removeFilter(cb.filter.shader);
-          cb.ui.selection.refresh();
           
           function random_coords() {
             return [
