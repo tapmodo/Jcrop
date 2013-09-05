@@ -5198,3 +5198,6 @@ a.badge:focus {
 .modal-body {
   max-height: 60%;
 }
+.table.option-list td small {
+  display: block;
+}
