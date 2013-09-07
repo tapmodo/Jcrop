@@ -14,9 +14,18 @@ module.exports = function(grunt) {
     'src/outro.js'
   ];
 
+  var json = grunt.file.readJSON('package.json');
+
   // Project configuration
   grunt.initConfig({
-    pkg: grunt.file.readJSON('package.json'),
+    pkg: json,
+    sed: {
+      version: {
+        path: 'css/Jcrop.css',
+        pattern: '%%VERSION%%',
+        replacement: '<%= pkg.version %>'
+      }
+    },
     watch: {
       css: {
         files: [ 'src/**/*.less' ],
@@ -50,6 +59,7 @@ module.exports = function(grunt) {
     cssmin: {
       dist: {
         options: {
+          keepSpecialComments: 0,
           banner: '/*! <%= pkg.name %>.min.css v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
             ' *  Copyright 2008-2013 Tapmodo Interactive LLC\n' +
             ' *  Free software under MIT License\n'+
@@ -80,10 +90,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-sed');
 
   // Default tasks
   grunt.registerTask('default', ['js','css']);
   grunt.registerTask('js', ['concat','uglify']);
-  grunt.registerTask('css', ['less','cssmin']);
+  grunt.registerTask('css', ['less','sed','cssmin']);
 
 };
