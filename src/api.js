@@ -254,20 +254,24 @@
     // }}}
     // deleteSelection: function(){{{
     deleteSelection: function(){
-      this.removeSelection(this.ui.selection);
-      this.ui.multi[0].focus();
-      this.ui.selection.refresh();
+      if (this.ui.selection) {
+        this.removeSelection(this.ui.selection);
+        this.ui.multi[0].focus();
+        this.ui.selection.refresh();
+      }
     },
     // }}}
     // animateTo: function(box){{{
     animateTo: function(box){
-      this.ui.selection.animateTo(box);
+      if (this.ui.selection)
+        this.ui.selection.animateTo(box);
       return this;
     },
     // }}}
     // setselect: function(box){{{
     setSelect: function(box){
-      this.ui.selection.update(Jcrop.wrapFromXywh(box));
+      if (this.ui.selection)
+        this.ui.selection.update(Jcrop.wrapFromXywh(box));
       return this;
     },
     // }}}
@@ -315,7 +319,8 @@
     // }}}
     // update: function(b){{{
     update: function(b){
-      this.ui.selection.update(b);
+      if (this.ui.selection)
+        this.ui.selection.update(b);
     }
     // }}}
   });
