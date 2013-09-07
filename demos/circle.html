@@ -131,8 +131,23 @@
     </script>
     <link rel="stylesheet" href="demo_files/main.css">
     <link rel="stylesheet" href="demo_files/demos.css">
-    <link rel="stylesheet" href="../css/Jcrop.css">
-    <link rel="stylesheet" href="http://jcrop-dev.tapmodo.com/Jcrop/demos/demo_files/extras.css">
+    <link rel="stylesheet" href="../css/Jcrop.css"><style type="text/css">.jcrop-circle-demo .jcrop-box {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  border: 1px rgba(255, 255, 255, 0.4) solid;
+  border-radius: 50%;
+  -webkit-box-shadow: 1px 1px 26px #000000;
+  -moz-box-shadow: 1px 1px 26px #000000;
+  box-shadow: 1px 1px 26px #000000;
+  overflow: hidden;
+}
+.jcrop-circle-demo .jcrop-box:focus {
+  outline: none;
+}
+</style>
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -169,7 +184,7 @@
                 <li><b>Circles</b></li>
               </ul>
             </div>
-            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/lake3-750.jpg" id="target">
+            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/sierra2-750.jpg" id="target">
               <div class="btn-toolbar"><a href="#" data-action="random-move" id="moveselection" class="btn btn-small">Move</a><span class="btn-group"><a href="#" data-setting="aspectRatio" data-value="1" class="btn active btn-small">Circle</a><a href="#" data-setting="aspectRatio" data-value="0" class="btn btn-small">Ellipse</a></span><span class="btn-group"><a href="#" data-setting="multi" data-value="0" class="btn active btn-small">Single </a><a href="#" data-setting="multi" data-value="1" class="btn btn-small">Multi</a></span></div>
               <h3>About This Demo</h3><p><strong>And you thought Jcrop could only do rectangles!</strong> Well, that&#39;s still
 mostly true. This demo implements a custom <code>Selection</code> object that
@@ -181,14 +196,6 @@ uses CSS properties to create the appearance of circles and ellipses.</p>
 selection an appearance of a circle or an ellipse. The built-in
 shader filter has been disabled, and a semi-opaque <code>&lt;div&gt;</code> has been
 inserted over the image to give the appearance of shading.</p>
-
-<h4>Magnification Illusion</h4>
-
-<p>The custom <code>Selection</code> object also inserts an image as its background
-to enable the shading effect. In this case, the image is similar to
-the original image but slightly larger, to provide the illusion of
-magnification. As the selection is moved, the background position is
-updated to reflect the correct position over the underlying image.</p>
 
 <h4>Cropping Irregular Selections</h4>
 
