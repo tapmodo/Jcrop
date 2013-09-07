@@ -309,9 +309,6 @@
         t.refresh();
         t.container.trigger('cropimage',[t,targ]);
 
-        //$(t.opt.imgTarget).before(this.element).remove();
-        //t.opt.imgTarget = this.element;
-
         if (typeof cb == 'function')
           cb.call(t,w,h);
       });
