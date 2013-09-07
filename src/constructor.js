@@ -10,7 +10,7 @@
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie_lt9 = /msie [1-8]\./.test(_ua);
 
-    this.container.addClass(this.opt.cssclass.container);
+    this.container.addClass(this.opt.css_container);
 
     this.ui = {};
     this.state = null;

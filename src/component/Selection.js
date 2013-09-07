@@ -41,12 +41,12 @@
       // }}}
       // startup: function(){{{
       startup: function(){
-        var t = this, css = t.core.opt.cssclass;
+        var t = this, o = t.core.opt;
         $.extend(t,Selection.defaults);
         t.filter = t.core.getDefaultFilters();
 
-        t.element = $('<div />').addClass(css.selection).data({ selection: t });
-        t.frame = $('<button />').addClass(css.button).data('ord','move');
+        t.element = $('<div />').addClass(o.css_selection).data({ selection: t });
+        t.frame = $('<button />').addClass(o.css_button).data('ord','move');
         t.element.append(t.frame).appendTo(t.core.container);
 
         // IE background/draggable hack
@@ -169,7 +169,7 @@
 
         this.focus();
 
-        if ((ord == 'move') && t.element.hasClass(t.core.opt.cssclass.nodrag))
+        if ((ord == 'move') && t.element.hasClass(t.core.opt.css_nodrag))
           return false;
 
         this.state = new Jcrop.component.DragState(e,this,ord);
@@ -188,22 +188,22 @@
       // }}}
       // allowDrag: function(v){{{
       allowDrag: function(v){
-        var t = this, css = t.core.opt.cssclass;
+        var t = this, o = t.core.opt;
         if (v == undefined) v = t.canDrag;
 
-        if (v && t.canDrag) t.element.removeClass(css.nodrag);
-          else t.element.addClass(css.nodrag);
+        if (v && t.canDrag) t.element.removeClass(o.css_nodrag);
+          else t.element.addClass(o.css_nodrag);
 
         return this;
       },
       // }}}
       // allowResize: function(v){{{
       allowResize: function(v){
-        var t = this, css = t.core.opt.cssclass;
+        var t = this, o = t.core.opt;
         if (v == undefined) v = t.canResize;
 
-        if (v && t.canResize) t.element.removeClass(css.noresize);
-          else t.element.addClass(css.noresize);
+        if (v && t.canResize) t.element.removeClass(o.css_noresize);
+          else t.element.addClass(o.css_noresize);
 
         return this;
       },
@@ -325,13 +325,13 @@
           d = o.dragbars;
 
         for(i=0; i<b.length; i++)
-          fr.append(t.createElement(o.cssclass.borders,b[i]));
+          fr.append(t.createElement(o.css_borders,b[i]));
 
         for(i=0; i<d.length; i++)
-          fr.append(t.createElement(o.cssclass.dragbars,d[i]));
+          fr.append(t.createElement(o.css_dragbars,d[i]));
 
         for(i=0; i<h.length; i++)
-          fr.append(t.createElement(o.cssclass.handles,h[i]));
+          fr.append(t.createElement(o.css_handles,h[i]));
       }
       //}}}
     }

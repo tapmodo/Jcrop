@@ -23,7 +23,7 @@
       if (!t.attached) {
         t.visible = false;
 
-        t.container = $('<div />').addClass(t.core.opt.cssclass.shades)
+        t.container = $('<div />').addClass(t.core.opt.css_shades)
           .prependTo(this.core.container).hide();
 
         t.elh = this.core.container.height();

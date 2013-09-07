@@ -88,7 +88,7 @@
 
         c.container.on(
           'touchstart.jcrop.jcrop-touch',
-          '.'+c.opt.cssclass.drag,
+          '.'+c.opt.css_drag,
           t.dragWrap(c.startDrag())
         );
       }

@@ -173,7 +173,7 @@
     initEvents: function(){
       var t = this;
       t.container.on('selectstart',function(e){ return false; })
-        .on('mousedown','.'+t.opt.cssclass.drag,t.startDrag());
+        .on('mousedown','.'+t.opt.css_drag,t.startDrag());
     },
     //}}}
     // maxSelect: function(){{{
@@ -276,7 +276,7 @@
       var t = this;
       return function(e){
         var $targ = $(e.target);
-        var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
+        var selection = $targ.closest('.'+t.opt.css_selection).data('selection');
         var ord = $targ.data('ord');
         t.container.trigger('cropstart',[selection,t.unscale(selection.get())]);
         selection.startDrag(e,ord);

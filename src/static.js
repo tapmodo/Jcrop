@@ -64,18 +64,16 @@
       // for better customization. Currently if you try to extend one
       // via an options object to Jcrop, it will wipe out all
       // the others you don't specify. Be careful for now!
-      cssclass: {
-        container: 'jcrop-active',
-        shades: 'jcrop-shades',
-        selection: 'jcrop-selection',
-        borders: 'jcrop-border',
-        handles: 'jcrop-handle jcrop-drag',
-        button: 'jcrop-box jcrop-drag',
-        drag: 'jcrop-drag',
-        nodrag: 'jcrop-nodrag',
-        noresize: 'jcrop-noresize',
-        dragbars: 'jcrop-dragbar jcrop-drag'
-      }
+      css_nodrag: 'jcrop-nodrag',
+      css_drag: 'jcrop-drag',
+      css_container: 'jcrop-active',
+      css_shades: 'jcrop-shades',
+      css_selection: 'jcrop-selection',
+      css_borders: 'jcrop-border',
+      css_handles: 'jcrop-handle jcrop-drag',
+      css_button: 'jcrop-box jcrop-drag',
+      css_noresize: 'jcrop-noresize',
+      css_dragbars: 'jcrop-dragbar jcrop-drag'
     },
     //}}}
     //filter: built-in filter collection {{{
