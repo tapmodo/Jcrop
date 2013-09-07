@@ -1,10 +1,46 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20130905
+/*! Jcrop.js v2.0.0-RC1 - build: 20130907
  *  @copyright 2008-2013 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
  **/
 (function($){
   'use strict';
+
+  /**
+   *  BackoffFilter
+   *  move out-of-bounds selection into allowed position at same size
+   */
+  var BackoffFilter = function(){
+    this.minw = 40;
+    this.minh = 40;
+    this.maxw = 0;
+    this.maxh = 0;
+    this.core = null;
+  };
+  $.extend(BackoffFilter.prototype,{
+    tag: 'backoff',
+    priority: 22,
+    filter: function(b){
+      var r = this.bound;
+
+      if (b.x < r.minx) { b.x = r.minx; b.x2 = b.w + b.x; }
+      if (b.y < r.miny) { b.y = r.miny; b.y2 = b.h + b.y; }
+      if (b.x2 > r.maxx) { b.x2 = r.maxx; b.x = b.x2 - b.w; }
+      if (b.y2 > r.maxy) { b.y2 = r.maxy; b.y = b.y2 - b.h; }
+
+      return b;
+    },
+    refresh: function(sel){
+      this.elw = sel.core.container.width();
+      this.elh = sel.core.container.height();
+      this.bound = {
+        minx: 0 + sel.edge.w,
+        miny: 0 + sel.edge.n,
+        maxx: this.elw + sel.edge.e,
+        maxy: this.elh + sel.edge.s
+      };
+    }
+  });
 
   /**
    *  ConstrainFilter
@@ -100,38 +136,30 @@
   });
 
   /**
-   *  BackoffFilter
-   *  move out-of-bounds selection into allowed position at same size
+   *  GridFilter
+   *  a rudimentary grid effect
    */
-  var BackoffFilter = function(){
-    this.minw = 40;
-    this.minh = 40;
-    this.maxw = 0;
-    this.maxh = 0;
+  var GridFilter = function(){
+    this.stepx = 1;
+    this.stepy = 1;
     this.core = null;
   };
-  $.extend(BackoffFilter.prototype,{
-    tag: 'backoff',
-    priority: 22,
+  $.extend(GridFilter.prototype,{
+    tag: 'grid',
+    priority: 19,
     filter: function(b){
-      var r = this.bound;
-
-      if (b.x < r.minx) { b.x = r.minx; b.x2 = b.w + b.x; }
-      if (b.y < r.miny) { b.y = r.miny; b.y2 = b.h + b.y; }
-      if (b.x2 > r.maxx) { b.x2 = r.maxx; b.x = b.x2 - b.w; }
-      if (b.y2 > r.maxy) { b.y2 = r.maxy; b.y = b.y2 - b.h; }
-
-      return b;
-    },
-    refresh: function(sel){
-      this.elw = sel.core.container.width();
-      this.elh = sel.core.container.height();
-      this.bound = {
-        minx: 0 + sel.edge.w,
-        miny: 0 + sel.edge.n,
-        maxx: this.elw + sel.edge.e,
-        maxy: this.elh + sel.edge.s
+      
+      var n = {
+        x: Math.round(b.x / this.stepx) * this.stepx,
+        y: Math.round(b.y / this.stepy) * this.stepy,
+        x2: Math.round(b.x2 / this.stepx) * this.stepx,
+        y2: Math.round(b.y2 / this.stepy) * this.stepy
       };
+      
+      n.w = n.x2 - n.x;
+      n.h = n.y2 - n.y;
+
+      return n;
     }
   });
 
@@ -263,7 +291,7 @@
       if (!t.attached) {
         t.visible = false;
 
-        t.container = $('<div />').addClass(t.core.opt.cssclass.shades)
+        t.container = $('<div />').addClass(t.core.opt.css_shades)
           .prependTo(this.core.container).hide();
 
         t.elh = this.core.container.height();
@@ -361,31 +389,75 @@
   });
 
   /**
-   *  GridFilter
-   *  a rudimentary grid effect
+   *  CropAnimator
+   *  manages smooth cropping animation
+   *
+   *  This object is called internally to manage animation.
+   *  An in-memory div is animated and a progress callback
+   *  is used to update the selection coordinates of the
+   *  visible selection in realtime.
    */
-  var GridFilter = function(){
-    this.stepx = 1;
-    this.stepy = 1;
-    this.core = null;
+  // var CropAnimator = function(selection){{{
+  var CropAnimator = function(selection){
+    this.selection = selection;
+    this.core = selection.core;
   };
-  $.extend(GridFilter.prototype,{
-    tag: 'grid',
-    priority: 19,
-    filter: function(b){
-      
-      var n = {
-        x: Math.round(b.x / this.stepx) * this.stepx,
-        y: Math.round(b.y / this.stepy) * this.stepy,
-        x2: Math.round(b.x2 / this.stepx) * this.stepx,
-        y2: Math.round(b.y2 / this.stepy) * this.stepy
-      };
-      
-      n.w = n.x2 - n.x;
-      n.h = n.y2 - n.y;
+  // }}}
 
-      return n;
+  $.extend(CropAnimator.prototype,{
+    // getElement: function(){{{
+    getElement: function(){
+      var b = this.selection.get();
+
+      return $('<div />')
+        .css({
+          position: 'absolute',
+          top: b.y+'px',
+          left: b.x+'px',
+          width: b.w+'px',
+          height: b.h+'px'
+        });
+    },
+    // }}}
+    // animate: function(x,y,w,h,cb){{{
+    animate: function(x,y,w,h,cb){
+      var t = this;
+
+      t.selection.allowResize(false);
+
+      t.getElement().animate({
+        top: y+'px',
+        left: x+'px',
+        width: w+'px',
+        height: h+'px'
+      },{
+        easing: t.core.opt.animEasing,
+        duration: t.core.opt.animDuration,
+        complete: function(){
+          t.selection.allowResize(true);
+          cb && cb.call(this);
+        },
+        progress: function(anim){
+          var props = {}, i, tw = anim.tweens;
+
+          for(i=0;i<tw.length;i++){
+            props[tw[i].prop] = tw[i].now; }
+
+          var b = {
+            x: parseInt(props.left),
+            y: parseInt(props.top),
+            w: parseInt(props.width),
+            h: parseInt(props.height)
+          };
+
+          b.x2 = b.x + b.w;
+          b.y2 = b.y + b.h;
+
+          t.selection.updateRaw(b,'se');
+        }
+      });
     }
+    // }}}
   });
 
   /**
@@ -541,608 +613,6 @@
   });
 
   /**
-   *  CropAnimator
-   *  manages smooth cropping animation
-   *
-   *  This object is called internally to manage animation.
-   *  An in-memory div is animated and a progress callback
-   *  is used to update the selection coordinates of the
-   *  visible selection in realtime.
-   */
-  // var CropAnimator = function(selection){{{
-  var CropAnimator = function(selection){
-    this.selection = selection;
-    this.core = selection.core;
-  };
-  // }}}
-
-  $.extend(CropAnimator.prototype,{
-    // getElement: function(){{{
-    getElement: function(){
-      var b = this.selection.get();
-
-      return $('<div />')
-        .css({
-          position: 'absolute',
-          top: b.y+'px',
-          left: b.x+'px',
-          width: b.w+'px',
-          height: b.h+'px'
-        });
-    },
-    // }}}
-    // animate: function(x,y,w,h,cb){{{
-    animate: function(x,y,w,h,cb){
-      var t = this;
-
-      t.selection.allowResize(false);
-
-      t.getElement().animate({
-        top: y+'px',
-        left: x+'px',
-        width: w+'px',
-        height: h+'px'
-      },{
-        easing: t.core.opt.animEasing,
-        duration: t.core.opt.animDuration,
-        complete: function(){
-          t.selection.allowResize(true);
-          cb && cb.call(this);
-        },
-        progress: function(anim){
-          var props = {}, i, tw = anim.tweens;
-
-          for(i=0;i<tw.length;i++){
-            props[tw[i].prop] = tw[i].now; }
-
-          var b = {
-            x: parseInt(props.left),
-            y: parseInt(props.top),
-            w: parseInt(props.width),
-            h: parseInt(props.height)
-          };
-
-          b.x2 = b.x + b.w;
-          b.y2 = b.y + b.h;
-
-          t.selection.updateRaw(b,'se');
-        }
-      });
-    }
-    // }}}
-  });
-
-  /**
-   *  KeyWatcher
-   *  provides keyboard support
-   */
-  // var KeyWatcher = function(core){{{
-  var KeyWatcher = function(core){
-    this.core = core;
-    this.init();
-  };
-  // }}}
-  // KeyWatcher.defaults = {{{
-  KeyWatcher.defaults = {
-    passthru: [ 9 ],
-    debug: false
-  };
-  // }}}
-
-  $.extend(KeyWatcher.prototype,{
-    // init: function(){{{
-    init: function(){
-      $.extend(this,KeyWatcher.defaults);
-      this.enable();
-    },
-    // }}}
-    // disable: function(){{{
-    disable: function(){
-      this.core.container.off('keydown.jcrop');
-    },
-    // }}}
-    // enable: function(){{{
-    enable: function(){
-      var t = this, m = t.core;
-      m.container.on('keydown.jcrop',function(e){
-        var nudge = e.shiftKey? 16: 2;
-
-        if ($.inArray(e.keyCode,t.passthru) >= 0)
-          return true;
-
-        switch(e.keyCode){
-          case 37: m.nudge(-nudge,0); break;
-          case 38: m.nudge(0,-nudge); break;
-          case 39: m.nudge(nudge,0); break;
-          case 40: m.nudge(0,nudge); break;
-
-          case 46:
-          case 8:
-            m.requestDelete();
-            return false;
-            break;
-
-          default:
-            if (t.debug) console.log('keycode: ' + e.keyCode);
-            break;
-        }
-
-        if (!e.metaKey && !e.ctrlKey)
-          e.preventDefault();
-      });
-    }
-    // }}}
-  });
-
-  /**
-   * StageDrag
-   * Facilitates dragging
-   */
-  // var StageDrag = function(manager,opt){{{
-  var StageDrag = function(manager,opt){
-    $.extend(this,StageDrag.defaults,opt || {});
-    this.manager = manager;
-    this.core = manager.core;
-  };
-  // }}}
-  // StageDrag.defaults = {{{
-  StageDrag.defaults = {
-    offset: [ -8, -8 ],
-    active: true,
-    minsize: [ 20, 20 ]
-  };
-  // }}}
-
-  $.extend(StageDrag.prototype,{
-    // start: function(e){{{
-    start: function(e){
-      var c = this.core;
-
-      // Do nothing if allowSelect is off
-      if (!c.opt.allowSelect) return false;
-
-      // Also do nothing if we can't draw any more selections
-      if (c.opt.multi && c.opt.multiMax && (c.ui.multi.length >= c.opt.multiMax)) return false;
-
-      // calculate a few variables for this drag operation
-      var o = $(e.currentTarget).offset();
-      var origx = e.pageX - o.left + this.offset[0];
-      var origy = e.pageY - o.top + this.offset[1];
-      var m = c.ui.multi;
-
-      // Determinenewly dragged crop behavior if multi disabled
-      if (!c.opt.multi) {
-        // For multiCleaanup true, remove all existing selections
-        if (c.opt.multiCleanup){
-          for(var i=0;i<m.length;i++) m[i].remove();
-          c.ui.multi = [];
-        }
-        // If not, only remove the currently active selection
-        else {
-          c.removeSelection(c.ui.selection);
-        }
-      }
-
-      // Create the new selection
-      var sel = c.newSelection()
-        // and position it
-        .updateRaw(Jcrop.wrapFromXywh([origx,origy,1,1]));
-
-      sel.element.trigger('cropstart',[sel,this.core.unscale(sel.get())]);
-      
-      return sel.startDrag(e,'se');
-    },
-    // }}}
-    // end: function(x,y){{{
-    end: function(x,y){
-      this.drag(x,y);
-      var b = this.sel.get();
-
-      if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
-        this.core.requestDelete();
-
-        else this.sel.focus();
-    }
-    // }}}
-  });
-
-  /**
-   * StageManager
-   * Provides basic stage-specific functionality
-   */
-  // var StageManager = function(core){{{
-  var StageManager = function(core){
-    this.core = core;
-    this.ui = core.ui;
-    this.init();
-  };
-  // }}}
-
-  $.extend(StageManager.prototype,{
-    // init: function(){{{
-    init: function(){
-      this.setupEvents();
-      this.dragger = new StageDrag(this);
-    },
-    // }}}
-    // tellConfigUpdate: function(options,proptype){{{
-    tellConfigUpdate: function(options,proptype){
-      for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
-        if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
-          m[i].setOptions(options);
-    },
-    // }}}
-    // configUpdateHandler: function(){{{
-    configUpdateHandler: function(){
-      var t = this;
-      return function(e,instance,options,proptype){
-        t.tellConfigUpdate(options,proptype);
-      };
-    },
-    // }}}
-    // startDragHandler: function(){{{
-    startDragHandler: function(){
-      var t = this;
-      return function(e){
-        if (!e.button || t.core.opt.is_ie_lt9) return t.dragger.start(e);
-      };
-    },
-    // }}}
-    // removeEvents: function(){{{
-    removeEvents: function(){
-      this.core.container.off('.jcrop-stage');
-    },
-    // }}}
-    // setupEvents: function(){{{
-    setupEvents: function(){
-      this.core.container
-        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler())
-        .on('cropconfig.jcrop-stage',this.configUpdateHandler());
-    }
-    // }}}
-  });
-
-  /**
-   * Selection
-   * Built-in selection object
-   */
-  var Selection = function(){};
-
-  $.extend(Selection,{
-    // defaults: {{{
-    defaults: {
-      minSize: [ 8, 8 ],
-      maxSize: [ 0, 0 ],
-      aspectRatio: 0,
-      edge: { n: 0, s: 0, e: 0, w: 0 },
-      bgColor: null,
-      bgOpacity: null,
-      last: null,
-
-      state: null,
-      active: true,
-      linked: true,
-      canDelete: true,
-      canDrag: true,
-      canResize: true,
-      canSelect: true
-    },
-    // }}}
-    prototype: {
-      // init: function(core){{{
-      init: function(core){
-        this.core = core;
-        this.startup();
-        this.linked = this.core.opt.linked;
-        this.attach();
-        this.setOptions(this.core.opt);
-      },
-      // }}}
-      // attach: function(){{{
-      attach: function(){
-        // For extending init() sequence
-      },
-      // }}}
-      // startup: function(){{{
-      startup: function(){
-        var t = this, css = t.core.opt.cssclass;
-        $.extend(t,Selection.defaults);
-        t.filter = t.core.getDefaultFilters();
-
-        t.element = $('<div />').addClass(css.selection).data({ selection: t });
-        t.frame = $('<button />').addClass(css.button).data('ord','move');
-        t.element.append(t.frame).appendTo(t.core.container);
-
-        // IE background/draggable hack
-        if (t.core.opt.is_msie) t.frame.css({
-          opacity: 0,
-          backgroundColor: 'white'
-        });
-
-        t.insertElements();
-
-        // Bind focus and blur events for this selection
-        t.frame.on('focus.jcrop',function(e){
-          t.element.trigger('cropfocus',t);
-          t.core.setSelection(t);
-          t.element.addClass('jcrop-focus');
-        }).on('blur.jcrop',function(e){
-          t.element.removeClass('jcrop-focus');
-          t.element.trigger('cropblur',t);
-        });
-      },
-      // }}}
-      // propagate: [{{{
-      propagate: [
-        'canDelete', 'canDrag', 'canResize', 'canSelect',
-        'minSize', 'maxSize', 'aspectRatio', 'edge'
-      ],
-      // }}}
-      // setOptions: function(opt){{{
-      setOptions: function(opt){
-        Jcrop.propagate(this.propagate,opt,this);
-        this.refresh();
-        return this;
-      },
-      // }}}
-      // refresh: function(){{{
-      refresh: function(){
-        this.allowResize();
-        this.allowDrag();
-        this.allowSelect();
-        this.callFilterFunction('refresh');
-        this.updateRaw(this.get(),'se');
-      },
-      // }}}
-      // callFilterFunction: function(f,args){{{
-      callFilterFunction: function(f,args){
-        for(var i=0;i<this.filter.length;i++)
-          if (this.filter[i][f]) this.filter[i][f](this);
-        return this;
-      },
-      // }}}
-      //addFilter: function(filter){{{
-      addFilter: function(filter){
-        filter.core = this.core;
-        if (!this.hasFilter(filter)) {
-          this.filter.push(filter);
-          this.sortFilters();
-          if (filter.init) filter.init();
-          this.refresh();
-        }
-      },
-      //}}}
-      // hasFilter: function(filter){{{
-      hasFilter: function(filter){
-        var i, f = this.filter, n = [];
-        for(i=0;i<f.length;i++) if (f[i] === filter) return true;
-      },
-      // }}}
-      // sortFilters: function(){{{
-      sortFilters: function(){
-        this.filter.sort(
-          function(x,y){ return x.priority - y.priority; }
-        );
-      },
-      // }}}
-      //clearFilters: function(){{{
-      clearFilters: function(){
-        var i, f = this.filter;
-
-        for(var i=0;i<f.length;i++)
-          if (f[i].destroy) f[i].destroy();
-
-        this.filter = [];
-      },
-      //}}}
-      // removeFiltersByTag: function(tag){{{
-      removeFilter: function(tag){
-        var i, f = this.filter, n = [];
-
-        for(var i=0;i<f.length;i++)
-          if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
-            if (f[i].destroy) f[i].destroy();
-          }
-          else n.push(f[i]);
-
-        this.filter = n;
-      },
-      // }}}
-      // runFilters: function(b,ord){{{
-      runFilters: function(b,ord){
-        for(var i=0;i<this.filter.length;i++)
-          b = this.filter[i].filter(b,ord,this);
-        return b;
-      },
-      // }}}
-      //endDrag: function(){{{
-      endDrag: function(){
-        if (this.state) {
-          $(document.body).off('.jcrop');
-          this.focus();
-          this.state = null;
-        }
-      },
-      //}}}
-      // startDrag: function(e,ord){{{
-      startDrag: function(e,ord){
-        var t = this;
-        var m = t.core;
-
-        ord = ord || $(e.target).data('ord');
-
-        this.focus();
-
-        if ((ord == 'move') && t.element.hasClass(t.core.opt.cssclass.nodrag))
-          return false;
-
-        this.state = new Jcrop.component.DragState(e,this,ord);
-        return false;
-      },
-      // }}}
-      // allowSelect: function(v){{{
-      allowSelect: function(v){
-        if (v === undefined) v = this.canSelect;
-
-        if (v && this.canSelect) this.frame.attr('disabled',false);
-          else this.frame.attr('disabled','disabled');
-
-        return this;
-      },
-      // }}}
-      // allowDrag: function(v){{{
-      allowDrag: function(v){
-        var t = this, css = t.core.opt.cssclass;
-        if (v == undefined) v = t.canDrag;
-
-        if (v && t.canDrag) t.element.removeClass(css.nodrag);
-          else t.element.addClass(css.nodrag);
-
-        return this;
-      },
-      // }}}
-      // allowResize: function(v){{{
-      allowResize: function(v){
-        var t = this, css = t.core.opt.cssclass;
-        if (v == undefined) v = t.canResize;
-
-        if (v && t.canResize) t.element.removeClass(css.noresize);
-          else t.element.addClass(css.noresize);
-
-        return this;
-      },
-      // }}}
-      // remove: function(){{{
-      remove: function(){
-        this.element.trigger('cropremove',this);
-        this.element.remove();
-      },
-      // }}}
-      // toBack: function(){{{
-      toBack: function(){
-        this.active = false;
-        this.element
-          .removeClass('jcrop-current')
-          .removeClass('jcrop-focus')
-          .css({zIndex:20});
-      },
-      // }}}
-      // toFront: function(){{{
-      toFront: function(){
-        this.active = true;
-        this.element
-          .addClass('jcrop-current')
-          .css({zIndex:30});
-        this.callFilterFunction('refresh');
-        this.refresh();
-      },
-      // }}}
-      // redraw: function(b){{{
-      redraw: function(b){
-        this.moveTo(b.x,b.y);
-        this.resize(b.w,b.h);
-        this.last = b;
-        return this;
-      },
-      // }}}
-      // update: function(b,ord){{{
-      update: function(b,ord){
-        return this.updateRaw(this.core.scale(b),ord);
-      },
-      // }}}
-      // update: function(b,ord){{{
-      updateRaw: function(b,ord){
-        b = this.runFilters(b,ord);
-        this.redraw(b);
-        this.element.trigger('cropmove',[this,this.core.unscale(b)]);
-        return this;
-      },
-      // }}}
-      // animateTo: function(box,cb){{{
-      animateTo: function(box,cb){
-        var ca = new Jcrop.component.Animator(this),
-            b = this.core.scale(Jcrop.wrapFromXywh(box));
-
-        ca.animate(b.x,b.y,b.w,b.h,cb);
-      },
-      // }}}
-      // center: function(instant){{{
-      center: function(instant){
-        var b = this.get(), m = this.core;
-        var elw = m.container.width(), elh = m.container.height();
-        var box = [ (elw-b.w)/2, (elh-b.h)/2, b.w, b.h ];
-        return this[instant?'setSelect':'animateTo'](box);
-      },
-      // }}}
-      //createElement: function(type,ord){{{
-      createElement: function(type,ord){
-        return $('<div />').addClass(type+' ord-'+ord).data('ord',ord);
-      },
-      //}}}
-      //moveTo: function(x,y){{{
-      moveTo: function(x,y){
-        this.element.css({top: y+'px', left: x+'px'});
-      },
-      //}}}
-      // blur: function(){{{
-      blur: function(){
-        this.element.blur();
-        return this;
-      },
-      // }}}
-      // focus: function(){{{
-      focus: function(){
-        this.core.setSelection(this);
-        this.frame.focus();
-        return this;
-      },
-      // }}}
-      //resize: function(w,h){{{
-      resize: function(w,h){
-        this.element.css({width: w+'px', height: h+'px'});
-      },
-      //}}}
-      //get: function(){{{
-      get: function(){
-        var b = this.element,
-          o = b.position(),
-          w = b.width(),
-          h = b.height(),
-          rv = { x: o.left, y: o.top };
-
-        rv.x2 = rv.x + w;
-        rv.y2 = rv.y + h;
-        rv.w = w;
-        rv.h = h;
-
-        return rv;
-      },
-      //}}}
-      //insertElements: function(){{{
-      insertElements: function(){
-        var t = this, i,
-          m = t.core,
-          fr = t.element,
-          o = t.core.opt,
-          b = o.borders,
-          h = o.handles,
-          d = o.dragbars;
-
-        for(i=0; i<b.length; i++)
-          fr.append(t.createElement(o.cssclass.borders,b[i]));
-
-        for(i=0; i<d.length; i++)
-          fr.append(t.createElement(o.cssclass.dragbars,d[i]));
-
-        for(i=0; i<h.length; i++)
-          fr.append(t.createElement(o.cssclass.handles,h[i]));
-      }
-      //}}}
-    }
-  });
-
-
-  /**
    * Image Loader
    * Reliably pre-loads images
    */
@@ -1289,12 +759,542 @@
 
         c.container.on(
           'touchstart.jcrop.jcrop-touch',
-          '.'+c.opt.cssclass.drag,
+          '.'+c.opt.css_drag,
           t.dragWrap(c.startDrag())
         );
       }
       // }}}
     }
+  });
+
+  /**
+   *  KeyWatcher
+   *  provides keyboard support
+   */
+  // var KeyWatcher = function(core){{{
+  var KeyWatcher = function(core){
+    this.core = core;
+    this.init();
+  };
+  // }}}
+  // KeyWatcher.defaults = {{{
+  KeyWatcher.defaults = {
+    passthru: [ 9 ],
+    debug: false
+  };
+  // }}}
+
+  $.extend(KeyWatcher.prototype,{
+    // init: function(){{{
+    init: function(){
+      $.extend(this,KeyWatcher.defaults);
+      this.enable();
+    },
+    // }}}
+    // disable: function(){{{
+    disable: function(){
+      this.core.container.off('keydown.jcrop');
+    },
+    // }}}
+    // enable: function(){{{
+    enable: function(){
+      var t = this, m = t.core;
+      m.container.on('keydown.jcrop',function(e){
+        var nudge = e.shiftKey? 16: 2;
+
+        if ($.inArray(e.keyCode,t.passthru) >= 0)
+          return true;
+
+        switch(e.keyCode){
+          case 37: m.nudge(-nudge,0); break;
+          case 38: m.nudge(0,-nudge); break;
+          case 39: m.nudge(nudge,0); break;
+          case 40: m.nudge(0,nudge); break;
+
+          case 46:
+          case 8:
+            m.requestDelete();
+            return false;
+            break;
+
+          default:
+            if (t.debug) console.log('keycode: ' + e.keyCode);
+            break;
+        }
+
+        if (!e.metaKey && !e.ctrlKey)
+          e.preventDefault();
+      });
+    }
+    // }}}
+  });
+
+  /**
+   * Selection
+   * Built-in selection object
+   */
+  var Selection = function(){};
+
+  $.extend(Selection,{
+    // defaults: {{{
+    defaults: {
+      minSize: [ 8, 8 ],
+      maxSize: [ 0, 0 ],
+      aspectRatio: 0,
+      edge: { n: 0, s: 0, e: 0, w: 0 },
+      bgColor: null,
+      bgOpacity: null,
+      last: null,
+
+      state: null,
+      active: true,
+      linked: true,
+      canDelete: true,
+      canDrag: true,
+      canResize: true,
+      canSelect: true
+    },
+    // }}}
+    prototype: {
+      // init: function(core){{{
+      init: function(core){
+        this.core = core;
+        this.startup();
+        this.linked = this.core.opt.linked;
+        this.attach();
+        this.setOptions(this.core.opt);
+      },
+      // }}}
+      // attach: function(){{{
+      attach: function(){
+        // For extending init() sequence
+      },
+      // }}}
+      // startup: function(){{{
+      startup: function(){
+        var t = this, o = t.core.opt;
+        $.extend(t,Selection.defaults);
+        t.filter = t.core.getDefaultFilters();
+
+        t.element = $('<div />').addClass(o.css_selection).data({ selection: t });
+        t.frame = $('<button />').addClass(o.css_button).data('ord','move');
+        t.element.append(t.frame).appendTo(t.core.container);
+
+        // IE background/draggable hack
+        if (t.core.opt.is_msie) t.frame.css({
+          opacity: 0,
+          backgroundColor: 'white'
+        });
+
+        t.insertElements();
+
+        // Bind focus and blur events for this selection
+        t.frame.on('focus.jcrop',function(e){
+          t.element.trigger('cropfocus',t);
+          t.core.setSelection(t);
+          t.element.addClass('jcrop-focus');
+        }).on('blur.jcrop',function(e){
+          t.element.removeClass('jcrop-focus');
+          t.element.trigger('cropblur',t);
+        });
+      },
+      // }}}
+      // propagate: [{{{
+      propagate: [
+        'canDelete', 'canDrag', 'canResize', 'canSelect',
+        'minSize', 'maxSize', 'aspectRatio', 'edge'
+      ],
+      // }}}
+      // setOptions: function(opt){{{
+      setOptions: function(opt){
+        Jcrop.propagate(this.propagate,opt,this);
+        this.refresh();
+        return this;
+      },
+      // }}}
+      // refresh: function(){{{
+      refresh: function(){
+        this.allowResize();
+        this.allowDrag();
+        this.allowSelect();
+        this.callFilterFunction('refresh');
+        this.updateRaw(this.get(),'se');
+      },
+      // }}}
+      // callFilterFunction: function(f,args){{{
+      callFilterFunction: function(f,args){
+        for(var i=0;i<this.filter.length;i++)
+          if (this.filter[i][f]) this.filter[i][f](this);
+        return this;
+      },
+      // }}}
+      //addFilter: function(filter){{{
+      addFilter: function(filter){
+        filter.core = this.core;
+        if (!this.hasFilter(filter)) {
+          this.filter.push(filter);
+          this.sortFilters();
+          if (filter.init) filter.init();
+          this.refresh();
+        }
+      },
+      //}}}
+      // hasFilter: function(filter){{{
+      hasFilter: function(filter){
+        var i, f = this.filter, n = [];
+        for(i=0;i<f.length;i++) if (f[i] === filter) return true;
+      },
+      // }}}
+      // sortFilters: function(){{{
+      sortFilters: function(){
+        this.filter.sort(
+          function(x,y){ return x.priority - y.priority; }
+        );
+      },
+      // }}}
+      //clearFilters: function(){{{
+      clearFilters: function(){
+        var i, f = this.filter;
+
+        for(var i=0;i<f.length;i++)
+          if (f[i].destroy) f[i].destroy();
+
+        this.filter = [];
+      },
+      //}}}
+      // removeFiltersByTag: function(tag){{{
+      removeFilter: function(tag){
+        var i, f = this.filter, n = [];
+
+        for(var i=0;i<f.length;i++)
+          if ((f[i].tag && (f[i].tag == tag)) || (tag === f[i])){
+            if (f[i].destroy) f[i].destroy();
+          }
+          else n.push(f[i]);
+
+        this.filter = n;
+      },
+      // }}}
+      // runFilters: function(b,ord){{{
+      runFilters: function(b,ord){
+        for(var i=0;i<this.filter.length;i++)
+          b = this.filter[i].filter(b,ord,this);
+        return b;
+      },
+      // }}}
+      //endDrag: function(){{{
+      endDrag: function(){
+        if (this.state) {
+          $(document.body).off('.jcrop');
+          this.focus();
+          this.state = null;
+        }
+      },
+      //}}}
+      // startDrag: function(e,ord){{{
+      startDrag: function(e,ord){
+        var t = this;
+        var m = t.core;
+
+        ord = ord || $(e.target).data('ord');
+
+        this.focus();
+
+        if ((ord == 'move') && t.element.hasClass(t.core.opt.css_nodrag))
+          return false;
+
+        this.state = new Jcrop.component.DragState(e,this,ord);
+        return false;
+      },
+      // }}}
+      // allowSelect: function(v){{{
+      allowSelect: function(v){
+        if (v === undefined) v = this.canSelect;
+
+        if (v && this.canSelect) this.frame.attr('disabled',false);
+          else this.frame.attr('disabled','disabled');
+
+        return this;
+      },
+      // }}}
+      // allowDrag: function(v){{{
+      allowDrag: function(v){
+        var t = this, o = t.core.opt;
+        if (v == undefined) v = t.canDrag;
+
+        if (v && t.canDrag) t.element.removeClass(o.css_nodrag);
+          else t.element.addClass(o.css_nodrag);
+
+        return this;
+      },
+      // }}}
+      // allowResize: function(v){{{
+      allowResize: function(v){
+        var t = this, o = t.core.opt;
+        if (v == undefined) v = t.canResize;
+
+        if (v && t.canResize) t.element.removeClass(o.css_noresize);
+          else t.element.addClass(o.css_noresize);
+
+        return this;
+      },
+      // }}}
+      // remove: function(){{{
+      remove: function(){
+        this.element.trigger('cropremove',this);
+        this.element.remove();
+      },
+      // }}}
+      // toBack: function(){{{
+      toBack: function(){
+        this.active = false;
+        this.element
+          .removeClass('jcrop-current')
+          .removeClass('jcrop-focus')
+          .css({zIndex:20});
+      },
+      // }}}
+      // toFront: function(){{{
+      toFront: function(){
+        this.active = true;
+        this.element
+          .addClass('jcrop-current')
+          .css({zIndex:30});
+        this.callFilterFunction('refresh');
+        this.refresh();
+      },
+      // }}}
+      // redraw: function(b){{{
+      redraw: function(b){
+        this.moveTo(b.x,b.y);
+        this.resize(b.w,b.h);
+        this.last = b;
+        return this;
+      },
+      // }}}
+      // update: function(b,ord){{{
+      update: function(b,ord){
+        return this.updateRaw(this.core.scale(b),ord);
+      },
+      // }}}
+      // update: function(b,ord){{{
+      updateRaw: function(b,ord){
+        b = this.runFilters(b,ord);
+        this.redraw(b);
+        this.element.trigger('cropmove',[this,this.core.unscale(b)]);
+        return this;
+      },
+      // }}}
+      // animateTo: function(box,cb){{{
+      animateTo: function(box,cb){
+        var ca = new Jcrop.component.Animator(this),
+            b = this.core.scale(Jcrop.wrapFromXywh(box));
+
+        ca.animate(b.x,b.y,b.w,b.h,cb);
+      },
+      // }}}
+      // center: function(instant){{{
+      center: function(instant){
+        var b = this.get(), m = this.core;
+        var elw = m.container.width(), elh = m.container.height();
+        var box = [ (elw-b.w)/2, (elh-b.h)/2, b.w, b.h ];
+        return this[instant?'setSelect':'animateTo'](box);
+      },
+      // }}}
+      //createElement: function(type,ord){{{
+      createElement: function(type,ord){
+        return $('<div />').addClass(type+' ord-'+ord).data('ord',ord);
+      },
+      //}}}
+      //moveTo: function(x,y){{{
+      moveTo: function(x,y){
+        this.element.css({top: y+'px', left: x+'px'});
+      },
+      //}}}
+      // blur: function(){{{
+      blur: function(){
+        this.element.blur();
+        return this;
+      },
+      // }}}
+      // focus: function(){{{
+      focus: function(){
+        this.core.setSelection(this);
+        this.frame.focus();
+        return this;
+      },
+      // }}}
+      //resize: function(w,h){{{
+      resize: function(w,h){
+        this.element.css({width: w+'px', height: h+'px'});
+      },
+      //}}}
+      //get: function(){{{
+      get: function(){
+        var b = this.element,
+          o = b.position(),
+          w = b.width(),
+          h = b.height(),
+          rv = { x: o.left, y: o.top };
+
+        rv.x2 = rv.x + w;
+        rv.y2 = rv.y + h;
+        rv.w = w;
+        rv.h = h;
+
+        return rv;
+      },
+      //}}}
+      //insertElements: function(){{{
+      insertElements: function(){
+        var t = this, i,
+          m = t.core,
+          fr = t.element,
+          o = t.core.opt,
+          b = o.borders,
+          h = o.handles,
+          d = o.dragbars;
+
+        for(i=0; i<b.length; i++)
+          fr.append(t.createElement(o.css_borders,b[i]));
+
+        for(i=0; i<d.length; i++)
+          fr.append(t.createElement(o.css_dragbars,d[i]));
+
+        for(i=0; i<h.length; i++)
+          fr.append(t.createElement(o.css_handles,h[i]));
+      }
+      //}}}
+    }
+  });
+
+
+  /**
+   * StageDrag
+   * Facilitates dragging
+   */
+  // var StageDrag = function(manager,opt){{{
+  var StageDrag = function(manager,opt){
+    $.extend(this,StageDrag.defaults,opt || {});
+    this.manager = manager;
+    this.core = manager.core;
+  };
+  // }}}
+  // StageDrag.defaults = {{{
+  StageDrag.defaults = {
+    offset: [ -8, -8 ],
+    active: true,
+    minsize: [ 20, 20 ]
+  };
+  // }}}
+
+  $.extend(StageDrag.prototype,{
+    // start: function(e){{{
+    start: function(e){
+      var c = this.core;
+
+      // Do nothing if allowSelect is off
+      if (!c.opt.allowSelect) return false;
+
+      // Also do nothing if we can't draw any more selections
+      if (c.opt.multi && c.opt.multiMax && (c.ui.multi.length >= c.opt.multiMax)) return false;
+
+      // calculate a few variables for this drag operation
+      var o = $(e.currentTarget).offset();
+      var origx = e.pageX - o.left + this.offset[0];
+      var origy = e.pageY - o.top + this.offset[1];
+      var m = c.ui.multi;
+
+      // Determinenewly dragged crop behavior if multi disabled
+      if (!c.opt.multi) {
+        // For multiCleaanup true, remove all existing selections
+        if (c.opt.multiCleanup){
+          for(var i=0;i<m.length;i++) m[i].remove();
+          c.ui.multi = [];
+        }
+        // If not, only remove the currently active selection
+        else {
+          c.removeSelection(c.ui.selection);
+        }
+      }
+
+      // Create the new selection
+      var sel = c.newSelection()
+        // and position it
+        .updateRaw(Jcrop.wrapFromXywh([origx,origy,1,1]));
+
+      sel.element.trigger('cropstart',[sel,this.core.unscale(sel.get())]);
+      
+      return sel.startDrag(e,'se');
+    },
+    // }}}
+    // end: function(x,y){{{
+    end: function(x,y){
+      this.drag(x,y);
+      var b = this.sel.get();
+
+      if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
+        this.core.requestDelete();
+
+        else this.sel.focus();
+    }
+    // }}}
+  });
+
+  /**
+   * StageManager
+   * Provides basic stage-specific functionality
+   */
+  // var StageManager = function(core){{{
+  var StageManager = function(core){
+    this.core = core;
+    this.ui = core.ui;
+    this.init();
+  };
+  // }}}
+
+  $.extend(StageManager.prototype,{
+    // init: function(){{{
+    init: function(){
+      this.setupEvents();
+      this.dragger = new StageDrag(this);
+    },
+    // }}}
+    // tellConfigUpdate: function(options,proptype){{{
+    tellConfigUpdate: function(options,proptype){
+      for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
+        if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
+          m[i].setOptions(options);
+    },
+    // }}}
+    // configUpdateHandler: function(){{{
+    configUpdateHandler: function(){
+      var t = this;
+      return function(e,instance,options,proptype){
+        t.tellConfigUpdate(options,proptype);
+      };
+    },
+    // }}}
+    // startDragHandler: function(){{{
+    startDragHandler: function(){
+      var t = this;
+      return function(e){
+        if (!e.button || t.core.opt.is_ie_lt9) return t.dragger.start(e);
+      };
+    },
+    // }}}
+    // removeEvents: function(){{{
+    removeEvents: function(){
+      this.core.container.off('.jcrop-stage');
+    },
+    // }}}
+    // setupEvents: function(){{{
+    setupEvents: function(){
+      this.core.container
+        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler())
+        .on('cropconfig.jcrop-stage',this.configUpdateHandler());
+    }
+    // }}}
   });
 
   // Jcrop constructor
@@ -1309,7 +1309,7 @@
     this.opt.is_msie = /msie/.test(_ua);
     this.opt.is_ie_lt9 = /msie [1-8]\./.test(_ua);
 
-    this.container.addClass(this.opt.cssclass.container);
+    this.container.addClass(this.opt.css_container);
 
     this.ui = {};
     this.state = null;
@@ -1395,18 +1395,16 @@
       // for better customization. Currently if you try to extend one
       // via an options object to Jcrop, it will wipe out all
       // the others you don't specify. Be careful for now!
-      cssclass: {
-        container: 'jcrop-active',
-        shades: 'jcrop-shades',
-        selection: 'jcrop-selection',
-        borders: 'jcrop-border',
-        handles: 'jcrop-handle jcrop-drag',
-        button: 'jcrop-box jcrop-drag',
-        drag: 'jcrop-drag',
-        nodrag: 'jcrop-nodrag',
-        noresize: 'jcrop-noresize',
-        dragbars: 'jcrop-dragbar jcrop-drag'
-      }
+      css_nodrag: 'jcrop-nodrag',
+      css_drag: 'jcrop-drag',
+      css_container: 'jcrop-active',
+      css_shades: 'jcrop-shades',
+      css_selection: 'jcrop-selection',
+      css_borders: 'jcrop-border',
+      css_handles: 'jcrop-handle jcrop-drag',
+      css_button: 'jcrop-box jcrop-drag',
+      css_noresize: 'jcrop-noresize',
+      css_dragbars: 'jcrop-dragbar jcrop-drag'
     },
     //}}}
     //filter: built-in filter collection {{{
@@ -1661,7 +1659,7 @@
     initEvents: function(){
       var t = this;
       t.container.on('selectstart',function(e){ return false; })
-        .on('mousedown','.'+t.opt.cssclass.drag,t.startDrag());
+        .on('mousedown','.'+t.opt.css_drag,t.startDrag());
     },
     //}}}
     // maxSelect: function(){{{
@@ -1742,20 +1740,24 @@
     // }}}
     // deleteSelection: function(){{{
     deleteSelection: function(){
-      this.removeSelection(this.ui.selection);
-      this.ui.multi[0].focus();
-      this.ui.selection.refresh();
+      if (this.ui.selection) {
+        this.removeSelection(this.ui.selection);
+        this.ui.multi[0].focus();
+        this.ui.selection.refresh();
+      }
     },
     // }}}
     // animateTo: function(box){{{
     animateTo: function(box){
-      this.ui.selection.animateTo(box);
+      if (this.ui.selection)
+        this.ui.selection.animateTo(box);
       return this;
     },
     // }}}
     // setselect: function(box){{{
     setSelect: function(box){
-      this.ui.selection.update(Jcrop.wrapFromXywh(box));
+      if (this.ui.selection)
+        this.ui.selection.update(Jcrop.wrapFromXywh(box));
       return this;
     },
     // }}}
@@ -1764,7 +1766,7 @@
       var t = this;
       return function(e){
         var $targ = $(e.target);
-        var selection = $targ.closest('.'+t.opt.cssclass.selection).data('selection');
+        var selection = $targ.closest('.'+t.opt.css_selection).data('selection');
         var ord = $targ.data('ord');
         t.container.trigger('cropstart',[selection,t.unscale(selection.get())]);
         selection.startDrag(e,ord);
@@ -1793,9 +1795,6 @@
         t.refresh();
         t.container.trigger('cropimage',[t,targ]);
 
-        //$(t.opt.imgTarget).before(this.element).remove();
-        //t.opt.imgTarget = this.element;
-
         if (typeof cb == 'function')
           cb.call(t,w,h);
       });
@@ -1803,7 +1802,8 @@
     // }}}
     // update: function(b){{{
     update: function(b){
-      this.ui.selection.update(b);
+      if (this.ui.selection)
+        this.ui.selection.update(b);
     }
     // }}}
   });
