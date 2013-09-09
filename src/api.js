@@ -88,7 +88,11 @@
     // getDefaultFilters: function(){{{
     getDefaultFilters: function(){
       var rv = [];
-      $.each(this.filter,function(u,i){ rv.push(i); });
+
+      for(var i=0,f=this.opt.applyFilters,l=f.length; i<l; i++)
+        if(this.filter.hasOwnProperty(f[i]))
+          rv.push(this.filter[f[i]]);
+
       rv.sort(function(x,y){ return x.priority - y.priority; });
       return rv;
     },
