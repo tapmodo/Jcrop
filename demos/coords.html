@@ -13,9 +13,12 @@
         // Create a new Selection object extended from Selection
         var CoordsSel = function(){ };
         
-        // Extend this object's prototype with the Selection.prototype
-        // And extend with some additional/updated methods
-        $.extend(CoordsSel.prototype,$.Jcrop.component.Selection.prototype,{
+        // Set the custom selection's prototype object to be an instance
+        // of the built-in Selection object
+        CoordsSel.prototype = new $.Jcrop.component.Selection;
+        
+        // Then we can continue extending it
+        $.extend(CoordsSel.prototype,{
           attach: function(){
             // Prepend an element to Selection.element (selection container)
             this.coords = $('<div> x </div>').addClass('jcrop-coords');

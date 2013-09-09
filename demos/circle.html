@@ -10,13 +10,14 @@
       jQuery(function($){
       
         // Create a new Selection object extended from Selection
-        var CircleSel = function(core){
-          this.core = core;
-        };
+        var CircleSel = function(){ };
         
-        // Extend this object's prototype with the Selection.prototype
-        // And extend with some additional/updated methods
-        $.extend(CircleSel.prototype,$.Jcrop.component.Selection.prototype,{
+        // Set the custom selection's prototype object to be an instance
+        // of the built-in Selection object
+        CircleSel.prototype = new $.Jcrop.component.Selection();
+        
+        // Then we can continue extending it
+        $.extend(CircleSel.prototype,{
           zoomscale: 1,
           attach: function(){
             this.frame.css({
@@ -42,16 +43,28 @@
           prototype: $.Jcrop.component.Selection.prototype
         });
         
-        $.Jcrop.defaults.applyFilters = [ 'constrain', 'extent', 'backoff', 'ratio', 'round' ];
-        
-        // Now set it as the component that is used for new selections
+        // Jcrop Initialization
         $('#target').Jcrop({
-          setSelect: [ 147, 55, 456, 390 ],
+        
+          // Change default Selection component for new selections
           selectionComponent: CircleSel,
+          
+          // Use a default filter chain that omits shader
+          applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'round' ],
+          
+          // Start with circles only
           aspectRatio: 1,
+          
+          // Set an initial selection
+          setSelect: [ 147, 55, 456, 390 ],
+          
+          // Only n/s/e/w handles
           handles: [ 'n','s','e','w' ],
+          
+          // No dragbars or borders
           dragbars: [ ],
           borders: [ ]
+          
         },function(){
           this.container.addClass('jcrop-circle-demo');
           interface_load(this);
@@ -61,15 +74,7 @@
           cb = obj;
           
           // Add in a custom shading element...
-          cb.container.append($('<div />').css({
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-            backgroundColor: 'black',
-            width: '100%',
-            height: '100%',
-            opacity: .4
-          }));
+          cb.container.append($('<div />').addClass('custom-shade'));
           
           function random_coords() {
             return [
@@ -146,6 +151,15 @@
 }
 .jcrop-circle-demo .jcrop-box:focus {
   outline: none;
+}
+.custom-shade {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: black;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
 }
 </style>
   </head>
