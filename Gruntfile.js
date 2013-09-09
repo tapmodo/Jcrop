@@ -19,13 +19,6 @@ module.exports = function(grunt) {
   // Project configuration
   grunt.initConfig({
     pkg: json,
-    sed: {
-      version: {
-        path: 'css/Jcrop.css',
-        pattern: '%%VERSION%%',
-        replacement: '<%= pkg.version %>'
-      }
-    },
     watch: {
       css: {
         files: [ 'src/**/*.less' ],
@@ -90,11 +83,12 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-sed');
 
   // Default tasks
   grunt.registerTask('default', ['js','css']);
   grunt.registerTask('js', ['concat','uglify']);
-  grunt.registerTask('css', ['less','sed','cssmin']);
+  grunt.registerTask('css', ['less','cssmin']);
+
+
 
 };
