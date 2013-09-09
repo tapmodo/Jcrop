@@ -1,9 +1,10 @@
   // Jcrop component storage
   Jcrop.component = {
-    ImageLoader: ImageLoader,
-    DragState: DragState,
-    StageManager: StageManager,
     Animator: CropAnimator,
+    DragState: DragState,
+    EventManager: EventManager,
+    ImageLoader: ImageLoader,
+    StageManager: StageManager,
     Selection: Selection,
     Keyboard: KeyWatcher,
     Touch: JcropTouch
@@ -25,6 +26,7 @@
       canResize: true,
 
       // Component constructors
+      eventManagerComponent:  Jcrop.component.EventManager,
       keyboardComponent:      Jcrop.component.Keyboard,
       dragstateComponent:     Jcrop.component.DragState,
       stagemanagerComponent:  Jcrop.component.StageManager,

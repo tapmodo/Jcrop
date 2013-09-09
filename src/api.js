@@ -2,6 +2,7 @@
   $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
+      this.event = new this.opt.eventManagerComponent(this);
       this.ui.keyboard = new this.opt.keyboardComponent(this);
       this.ui.stage = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
