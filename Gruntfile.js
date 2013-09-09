@@ -63,6 +63,19 @@ module.exports = function(grunt) {
         }
       }
     },
+    usebanner: {
+      dist: {
+        options: {
+          banner: '/*! <%= pkg.name %>.css v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
+            ' *  Copyright 2008-2013 Tapmodo Interactive LLC\n' +
+            ' *  Free software under MIT License\n'+
+            ' **/\n'
+        },
+        files: {
+          src: [ 'css/Jcrop.css' ]
+        }
+      }
+    },
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %>.min.js v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n' +
@@ -83,12 +96,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-banner');
 
   // Default tasks
   grunt.registerTask('default', ['js','css']);
   grunt.registerTask('js', ['concat','uglify']);
-  grunt.registerTask('css', ['less','cssmin']);
-
-
+  grunt.registerTask('css', ['less','cssmin','usebanner']);
 
 };
