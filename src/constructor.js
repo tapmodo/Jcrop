@@ -23,9 +23,9 @@
     this.applySizeConstraints();
     this.container.trigger('cropinit',this);
       
-    if (/msie [1-8]\./.test(_ua)) {
+    // IE<9 doesn't work if mouse events are attached to window
+    if (this.opt.is_ie_lt9)
       this.opt.dragEventTarget = document.body;
-    }
 
   };
   // }}}
