@@ -3,7 +3,7 @@
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
 
-    this.opt = $.extend(true,{},Jcrop.defaults);
+    this.opt = $.extend({},Jcrop.defaults,opt || {});
 
     this.container = $(element);
 
