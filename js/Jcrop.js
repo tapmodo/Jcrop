@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20130907
+/*! Jcrop.js v2.0.0-RC1 - build: 20130909
  *  @copyright 2008-2013 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -613,6 +613,21 @@
   });
 
   /**
+   *  EventManager
+   *  provides internal event support
+   */
+  var EventManager = function(core){
+    this.core = core;
+  };
+  $.extend(EventManager,{
+    prototype: {
+      on: function(n,cb){ $(this).on(n,cb); },
+      off: function(n){ $(this).off(n); },
+      trigger: function(n){ $(this).trigger(n); }
+    }
+  });
+
+  /**
    * Image Loader
    * Reliably pre-loads images
    */
@@ -777,56 +792,58 @@
     this.init();
   };
   // }}}
-  // KeyWatcher.defaults = {{{
-  KeyWatcher.defaults = {
-    passthru: [ 9 ],
-    debug: false
-  };
-  // }}}
-
-  $.extend(KeyWatcher.prototype,{
-    // init: function(){{{
-    init: function(){
-      $.extend(this,KeyWatcher.defaults);
-      this.enable();
+  $.extend(KeyWatcher,{
+    // defaults: {{{
+    defaults: {
+      eventName: 'keydown.jcrop',
+      passthru: [ 9 ],
+      debug: false
     },
     // }}}
-    // disable: function(){{{
-    disable: function(){
-      this.core.container.off('keydown.jcrop');
-    },
-    // }}}
-    // enable: function(){{{
-    enable: function(){
-      var t = this, m = t.core;
-      m.container.on('keydown.jcrop',function(e){
-        var nudge = e.shiftKey? 16: 2;
+    prototype: {
+      // init: function(){{{
+      init: function(){
+        $.extend(this,KeyWatcher.defaults);
+        this.enable();
+      },
+      // }}}
+      // disable: function(){{{
+      disable: function(){
+        this.core.container.off(this.eventName);
+      },
+      // }}}
+      // enable: function(){{{
+      enable: function(){
+        var t = this, m = t.core;
+        m.container.on(t.eventName,function(e){
+          var nudge = e.shiftKey? 16: 2;
 
-        if ($.inArray(e.keyCode,t.passthru) >= 0)
-          return true;
+          if ($.inArray(e.keyCode,t.passthru) >= 0)
+            return true;
 
-        switch(e.keyCode){
-          case 37: m.nudge(-nudge,0); break;
-          case 38: m.nudge(0,-nudge); break;
-          case 39: m.nudge(nudge,0); break;
-          case 40: m.nudge(0,nudge); break;
+          switch(e.keyCode){
+            case 37: m.nudge(-nudge,0); break;
+            case 38: m.nudge(0,-nudge); break;
+            case 39: m.nudge(nudge,0); break;
+            case 40: m.nudge(0,nudge); break;
 
-          case 46:
-          case 8:
-            m.requestDelete();
-            return false;
-            break;
+            case 46:
+            case 8:
+              m.requestDelete();
+              return false;
+              break;
 
-          default:
-            if (t.debug) console.log('keycode: ' + e.keyCode);
-            break;
-        }
+            default:
+              if (t.debug) console.log('keycode: ' + e.keyCode);
+              break;
+          }
 
-        if (!e.metaKey && !e.ctrlKey)
-          e.preventDefault();
-      });
+          if (!e.metaKey && !e.ctrlKey)
+            e.preventDefault();
+        });
+      }
+      // }}}
     }
-    // }}}
   });
 
   /**
@@ -863,6 +880,7 @@
         this.linked = this.core.opt.linked;
         this.attach();
         this.setOptions(this.core.opt);
+        core.container.trigger('cropcreate',[this]);
       },
       // }}}
       // attach: function(){{{
@@ -1260,19 +1278,11 @@
       this.dragger = new StageDrag(this);
     },
     // }}}
-    // tellConfigUpdate: function(options,proptype){{{
-    tellConfigUpdate: function(options,proptype){
+    // tellConfigUpdate: function(options){{{
+    tellConfigUpdate: function(options){
       for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
         if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
           m[i].setOptions(options);
-    },
-    // }}}
-    // configUpdateHandler: function(){{{
-    configUpdateHandler: function(){
-      var t = this;
-      return function(e,instance,options,proptype){
-        t.tellConfigUpdate(options,proptype);
-      };
     },
     // }}}
     // startDragHandler: function(){{{
@@ -1285,14 +1295,21 @@
     // }}}
     // removeEvents: function(){{{
     removeEvents: function(){
+      this.core.event.off('.jcrop-stage');
       this.core.container.off('.jcrop-stage');
     },
     // }}}
     // setupEvents: function(){{{
     setupEvents: function(){
+      var t = this, c = t.core;
+
+      c.event.on('configupdate.jcrop-stage',function(e){
+        t.tellConfigUpdate(c.opt)
+        c.container.trigger('cropconfig',[c,c.opt]);
+      });
+
       this.core.container
-        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler())
-        .on('cropconfig.jcrop-stage',this.configUpdateHandler());
+        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
     }
     // }}}
   });
@@ -1302,7 +1319,7 @@
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
 
-    this.opt = $.extend(true,{},Jcrop.defaults);
+    this.opt = $.extend({},Jcrop.defaults,opt || {});
 
     this.container = $(element);
 
@@ -1322,19 +1339,20 @@
     this.applySizeConstraints();
     this.container.trigger('cropinit',this);
       
-    if (/msie [1-8]\./.test(_ua)) {
+    // IE<9 doesn't work if mouse events are attached to window
+    if (this.opt.is_ie_lt9)
       this.opt.dragEventTarget = document.body;
-    }
 
   };
   // }}}
 
   // Jcrop component storage
   Jcrop.component = {
-    ImageLoader: ImageLoader,
-    DragState: DragState,
-    StageManager: StageManager,
     Animator: CropAnimator,
+    DragState: DragState,
+    EventManager: EventManager,
+    ImageLoader: ImageLoader,
+    StageManager: StageManager,
     Selection: Selection,
     Keyboard: KeyWatcher,
     Touch: JcropTouch
@@ -1356,6 +1374,7 @@
       canResize: true,
 
       // Component constructors
+      eventManagerComponent:  Jcrop.component.EventManager,
       keyboardComponent:      Jcrop.component.Keyboard,
       dragstateComponent:     Jcrop.component.DragState,
       stagemanagerComponent:  Jcrop.component.StageManager,
@@ -1488,6 +1507,7 @@
   $.extend(Jcrop.prototype,{
     //init: function(){{{
     init: function(){
+      this.event = new this.opt.eventManagerComponent(this);
       this.ui.keyboard = new this.opt.keyboardComponent(this);
       this.ui.stage = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
@@ -1542,7 +1562,7 @@
         this.opt.setSelect = null;
       }
 
-      this.container.trigger('cropconfig',[this,opt,proptype]);
+      this.event.trigger('configupdate');
       return this;
     },
     // }}}
@@ -1573,7 +1593,11 @@
     // getDefaultFilters: function(){{{
     getDefaultFilters: function(){
       var rv = [];
-      $.each(this.filter,function(u,i){ rv.push(i); });
+
+      for(var i=0,f=this.opt.applyFilters,l=f.length; i<l; i++)
+        if(this.filter.hasOwnProperty(f[i]))
+          rv.push(this.filter[f[i]]);
+
       rv.sort(function(x,y){ return x.priority - y.priority; });
       return rv;
     },
