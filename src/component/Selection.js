@@ -32,6 +32,7 @@
         this.linked = this.core.opt.linked;
         this.attach();
         this.setOptions(this.core.opt);
+        core.container.trigger('cropcreate',[this]);
       },
       // }}}
       // attach: function(){{{

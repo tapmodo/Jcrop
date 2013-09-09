@@ -57,7 +57,7 @@
         this.opt.setSelect = null;
       }
 
-      this.container.trigger('cropconfig',[this,opt,proptype]);
+      this.event.trigger('configupdate');
       return this;
     },
     // }}}

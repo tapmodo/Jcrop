@@ -17,19 +17,11 @@
       this.dragger = new StageDrag(this);
     },
     // }}}
-    // tellConfigUpdate: function(options,proptype){{{
-    tellConfigUpdate: function(options,proptype){
+    // tellConfigUpdate: function(options){{{
+    tellConfigUpdate: function(options){
       for(var i=0,m=this.ui.multi,l=m.length;i<l;i++)
         if (m[i].setOptions && (m[i].linked || (this.core.opt.linkCurrent && m[i] == this.ui.selection)))
           m[i].setOptions(options);
-    },
-    // }}}
-    // configUpdateHandler: function(){{{
-    configUpdateHandler: function(){
-      var t = this;
-      return function(e,instance,options,proptype){
-        t.tellConfigUpdate(options,proptype);
-      };
     },
     // }}}
     // startDragHandler: function(){{{
@@ -42,14 +34,21 @@
     // }}}
     // removeEvents: function(){{{
     removeEvents: function(){
+      this.core.event.off('.jcrop-stage');
       this.core.container.off('.jcrop-stage');
     },
     // }}}
     // setupEvents: function(){{{
     setupEvents: function(){
+      var t = this, c = t.core;
+
+      c.event.on('configupdate.jcrop-stage',function(e){
+        t.tellConfigUpdate(c.opt)
+        c.container.trigger('cropconfig',[c,c.opt]);
+      });
+
       this.core.container
-        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler())
-        .on('cropconfig.jcrop-stage',this.configUpdateHandler());
+        .on('mousedown.jcrop.jcrop-stage',this.startDragHandler());
     }
     // }}}
   });
