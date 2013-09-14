@@ -75,7 +75,12 @@
       css_handles: 'jcrop-handle jcrop-drag',
       css_button: 'jcrop-box jcrop-drag',
       css_noresize: 'jcrop-noresize',
-      css_dragbars: 'jcrop-dragbar jcrop-drag'
+      css_dragbars: 'jcrop-dragbar jcrop-drag',
+
+      legacyHandlers: {
+        onChange: 'cropmove',
+        onSelect: 'cropend'
+      }
     },
     //}}}
     //filter: built-in filter collection {{{

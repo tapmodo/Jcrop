@@ -38,11 +38,30 @@
       this.core.container.off('.jcrop-stage');
     },
     // }}}
+    // shimLegacyHandlers: function(options){{{
+    // This method uses the legacyHandlers configuration object to
+    // gracefully wrap old-style Jcrop events with new ones
+    shimLegacyHandlers: function(options){
+      var _x = {}, core = this.core, tmp;
+
+      $.each(core.opt.legacyHandlers,function(k,i){
+        if (k in options) {
+          tmp = options[k];
+          core.container.off('.jcrop-'+k)
+            .on(i+'.jcrop.jcrop-'+k,function(e,s,c){
+              tmp.call(core,c);
+            });
+          delete options[k];
+        }
+      });
+    },
+    // }}}
     // setupEvents: function(){{{
     setupEvents: function(){
       var t = this, c = t.core;
 
       c.event.on('configupdate.jcrop-stage',function(e){
+        t.shimLegacyHandlers(c.opt);
         t.tellConfigUpdate(c.opt)
         c.container.trigger('cropconfig',[c,c.opt]);
       });
