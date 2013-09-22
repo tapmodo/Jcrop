@@ -187,17 +187,23 @@
     function presize($obj, w, h) //{{{
     {
       var nw = $obj.width(),
-          nh = $obj.height();
+          nh = $obj.height(),
+          ow = $obj.width(),
+          oh = $obj.height();
+      if (options.hasOwnProperty('trueSize')) {
+        ow = nw = options.trueSize[0];
+        oh = nh = options.trueSize[1];
+      }
       if ((nw > w) && w > 0) {
         nw = w;
-        nh = (w / $obj.width()) * $obj.height();
+        nh = (w / ow) * oh;
       }
       if ((nh > h) && h > 0) {
         nh = h;
-        nw = (h / $obj.height()) * $obj.width();
+        nw = (h / oh) * ow;
       }
-      xscale = $obj.width() / nw;
-      yscale = $obj.height() / nh;
+      xscale = ow / nw;
+      yscale = oh / nh;
       $obj.width(nw).height(nh);
     }
     //}}}
