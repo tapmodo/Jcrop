@@ -301,8 +301,9 @@
       // Necessary when crop image is within a hidden element when page is loaded.
       if ($origimg[0].width != 0 && $origimg[0].height != 0) {
         // Obtain dimensions from contained img element.
-        $origimg.width($origimg[0].width);
-        $origimg.height($origimg[0].height);
+	var h = $origimg[0].height,w = $origimg.width;
+        $origimg.width(w);
+        $origimg.height(h);
       } else {
         // Obtain dimensions from temporary image in case the original is not loaded yet (e.g. IE 7.0). 
         var tempImage = new Image();
