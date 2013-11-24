@@ -1650,8 +1650,6 @@
 
     trackDocument: true,
 
-    useHandJS: false,
-
     // Styling Options
     baseClass: 'jcrop',
     addClass: null,
