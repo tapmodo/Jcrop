@@ -412,7 +412,7 @@
             }
             support[events[i]] = isSupported;
           }
-          return support.touchstart && support.touchend && support.touchmove;
+          return (support.touchstart && support.touchend && support.touchmove) || !!navigator.msMaxTouchPoints;
         }
         catch(err) {
           return false;
@@ -448,7 +448,7 @@
           e.pageY = e.originalEvent.changedTouches[0].pageY;
           return e;
         },
-        isSupported: hasTouchSupport,
+        isSupported: hasTouchSupport(),
         support: detectSupport()
       };
     }());
@@ -894,6 +894,10 @@
           div = dragDiv(ord, hdep++).css({
             opacity: options.handleOpacity
           }).addClass(cssClass('handle'));
+
+          if (Touch.isSupported) {
+            div.addClass('touch');
+          }
 
         if (hs) { div.width(hs).height(hs); }
 
