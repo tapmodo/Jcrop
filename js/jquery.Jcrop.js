@@ -1408,6 +1408,11 @@
     {
       Coords.setPressed([l[0], l[1]]);
       Coords.setCurrent([l[2], l[3]]);
+
+      // Make sure selection coordinates reflect min/max size restrictions.
+      Selection.refresh();
+
+      // Show selection.
       Selection.update();
     }
     //}}}
