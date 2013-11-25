@@ -675,17 +675,17 @@
             ysize = y2 - y1,
             delta;
 
-        if (xlimit && (Math.abs(xsize) > xlimit)) {
-          x2 = (xsize > 0) ? (x1 + xlimit) : (x1 - xlimit);
+        if (xlimit && (Math.abs(xsize) > xlimit / xscale)) {
+          x2 = (xsize > 0) ? (x1 + xlimit / xscale) : (x1 - xlimit / xscale);
         }
-        if (ylimit && (Math.abs(ysize) > ylimit)) {
-          y2 = (ysize > 0) ? (y1 + ylimit) : (y1 - ylimit);
+        if (ylimit && (Math.abs(ysize) > ylimit / yscale)) {
+          y2 = (ysize > 0) ? (y1 + ylimit / yscale) : (y1 - ylimit / yscale);
         }
 
-        if (ymin / yscale && (Math.abs(ysize) < ymin / yscale)) {
+        if (ymin && (Math.abs(ysize) < ymin / yscale)) {
           y2 = (ysize > 0) ? (y1 + ymin / yscale) : (y1 - ymin / yscale);
         }
-        if (xmin / xscale && (Math.abs(xsize) < xmin / xscale)) {
+        if (xmin && (Math.abs(xsize) < xmin / xscale)) {
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
         }
 
