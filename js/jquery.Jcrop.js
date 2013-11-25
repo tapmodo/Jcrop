@@ -459,6 +459,7 @@
           y1 = 0,
           x2 = 0,
           y2 = 0,
+          prevDim = { reset: true, w: 0, h: 0 },
           ox, oy;
 
       function setPressed(pos) //{{{
@@ -466,6 +467,7 @@
         pos = rebound(pos);
         x2 = x1 = pos[0];
         y2 = y1 = pos[1];
+        prevDim = { reset: true, w: 0, h: 0 };
       }
       //}}}
       function setCurrent(pos) //{{{
@@ -475,6 +477,12 @@
         oy = pos[1] - y2;
         x2 = pos[0];
         y2 = pos[1];
+
+        if (prevDim.reset) {
+           prevDim.w = x2 - x1;
+           prevDim.h = y2 - y1;
+           prevDim.reset = false;
+        }
       }
       //}}}
       function getOffset() //{{{
@@ -524,19 +532,31 @@
       //}}}
       function getFixed() //{{{
       {
+        // This function could use some optimization I think...
+        var rw = x2 - x1,
+            rh = y2 - y1;
+
+        if (options.preventSelectionFlipping) {
+          if (rw * prevDim.w <= 0) {
+             rw = prevDim.w;
+             x2 = rw + x1;
+          }
+          if (rh * prevDim.h <= 0) {
+             rh = prevDim.h;
+             y2 = rh + y1;
+          }
+        }
+        prevDim.w = rw;
+        prevDim.h = rh;
+
         if (!options.aspectRatio) {
           return getRect();
         }
-        // This function could use some optimization I think...
+
         var aspect = options.aspectRatio,
             min_x = options.minSize[0] / xscale,
-            
-            
-            //min_y = options.minSize[1]/yscale,
             max_x = options.maxSize[0] / xscale,
             max_y = options.maxSize[1] / yscale,
-            rw = x2 - x1,
-            rh = y2 - y1,
             rwa = Math.abs(rw),
             rha = Math.abs(rh),
             real_ratio = rwa / rha,
@@ -1686,6 +1706,7 @@
     minSelect: [0, 0],
     maxSize: [0, 0],
     minSize: [0, 0],
+    preventSelectionFlipping: false,
 
     // Callbacks / Event Handlers
     onChange: function () {},
