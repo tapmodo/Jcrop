@@ -1,4 +1,4 @@
-/**
+/*!
  * jquery.Jcrop.js v0.9.12
  * jQuery Image Cropping Plugin - released under MIT License 
  * Author: Kelly Hallman <khallman@gmail.com>
@@ -412,7 +412,7 @@
             }
             support[events[i]] = isSupported;
           }
-          return support.touchstart && support.touchend && support.touchmove;
+          return (support.touchstart && support.touchend && support.touchmove) || !!navigator.msMaxTouchPoints;
         }
         catch(err) {
           return false;
@@ -448,7 +448,7 @@
           e.pageY = e.originalEvent.changedTouches[0].pageY;
           return e;
         },
-        isSupported: hasTouchSupport,
+        isSupported: hasTouchSupport(),
         support: detectSupport()
       };
     }());
@@ -459,6 +459,7 @@
           y1 = 0,
           x2 = 0,
           y2 = 0,
+          prevDim = { reset: true, w: 0, h: 0 },
           ox, oy;
 
       function setPressed(pos) //{{{
@@ -466,6 +467,7 @@
         pos = rebound(pos);
         x2 = x1 = pos[0];
         y2 = y1 = pos[1];
+        prevDim = { reset: true, w: 0, h: 0 };
       }
       //}}}
       function setCurrent(pos) //{{{
@@ -475,6 +477,12 @@
         oy = pos[1] - y2;
         x2 = pos[0];
         y2 = pos[1];
+
+        if (prevDim.reset) {
+           prevDim.w = x2 - x1;
+           prevDim.h = y2 - y1;
+           prevDim.reset = false;
+        }
       }
       //}}}
       function getOffset() //{{{
@@ -524,19 +532,31 @@
       //}}}
       function getFixed() //{{{
       {
+        // This function could use some optimization I think...
+        var rw = x2 - x1,
+            rh = y2 - y1;
+
+        if (options.preventSelectionFlipping) {
+          if (rw * prevDim.w <= 0) {
+             rw = prevDim.w;
+             x2 = rw + x1;
+          }
+          if (rh * prevDim.h <= 0) {
+             rh = prevDim.h;
+             y2 = rh + y1;
+          }
+        }
+        prevDim.w = rw;
+        prevDim.h = rh;
+
         if (!options.aspectRatio) {
           return getRect();
         }
-        // This function could use some optimization I think...
+
         var aspect = options.aspectRatio,
             min_x = options.minSize[0] / xscale,
-            
-            
-            //min_y = options.minSize[1]/yscale,
             max_x = options.maxSize[0] / xscale,
             max_y = options.maxSize[1] / yscale,
-            rw = x2 - x1,
-            rh = y2 - y1,
             rwa = Math.abs(rw),
             rha = Math.abs(rh),
             real_ratio = rwa / rha,
@@ -655,17 +675,17 @@
             ysize = y2 - y1,
             delta;
 
-        if (xlimit && (Math.abs(xsize) > xlimit)) {
-          x2 = (xsize > 0) ? (x1 + xlimit) : (x1 - xlimit);
+        if (xlimit && (Math.abs(xsize) > xlimit / xscale)) {
+          x2 = (xsize > 0) ? (x1 + xlimit / xscale) : (x1 - xlimit / xscale);
         }
-        if (ylimit && (Math.abs(ysize) > ylimit)) {
-          y2 = (ysize > 0) ? (y1 + ylimit) : (y1 - ylimit);
+        if (ylimit && (Math.abs(ysize) > ylimit / yscale)) {
+          y2 = (ysize > 0) ? (y1 + ylimit / yscale) : (y1 - ylimit / yscale);
         }
 
-        if (ymin / yscale && (Math.abs(ysize) < ymin / yscale)) {
+        if (ymin && (Math.abs(ysize) < ymin / yscale)) {
           y2 = (ysize > 0) ? (y1 + ymin / yscale) : (y1 - ymin / yscale);
         }
-        if (xmin / xscale && (Math.abs(xsize) < xmin / xscale)) {
+        if (xmin && (Math.abs(xsize) < xmin / xscale)) {
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
         }
 
@@ -894,6 +914,10 @@
           div = dragDiv(ord, hdep++).css({
             opacity: options.handleOpacity
           }).addClass(cssClass('handle'));
+
+          if (Touch.isSupported) {
+            div.addClass('touch');
+          }
 
         if (hs) { div.width(hs).height(hs); }
 
@@ -1384,6 +1408,11 @@
     {
       Coords.setPressed([l[0], l[1]]);
       Coords.setCurrent([l[2], l[3]]);
+
+      // Make sure selection coordinates reflect min/max size restrictions.
+      Selection.refresh();
+
+      // Show selection.
       Selection.update();
     }
     //}}}
@@ -1682,6 +1711,7 @@
     minSelect: [0, 0],
     maxSize: [0, 0],
     minSize: [0, 0],
+    preventSelectionFlipping: false,
 
     // Callbacks / Event Handlers
     onChange: function () {},

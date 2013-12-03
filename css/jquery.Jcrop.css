@@ -102,6 +102,43 @@
   margin-bottom: -4px;
   margin-left: -4px;
 }
+.jcrop-handle.touch {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+}
+.jcrop-handle.touch.ord-n {
+  margin-left: -26px;
+  margin-top: -26px;
+}
+.jcrop-handle.touch.ord-s {
+  margin-bottom: -26px;
+  margin-left: -26px;
+}
+.jcrop-handle.touch.ord-e {
+  margin-right: -26px;
+  margin-top: -26px;
+}
+.jcrop-handle.touch.ord-w {
+  margin-left: -26px;
+  margin-top: -26px;
+}
+.jcrop-handle.touch.ord-nw {
+  margin-left: -26px;
+  margin-top: -26px;
+}
+.jcrop-handle.touch.ord-ne {
+  margin-right: -26px;
+  margin-top: -26px;
+}
+.jcrop-handle.touch.ord-se {
+  margin-bottom: -26px;
+  margin-right: -26px;
+}
+.jcrop-handle.touch.ord-sw {
+  margin-bottom: -26px;
+  margin-left: -26px;
+}
 /* Dragbars */
 .jcrop-dragbar.ord-n,
 .jcrop-dragbar.ord-s {

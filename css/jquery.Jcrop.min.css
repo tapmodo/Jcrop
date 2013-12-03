@@ -1,4 +1,4 @@
-/* jquery.Jcrop.min.css v0.9.12 (build:20130521) */
+/* jquery.Jcrop.min.css v0.9.12 (build:20131124) */
 .jcrop-holder{-ms-touch-action:none;direction:ltr;text-align:left;}
 .jcrop-vline,.jcrop-hline{background:#FFF url(Jcrop.gif);font-size:0;position:absolute;}
 .jcrop-vline{height:100%;width:1px!important;}
@@ -15,6 +15,8 @@
 .jcrop-handle.ord-ne{margin-right:-4px;margin-top:-4px;right:0;top:0;}
 .jcrop-handle.ord-se{bottom:0;margin-bottom:-4px;margin-right:-4px;right:0;}
 .jcrop-handle.ord-sw{bottom:0;left:0;margin-bottom:-4px;margin-left:-4px;}
+.jcrop-handle.touch{border-radius:25px;height:50px;width:50px;}
+.jcrop-handle.touch.ord-se{margin-bottom:-26px;margin-right:-26px;}
 .jcrop-dragbar.ord-n,.jcrop-dragbar.ord-s{height:7px;width:100%;}
 .jcrop-dragbar.ord-e,.jcrop-dragbar.ord-w{height:100%;width:7px;}
 .jcrop-dragbar.ord-n{margin-top:-4px;}
@@ -27,3 +29,6 @@
 .jcrop-dark .jcrop-handle{-moz-border-radius:3px;-webkit-border-radius:3px;background-color:#FFF;border-color:#000;border-radius:3px;}
 .solid-line .jcrop-vline,.solid-line .jcrop-hline{background:#FFF;}
 .jcrop-holder img,img.jcrop-preview{max-width:none;}
+.jcrop-handle.touch.ord-n,.jcrop-handle.touch.ord-w,.jcrop-handle.touch.ord-nw{margin-left:-26px;margin-top:-26px;}
+.jcrop-handle.touch.ord-s,.jcrop-handle.touch.ord-sw{margin-bottom:-26px;margin-left:-26px;}
+.jcrop-handle.touch.ord-e,.jcrop-handle.touch.ord-ne{margin-right:-26px;margin-top:-26px;}

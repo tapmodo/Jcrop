@@ -12,13 +12,18 @@
 // Used to set handle and dragbar size/width
 // To center on a 1px selection line, use an odd number
 @grabSize: 7px;
+@grabTouchSize: 50px;
 
 // Used to offset handles and dragbar
 // Default value will center on 1px selection line
 @grabOffset: (floor(@grabSize/2)+1) * -1;
+@grabTouchOffset: (floor(@grabTouchSize/2)+1) * -1;
 
 @handleSize: @grabSize;
+@handleTouchSize: @grabTouchSize;
+@handleTouchRadius: (floor(@handleTouchSize / 2));
 @handleOffset: @grabOffset;
+@handleTouchOffset: @grabTouchOffset;
 @handleBorderWidth: 1px;
 @handleBorderColor: #eee;
 @handleBorderStyle: solid;
@@ -89,6 +94,21 @@
   &.ord-ne {margin-right:@handleOffset;margin-top:@handleOffset;right:0;top:0;}
   &.ord-se {bottom:0;margin-bottom:@handleOffset;margin-right:@handleOffset;right:0;}
   &.ord-sw {bottom:0;left:0;margin-bottom:@handleOffset;margin-left:@handleOffset;}
+
+  &.touch {
+    width: @handleTouchSize;
+    height: @handleTouchSize;
+    border-radius: @handleTouchRadius;
+
+    &.ord-n {margin-left:@handleTouchOffset;margin-top:@handleTouchOffset;}
+    &.ord-s {margin-bottom:@handleTouchOffset;margin-left:@handleTouchOffset;}
+    &.ord-e {margin-right:@handleTouchOffset;margin-top:@handleTouchOffset;}
+    &.ord-w {margin-left:@handleTouchOffset;margin-top:@handleTouchOffset;}
+    &.ord-nw {margin-left:@handleTouchOffset;margin-top:@handleTouchOffset;}
+    &.ord-ne {margin-right:@handleTouchOffset;margin-top:@handleTouchOffset;}
+    &.ord-se {margin-bottom:@handleTouchOffset;margin-right:@handleTouchOffset}
+    &.ord-sw {margin-bottom:@handleTouchOffset;margin-left:@handleTouchOffset;}
+  }
 
 }
 
