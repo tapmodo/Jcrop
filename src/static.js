@@ -108,12 +108,6 @@
       return obj;
     },
     // }}}
-    //supportsCanvas: function(){{{
-    supportsCanvas: function(){
-        var elem = document.createElement('canvas');
-        return !!(elem.getContext && elem.getContext('2d'));
-    },
-    // }}}
     // imgCopy: function(imgel){{{
     imgCopy: function(imgel){
       var img = new Image;
@@ -123,7 +117,7 @@
     // }}}
     // imageClone: function(imgel){{{
     imageClone: function(imgel){
-      return Jcrop.supportsCanvas()?
+      return $.Jcrop.supportsCanvas?
         Jcrop.canvasClone(imgel):
         Jcrop.imgCopy(imgel);
     },
