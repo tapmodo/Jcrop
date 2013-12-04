@@ -1721,6 +1721,14 @@
         }
           
       }
+
+      if (this.opt.trueSize){
+        var dw = this.opt.trueSize[0];
+        var dh = this.opt.trueSize[1];
+        var cs = this.getContainerSize();
+        this.opt.xscale = dw / cs[0];
+        this.opt.yscale = dh / cs[1];
+      }
     },
     // }}}
     // setOptions: function(opt){{{
@@ -1980,6 +1988,11 @@
       };
     },
     //}}}
+    // getContainerSize: function(){{{
+    getContainerSize: function(){
+      return [ this.container.width(), this.container.height() ];
+    },
+    // }}}
     // resizeContainer: function(w,h){{{
     resizeContainer: function(w,h){
       this.container.width(w).height(h);

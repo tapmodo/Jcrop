@@ -34,6 +34,14 @@
         }
           
       }
+
+      if (this.opt.trueSize){
+        var dw = this.opt.trueSize[0];
+        var dh = this.opt.trueSize[1];
+        var cs = this.getContainerSize();
+        this.opt.xscale = dw / cs[0];
+        this.opt.yscale = dh / cs[1];
+      }
     },
     // }}}
     // setOptions: function(opt){{{
@@ -316,12 +324,6 @@
         targ.src = src;
         $(targ).width(w).height(h);
         t.applySizeConstraints();
-        if (t.opt.trueSize){
-          var dw = t.opt.trueSize[0];
-          var dh = t.opt.trueSize[1];
-          t.opt.xscale = dw / w;
-          t.opt.yscale = dh / h;
-        }
         t.refresh();
         t.container.trigger('cropimage',[t,targ]);
 
