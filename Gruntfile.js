@@ -7,6 +7,7 @@ module.exports = function(grunt) {
     'src/intro.js',
     'src/filter/*.js',
     'src/component/*.js',
+    'src/stage/*.js',
     'src/constructor.js',
     'src/static.js',
     'src/api.js',
