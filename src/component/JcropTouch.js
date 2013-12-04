@@ -65,7 +65,7 @@
       shimStageDrag: function(){
         this.core.container
           .addClass('jcrop-touch')
-          .on('touchstart.jcrop.jcrop-stage',this.dragWrap(this.core.ui.stage.startDragHandler()));
+          .on('touchstart.jcrop.jcrop-stage',this.dragWrap(this.core.ui.manager.startDragHandler()));
       },
       // }}}
       // dragWrap: function(cb){{{

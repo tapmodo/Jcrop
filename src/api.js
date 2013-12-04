@@ -4,7 +4,7 @@
     init: function(){
       this.event = new this.opt.eventManagerComponent(this);
       this.ui.keyboard = new this.opt.keyboardComponent(this);
-      this.ui.stage = new this.opt.stagemanagerComponent(this);
+      this.ui.manager = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
 
       if ($.Jcrop.component.Touch.support())
@@ -16,7 +16,7 @@
     // applySizeConstraints: function(){{{
     applySizeConstraints: function(){
       var o = this.opt,
-          img = this.opt.imgTarget;
+          img = this.opt.imgsrc;
 
       if (img){
 
@@ -63,10 +63,10 @@
     // }}}
     //destroy: function(){{{
     destroy: function(){
-      if (this.opt.imgTarget) {
-        this.container.before(this.opt.imgTarget);
+      if (this.opt.imgsrc) {
+        this.container.before(this.opt.imgsrc);
         this.container.remove();
-        $(this.opt.imgTarget).removeData('Jcrop');
+        $(this.opt.imgsrc).removeData('Jcrop');
       } else {
         // @todo: more elegant destroy() process for non-image containers
         this.container.remove();
@@ -301,7 +301,7 @@
     // }}}
     // setImage: function(src,cb){{{
     setImage: function(src,cb){
-      var t = this, targ = t.opt.imgTarget;
+      var t = this, targ = t.opt.imgsrc;
 
       if (!targ) return false;
 

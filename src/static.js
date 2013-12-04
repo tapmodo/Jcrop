@@ -8,6 +8,10 @@
     Selection: Selection,
     Keyboard: KeyWatcher,
     Thumbnailer: Thumbnailer,
+    AbstractStage: AbstractStage,
+    ImageStage: ImageStage,
+    CanvasStage: CanvasStage,
+    CanvasAnimator: CanvasAnimator,
     Touch: JcropTouch
   };
 
@@ -33,6 +37,9 @@
       stagemanagerComponent:  Jcrop.component.StageManager,
       animatorComponent:      Jcrop.component.Animator,
       selectionComponent:     Jcrop.component.Selection,
+
+      // This is a function that is called, which returns a stage object
+      stageConstructor:       Jcrop.stageConstructor,
 
       // Stage Behavior
       allowSelect: true,
@@ -146,6 +153,26 @@
           else return [ w, w / ratio ];
     },
     // }}}
+    stageConstructor: function(el,options,callback){
+
+      function done_loading(obj,opt){
+        if (typeof callback == 'function')
+          callback.call(this,obj,opt);
+      };
+
+      if (el.tagName == 'IMG'){
+
+        if ($.Jcrop.supportsCanvas)
+          $.Jcrop.component.CanvasStage.create(el,options,done_loading);
+
+        else
+          $.Jcrop.component.ImageStage.create(el,options,done_loading);
+      }
+
+      else
+        $.Jcrop.component.AbstractStage.create(el,options,done_loading);
+
+    },
     // supportsColorFade: function(){{{
     supportsColorFade: function(){
       return $.fx.step.hasOwnProperty('backgroundColor');
