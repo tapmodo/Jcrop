@@ -43,22 +43,6 @@
             t.refresh();
           });
         }
-        else if (Jcrop.supportsCSSTransforms) {
-          t.core.container.on('cropredraw',function(e){
-            t.copyTransforms();
-            t.refresh();
-          });
-        }
-      },
-      copyTransforms: function(){
-        var s = this.core.ui.stage;
-        var rx = this.cw/this.preview.width();
-        var ry = this.ch/this.preview.height();
-        this.preview.css({
-          transform: 'rotate('+s.angle+'deg) '+
-            'scale('+s.scale+','+s.scale+') '+
-            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
-        });
       },
       updateImage: function(imgel){
         this.preview.remove();
@@ -124,27 +108,21 @@
       },
       initEvents: function(){
         var t = this;
-        t.core.container.on('croprotstart croprotend cropimage cropstart cropmove cropend',function(e,s,c){
+        t.core.container.on('cropimage cropstart cropmove cropend',function(e,s,c){
           if (t.selectionTarget && (t.selectionTarget !== e.target)) return false;
 
           switch(e.type){
-
             case 'cropimage':
               t.updateImage(c);
               break;
-
             case 'cropstart':
               t.selectionStart(s);
-            case 'croprotstart':
               t.show();
               break;
-
             case 'cropend':
               t.renderCoords(c);
-            case 'croprotend':
               if (t.autoHide) t.hide();
               break;
-
             case 'cropmove':
               t.renderCoords(c);
               break;

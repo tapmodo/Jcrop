@@ -68,7 +68,7 @@ $.extend(CanvasStage.prototype,{
 
     // And restore the updated context
     this.context.restore();
-    this.$canvas.trigger('redraw');
+    this.$canvas.trigger('cropredraw');
     return this;
   },
   // }}}

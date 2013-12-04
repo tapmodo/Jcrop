@@ -389,6 +389,77 @@
   });
 
   /**
+   *  CanvasAnimator
+   *  manages smooth cropping animation
+   *
+   *  This object is called internally to manage animation.
+   *  An in-memory div is animated and a progress callback
+   *  is used to update the selection coordinates of the
+   *  visible selection in realtime.
+   */
+  // var CanvasAnimator = function(selection){{{
+  var CanvasAnimator = function(stage){
+    this.stage = stage;
+    this.core = stage.core;
+    this.cloneStagePosition();
+  };
+  // }}}
+
+  $.extend(CanvasAnimator.prototype,{
+    cloneStagePosition: function(){
+      var s = this.stage;
+      this.angle = s.angle;
+      this.scale = s.scale;
+      this.offset = s.offset;
+    },
+    // getElement: function(){{{
+    getElement: function(){
+      var s = this.stage;
+
+      return $('<div />')
+        .css({
+          position: 'absolute',
+          top: s.offset[0]+'px',
+          left: s.offset[1]+'px',
+          width: s.angle+'px',
+          height: s.scale+'px'
+        });
+    },
+    // }}}
+    // animate: function(cb){{{
+    animate: function(cb){
+      var t = this;
+
+      this.scale = this.stage.boundScale(this.scale);
+
+      t.getElement().animate({
+        top: t.offset[0]+'px',
+        left: t.offset[1]+'px',
+        width: t.angle+'px',
+        height: t.scale+'px'
+      },{
+        easing: t.core.opt.animEasing,
+        duration: t.core.opt.animDuration,
+        complete: function(){
+          (typeof cb == 'function') && cb.call(this);
+        },
+        progress: function(anim){
+          var props = {}, i, tw = anim.tweens;
+
+          for(i=0;i<tw.length;i++){
+            props[tw[i].prop] = tw[i].now; }
+
+          t.stage.setAngle(props.width)
+            .setScale(props.height)
+            .setOffset(props.top,props.left)
+            .redraw();
+        }
+      });
+    }
+    // }}}
+  });
+
+  /**
    *  CropAnimator
    *  manages smooth cropping animation
    *
@@ -751,7 +822,7 @@
       shimStageDrag: function(){
         this.core.container
           .addClass('jcrop-touch')
-          .on('touchstart.jcrop.jcrop-stage',this.dragWrap(this.core.ui.stage.startDragHandler()));
+          .on('touchstart.jcrop.jcrop-stage',this.dragWrap(this.core.ui.manager.startDragHandler()));
       },
       // }}}
       // dragWrap: function(cb){{{
@@ -1378,22 +1449,6 @@
             t.refresh();
           });
         }
-        else if (Jcrop.supportsCSSTransforms) {
-          t.core.container.on('cropredraw',function(e){
-            t.copyTransforms();
-            t.refresh();
-          });
-        }
-      },
-      copyTransforms: function(){
-        var s = this.core.ui.stage;
-        var rx = this.cw/this.preview.width();
-        var ry = this.ch/this.preview.height();
-        this.preview.css({
-          transform: 'rotate('+s.angle+'deg) '+
-            'scale('+s.scale+','+s.scale+') '+
-            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
-        });
       },
       updateImage: function(imgel){
         this.preview.remove();
@@ -1459,27 +1514,21 @@
       },
       initEvents: function(){
         var t = this;
-        t.core.container.on('croprotstart croprotend cropimage cropstart cropmove cropend',function(e,s,c){
+        t.core.container.on('cropimage cropstart cropmove cropend',function(e,s,c){
           if (t.selectionTarget && (t.selectionTarget !== e.target)) return false;
 
           switch(e.type){
-
             case 'cropimage':
               t.updateImage(c);
               break;
-
             case 'cropstart':
               t.selectionStart(s);
-            case 'croprotstart':
               t.show();
               break;
-
             case 'cropend':
               t.renderCoords(c);
-            case 'croprotend':
               if (t.autoHide) t.hide();
               break;
-
             case 'cropmove':
               t.renderCoords(c);
               break;
@@ -1488,6 +1537,156 @@
       }
     }
   });
+
+
+var AbstractStage = function(){
+};
+
+$.extend(AbstractStage,{
+  create: function(el,options,callback){
+    var obj = new AbstractStage;
+    obj.element = el;
+    callback.call(this,obj,options);
+  },
+  prototype: {
+    attach: function(core){
+      this.core = core;
+      core.ui.stage = this;
+    },
+    getElement: function(){
+      return this.element;
+    }
+  }
+});
+
+
+
+var ImageStage = function(){
+};
+
+ImageStage.prototype = new AbstractStage();
+
+$.extend(ImageStage,{
+  create: function(el,options,callback){
+    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
+      var obj = new ImageStage;
+      obj.element = $(el).wrap('<div />').parent();
+
+      obj.element.width(w).height(h);
+      obj.imgsrc = el;
+
+      if (typeof callback == 'function')
+        callback.call(this,obj,options);
+    });
+  }
+});
+
+
+
+var CanvasStage = function(){
+  this.angle = 0;
+  this.scale = 1;
+  this.scaleMin = 0.2;
+  this.scaleMax = 1.25;
+  this.offset = [0,0];
+};
+
+CanvasStage.prototype = new AbstractStage();
+
+$.extend(CanvasStage,{
+  create: function(el,options,callback){
+    var $el = $(el);
+    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
+      var obj = new CanvasStage;
+      $el.hide();
+      obj.createCanvas(el,w,h);
+      $el.before(obj.element);
+      obj.imgsrc = el;
+      obj.redraw();
+
+      if (typeof callback == 'function')
+        callback(obj,options);
+    });
+  }
+});
+
+$.extend(CanvasStage.prototype,{
+  init: function(core){
+    this.core = core;
+  },
+  createCanvas: function(img,w,h){
+    this.width = w;
+    this.height = h;
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.$canvas = $(this.canvas)
+      .width(w)
+      .height(h);
+    this.context = this.canvas.getContext('2d');
+    this.fillstyle = "rgb(0,0,0)";
+    this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
+  },
+  // clear: function() {{{
+  clear: function() {
+    this.context.fillStyle = this.fillstyle;
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    return this;
+  },
+  // }}}
+  // redraw: function() {{{
+  redraw: function() {
+    // Save the current context
+    this.context.save();
+    this.clear();
+
+    // Translate to the center point of our image
+    this.context.translate(parseInt(this.width * 0.5), parseInt(this.height * 0.5));
+    // Perform the rotation and scaling
+    this.context.translate(this.offset[0],this.offset[1]);
+    this.context.rotate(this.angle * (Math.PI/180));
+    this.context.scale(this.scale,this.scale);
+    // Translate back to the top left of our image
+    this.context.translate(-parseInt(this.width * 0.5), -parseInt(this.height * 0.5));
+    // Finally we draw the image
+    this.context.drawImage(this.imgsrc,0,0,this.width,this.height);
+
+    // And restore the updated context
+    this.context.restore();
+    this.$canvas.trigger('cropredraw');
+    return this;
+  },
+  // }}}
+  // setOffset: function(x,y) {{{
+  setOffset: function(x,y) {
+    this.offset = [x,y];
+    return this;
+  },
+  // }}}
+  // setAngle: function(v) {{{
+  setAngle: function(v) {
+    this.angle = v;
+    return this;
+  },
+  // }}}
+  boundScale: function(v){
+    if (v<this.scaleMin) v = this.scaleMin;
+    else if (v>this.scaleMax) v = this.scaleMax;
+    return v;
+  },
+  // setScale: function(v) {{{
+  setScale: function(v) {
+    this.scale = this.boundScale(v);
+    return this;
+  },
+  // }}}
+  // setFillStyle: function(v) {{{
+  setFillStyle: function(v) {
+    this.fillstyle = v;
+    return this;
+  }
+  // }}}
+});
 
 
   // Jcrop constructor
@@ -1532,6 +1731,10 @@
     Selection: Selection,
     Keyboard: KeyWatcher,
     Thumbnailer: Thumbnailer,
+    AbstractStage: AbstractStage,
+    ImageStage: ImageStage,
+    CanvasStage: CanvasStage,
+    CanvasAnimator: CanvasAnimator,
     Touch: JcropTouch
   };
 
@@ -1557,6 +1760,9 @@
       stagemanagerComponent:  Jcrop.component.StageManager,
       animatorComponent:      Jcrop.component.Animator,
       selectionComponent:     Jcrop.component.Selection,
+
+      // This is a function that is called, which returns a stage object
+      stageConstructor:       Jcrop.stageConstructor,
 
       // Stage Behavior
       allowSelect: true,
@@ -1625,12 +1831,6 @@
       return obj;
     },
     // }}}
-    //supportsCanvas: function(){{{
-    supportsCanvas: function(){
-        var elem = document.createElement('canvas');
-        return !!(elem.getContext && elem.getContext('2d'));
-    },
-    // }}}
     // imgCopy: function(imgel){{{
     imgCopy: function(imgel){
       var img = new Image;
@@ -1640,7 +1840,7 @@
     // }}}
     // imageClone: function(imgel){{{
     imageClone: function(imgel){
-      return Jcrop.supportsCanvas()?
+      return $.Jcrop.supportsCanvas?
         Jcrop.canvasClone(imgel):
         Jcrop.imgCopy(imgel);
     },
@@ -1670,6 +1870,26 @@
           else return [ w, w / ratio ];
     },
     // }}}
+    stageConstructor: function(el,options,callback){
+
+      function done_loading(obj,opt){
+        if (typeof callback == 'function')
+          callback.call(this,obj,opt);
+      };
+
+      if (el.tagName == 'IMG'){
+
+        if ($.Jcrop.supportsCanvas)
+          $.Jcrop.component.CanvasStage.create(el,options,done_loading);
+
+        else
+          $.Jcrop.component.ImageStage.create(el,options,done_loading);
+      }
+
+      else
+        $.Jcrop.component.AbstractStage.create(el,options,done_loading);
+
+    },
     // supportsColorFade: function(){{{
     supportsColorFade: function(){
       return $.fx.step.hasOwnProperty('backgroundColor');
@@ -1691,7 +1911,7 @@
     init: function(){
       this.event = new this.opt.eventManagerComponent(this);
       this.ui.keyboard = new this.opt.keyboardComponent(this);
-      this.ui.stage = new this.opt.stagemanagerComponent(this);
+      this.ui.manager = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
 
       if ($.Jcrop.component.Touch.support())
@@ -1703,7 +1923,7 @@
     // applySizeConstraints: function(){{{
     applySizeConstraints: function(){
       var o = this.opt,
-          img = this.opt.imgTarget;
+          img = this.opt.imgsrc;
 
       if (img){
 
@@ -1758,10 +1978,10 @@
     // }}}
     //destroy: function(){{{
     destroy: function(){
-      if (this.opt.imgTarget) {
-        this.container.before(this.opt.imgTarget);
+      if (this.opt.imgsrc) {
+        this.container.before(this.opt.imgsrc);
         this.container.remove();
-        $(this.opt.imgTarget).removeData('Jcrop');
+        $(this.opt.imgsrc).removeData('Jcrop');
       } else {
         // @todo: more elegant destroy() process for non-image containers
         this.container.remove();
@@ -2001,7 +2221,7 @@
     // }}}
     // setImage: function(src,cb){{{
     setImage: function(src,cb){
-      var t = this, targ = t.opt.imgTarget;
+      var t = this, targ = t.opt.imgsrc;
 
       if (!targ) return false;
 
@@ -2061,32 +2281,20 @@
       if (exists)
         exists.setOptions(options);
 
-      // Otherwise, if it's an IMG, create a wrapper
-      else if (this.tagName == 'IMG')
+      else {
+        if (!options.stageConstructor) options.stageConstructor = $.Jcrop.stageConstructor;
 
-        $.Jcrop.component.ImageLoader.attach(this,function(w,h){
-          var $wrapper = $t.wrap('<div />').parent();
+        options.stageConstructor(this,options,function(stage,options){
+          var obj = $.Jcrop.attach(stage.element,options);
 
-          $wrapper.width(w).height(h);
-
-          obj = $.Jcrop.attach($wrapper,$.extend({},options,{
-            imgTarget: t
-          }));
+          if (typeof stage.attach == 'function')
+            stage.attach(obj);
 
           $t.data('Jcrop',obj);
 
           if (typeof callback == 'function')
             callback.call(obj);
         });
-
-      // Or hope it's a block element, because we're attaching
-      else {
-
-        obj = $.Jcrop.attach(this,options);
-        $t.data('Jcrop',obj);
-
-        if (typeof callback == 'function')
-          callback.call(obj);
       }
 
       return this;
@@ -2094,7 +2302,285 @@
   };
   // }}}
 
+/* Modernizr 2.7.0 (Custom Build) | MIT & BSD
+ * Build: http://modernizr.com/download/#-canvas-canvastext-draganddrop-inlinesvg-svg-svgclippaths-hasevent-url_data_uri
+ */
+;
+
+
+
+var Modernizr = (function( window, document, undefined ) {
+
+    var version = '2.7.0',
+
+    Modernizr = {},
+
+
+    docElement = document.documentElement,
+
+    mod = 'modernizr',
+    modElem = document.createElement(mod),
+    mStyle = modElem.style,
+
+    inputElem  ,
+
+
+    toString = {}.toString,
+
+
+
+    ns = {'svg': 'http://www.w3.org/2000/svg'},
+
+    tests = {},
+    inputs = {},
+    attrs = {},
+
+    classes = [],
+
+    slice = classes.slice,
+
+    featureName,
+
+    isEventSupported = (function() {
+
+      var TAGNAMES = {
+        'select': 'input', 'change': 'input',
+        'submit': 'form', 'reset': 'form',
+        'error': 'img', 'load': 'img', 'abort': 'img'
+      };
+
+      function isEventSupported( eventName, element ) {
+
+        element = element || document.createElement(TAGNAMES[eventName] || 'div');
+        eventName = 'on' + eventName;
+
+            var isSupported = eventName in element;
+
+        if ( !isSupported ) {
+                if ( !element.setAttribute ) {
+            element = document.createElement('div');
+          }
+          if ( element.setAttribute && element.removeAttribute ) {
+            element.setAttribute(eventName, '');
+            isSupported = is(element[eventName], 'function');
+
+                    if ( !is(element[eventName], 'undefined') ) {
+              element[eventName] = undefined;
+            }
+            element.removeAttribute(eventName);
+          }
+        }
+
+        element = null;
+        return isSupported;
+      }
+      return isEventSupported;
+    })(),
+
+
+    _hasOwnProperty = ({}).hasOwnProperty, hasOwnProp;
+
+    if ( !is(_hasOwnProperty, 'undefined') && !is(_hasOwnProperty.call, 'undefined') ) {
+      hasOwnProp = function (object, property) {
+        return _hasOwnProperty.call(object, property);
+      };
+    }
+    else {
+      hasOwnProp = function (object, property) { 
+        return ((property in object) && is(object.constructor.prototype[property], 'undefined'));
+      };
+    }
+
+
+    if (!Function.prototype.bind) {
+      Function.prototype.bind = function bind(that) {
+
+        var target = this;
+
+        if (typeof target != "function") {
+            throw new TypeError();
+        }
+
+        var args = slice.call(arguments, 1),
+            bound = function () {
+
+            if (this instanceof bound) {
+
+              var F = function(){};
+              F.prototype = target.prototype;
+              var self = new F();
+
+              var result = target.apply(
+                  self,
+                  args.concat(slice.call(arguments))
+              );
+              if (Object(result) === result) {
+                  return result;
+              }
+              return self;
+
+            } else {
+
+              return target.apply(
+                  that,
+                  args.concat(slice.call(arguments))
+              );
+
+            }
+
+        };
+
+        return bound;
+      };
+    }
+
+    function setCss( str ) {
+        mStyle.cssText = str;
+    }
+
+    function setCssAll( str1, str2 ) {
+        return setCss(prefixes.join(str1 + ';') + ( str2 || '' ));
+    }
+
+    function is( obj, type ) {
+        return typeof obj === type;
+    }
+
+    function contains( str, substr ) {
+        return !!~('' + str).indexOf(substr);
+    }
+
+
+    function testDOMProps( props, obj, elem ) {
+        for ( var i in props ) {
+            var item = obj[props[i]];
+            if ( item !== undefined) {
+
+                            if (elem === false) return props[i];
+
+                            if (is(item, 'function')){
+                                return item.bind(elem || obj);
+                }
+
+                            return item;
+            }
+        }
+        return false;
+    }    tests['canvas'] = function() {
+        var elem = document.createElement('canvas');
+        return !!(elem.getContext && elem.getContext('2d'));
+    };
+
+    tests['canvastext'] = function() {
+        return !!(Modernizr['canvas'] && is(document.createElement('canvas').getContext('2d').fillText, 'function'));
+    };
+
+    tests['draganddrop'] = function() {
+        var div = document.createElement('div');
+        return ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div);
+    };    tests['svg'] = function() {
+        return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
+    };
+
+    tests['inlinesvg'] = function() {
+      var div = document.createElement('div');
+      div.innerHTML = '<svg/>';
+      return (div.firstChild && div.firstChild.namespaceURI) == ns.svg;
+    };
+
+
+
+    tests['svgclippaths'] = function() {
+        return !!document.createElementNS && /SVGClipPath/.test(toString.call(document.createElementNS(ns.svg, 'clipPath')));
+    };
+
+    for ( var feature in tests ) {
+        if ( hasOwnProp(tests, feature) ) {
+                                    featureName  = feature.toLowerCase();
+            Modernizr[featureName] = tests[feature]();
+
+            classes.push((Modernizr[featureName] ? '' : 'no-') + featureName);
+        }
+    }
+
+
+
+     Modernizr.addTest = function ( feature, test ) {
+       if ( typeof feature == 'object' ) {
+         for ( var key in feature ) {
+           if ( hasOwnProp( feature, key ) ) {
+             Modernizr.addTest( key, feature[ key ] );
+           }
+         }
+       } else {
+
+         feature = feature.toLowerCase();
+
+         if ( Modernizr[feature] !== undefined ) {
+                                              return Modernizr;
+         }
+
+         test = typeof test == 'function' ? test() : test;
+
+         if (typeof enableClasses !== "undefined" && enableClasses) {
+           docElement.className += ' ' + (test ? '' : 'no-') + feature;
+         }
+         Modernizr[feature] = test;
+
+       }
+
+       return Modernizr; 
+     };
+
+
+    setCss('');
+    modElem = inputElem = null;
+
+
+    Modernizr._version      = version;
+
+
+
+    Modernizr.hasEvent      = isEventSupported;    return Modernizr;
+
+})(window, window.document); // data uri test.
+// https://github.com/Modernizr/Modernizr/issues/14
+
+// This test is asynchronous. Watch out.
+
+
+// in IE7 in HTTPS this can cause a Mixed Content security popup. 
+//  github.com/Modernizr/Modernizr/issues/362
+// To avoid that you can create a new iframe and inject this.. perhaps..
+
+
+(function(){
+
+  var datauri = new Image();
+
+
+  datauri.onerror = function() {
+      Modernizr.addTest('datauri', function () { return false; });
+  };  
+  datauri.onload = function() {
+      Modernizr.addTest('datauri', function () { return (datauri.width == 1 && datauri.height == 1); });
+  };
+
+  datauri.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+
+})();
+;
+
+
   // Attach to jQuery object
   $.Jcrop = Jcrop;
+
+  $.Jcrop.supportsCanvas = Modernizr.canvas;
+  $.Jcrop.supportsCanvasText = Modernizr.canvastext;
+  $.Jcrop.supportsDragAndDrop = Modernizr.draganddrop;
+  $.Jcrop.supportsDataURI = Modernizr.datauri;
+  $.Jcrop.supportsInlineSVG = Modernizr.svg;
+  $.Jcrop.supportsInlineSVG = Modernizr.inlinesvg;
+  $.Jcrop.supportsSVGClipPaths = Modernizr.svgclippaths;
 
 })(jQuery);
