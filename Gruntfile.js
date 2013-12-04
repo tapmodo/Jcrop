@@ -11,6 +11,7 @@ module.exports = function(grunt) {
     'src/static.js',
     'src/api.js',
     'src/plugin.js',
+    'src/modernizr.js',
     'src/outro.js'
   ];
 
