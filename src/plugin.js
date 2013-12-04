@@ -32,32 +32,20 @@
       if (exists)
         exists.setOptions(options);
 
-      // Otherwise, if it's an IMG, create a wrapper
-      else if (this.tagName == 'IMG')
+      else {
+        if (!options.stageConstructor) options.stageConstructor = $.Jcrop.stageConstructor;
 
-        $.Jcrop.component.ImageLoader.attach(this,function(w,h){
-          var $wrapper = $t.wrap('<div />').parent();
+        options.stageConstructor(this,options,function(stage,options){
+          var obj = $.Jcrop.attach(stage.element,options);
 
-          $wrapper.width(w).height(h);
-
-          obj = $.Jcrop.attach($wrapper,$.extend({},options,{
-            imgTarget: t
-          }));
+          if (typeof stage.attach == 'function')
+            stage.attach(obj);
 
           $t.data('Jcrop',obj);
 
           if (typeof callback == 'function')
             callback.call(obj);
         });
-
-      // Or hope it's a block element, because we're attaching
-      else {
-
-        obj = $.Jcrop.attach(this,options);
-        $t.data('Jcrop',obj);
-
-        if (typeof callback == 'function')
-          callback.call(obj);
       }
 
       return this;
