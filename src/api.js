@@ -293,6 +293,11 @@
       };
     },
     //}}}
+    // getContainerSize: function(){{{
+    getContainerSize: function(){
+      return [ this.container.width(), this.container.height() ];
+    },
+    // }}}
     // resizeContainer: function(w,h){{{
     resizeContainer: function(w,h){
       this.container.width(w).height(h);
