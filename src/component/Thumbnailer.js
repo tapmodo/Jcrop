@@ -43,6 +43,20 @@
             t.refresh();
           });
         }
+        else if (Jcrop.supportsCSSTransforms) {
+          t.core.container.on('cropredraw',function(e){
+            t.copyTransforms();
+            t.refresh();
+          });
+        }
+      },
+      copyTransforms: function(){
+        var s = this.core.ui.stage;
+        this.preview.css({
+          transform: 'rotate('+s.angle+'deg) '+
+            'scale('+s.scale+','+s.scale+') '+
+            'translate('+s.offset[0]+'px,'+s.offset[1]+'px)'
+        });
       },
       updateImage: function(imgel){
         this.preview.remove();
