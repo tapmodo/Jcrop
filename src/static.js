@@ -8,11 +8,16 @@
     Selection: Selection,
     Keyboard: KeyWatcher,
     Thumbnailer: Thumbnailer,
-    AbstractStage: AbstractStage,
-    ImageStage: ImageStage,
-    CanvasStage: CanvasStage,
     CanvasAnimator: CanvasAnimator,
     Touch: JcropTouch
+  };
+
+  // Jcrop stage constructors
+  Jcrop.stage = {
+    Block: AbstractStage,
+    Image: ImageStage,
+    Canvas: CanvasStage,
+    Transform: TransformStage
   };
 
   // Jcrop static functions
@@ -147,26 +152,27 @@
           else return [ w, w / ratio ];
     },
     // }}}
+    // stageConstructor: function(el,options,callback){{{
     stageConstructor: function(el,options,callback){
 
-      function done_loading(obj,opt){
-        if (typeof callback == 'function')
-          callback.call(this,obj,opt);
-      };
+      // Get a priority-ordered list of available stages
+      var stages = [];
+      $.each(Jcrop.stage,function(i,e){
+        stages.push(e);
+      });
+      stages.sort(function(a,b){ return a.priority - b.priority; });
 
-      if (el.tagName == 'IMG'){
-
-        if ($.Jcrop.supportsCanvas)
-          $.Jcrop.component.CanvasStage.create(el,options,done_loading);
-
-        else
-          $.Jcrop.component.ImageStage.create(el,options,done_loading);
+      // Find the first one that supports this element
+      for(var i=0,l=stages.length;i<l;i++){
+        if (stages[i].isSupported(el,options)){
+          stages[i].create(el,options,function(obj,opt){
+            if (typeof callback == 'function') callback(obj,opt);
+          });
+          break;
+        }
       }
-
-      else
-        $.Jcrop.component.AbstractStage.create(el,options,done_loading);
-
     },
+    // }}}
     // supportsColorFade: function(){{{
     supportsColorFade: function(){
       return $.fx.step.hasOwnProperty('backgroundColor');

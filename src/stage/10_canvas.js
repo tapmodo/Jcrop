@@ -1,14 +1,13 @@
 var CanvasStage = function(){
-  this.angle = 0;
-  this.scale = 1;
-  this.scaleMin = 0.2;
-  this.scaleMax = 1.25;
-  this.offset = [0,0];
 };
 
-CanvasStage.prototype = new AbstractStage();
+CanvasStage.prototype = new TransformStage();
 
 $.extend(CanvasStage,{
+  isSupported: function(el,o){
+    if ($.Jcrop.supportsCanvas && (el.tagName == 'IMG')) return true;
+  },
+  priority: 60,
   create: function(el,options,callback){
     var $el = $(el);
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
@@ -69,29 +68,6 @@ $.extend(CanvasStage.prototype,{
     // And restore the updated context
     this.context.restore();
     this.$canvas.trigger('cropredraw');
-    return this;
-  },
-  // }}}
-  // setOffset: function(x,y) {{{
-  setOffset: function(x,y) {
-    this.offset = [x,y];
-    return this;
-  },
-  // }}}
-  // setAngle: function(v) {{{
-  setAngle: function(v) {
-    this.angle = v;
-    return this;
-  },
-  // }}}
-  boundScale: function(v){
-    if (v<this.scaleMin) v = this.scaleMin;
-    else if (v>this.scaleMax) v = this.scaleMax;
-    return v;
-  },
-  // setScale: function(v) {{{
-  setScale: function(v) {
-    this.scale = this.boundScale(v);
     return this;
   },
   // }}}

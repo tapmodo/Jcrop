@@ -2,6 +2,13 @@ var AbstractStage = function(){
 };
 
 $.extend(AbstractStage,{
+  isSupported: function(el,o){
+    // @todo: should actually check if it's an HTML element
+    return true;
+  },
+  // A higher priority means less desirable
+  // AbstractStage is the last one we want to use
+  priority: 100,
   create: function(el,options,callback){
     var obj = new AbstractStage;
     obj.element = el;
