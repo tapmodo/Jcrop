@@ -7,7 +7,7 @@
       this.ui.manager = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
 
-      if ($.Jcrop.component.Touch.support())
+      if ($.Jcrop.supportsTouch)
         new $.Jcrop.component.Touch(this);
 
       this.initEvents();
