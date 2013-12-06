@@ -41,6 +41,7 @@
       var t = this;
 
       this.scale = this.stage.boundScale(this.scale);
+      t.stage.triggerEvent('croprotstart');
 
       t.getElement().animate({
         top: t.offset[0]+'px',
@@ -51,6 +52,7 @@
         easing: t.core.opt.animEasing,
         duration: t.core.opt.animDuration,
         complete: function(){
+          t.stage.triggerEvent('croprotend');
           (typeof cb == 'function') && cb.call(this);
         },
         progress: function(anim){

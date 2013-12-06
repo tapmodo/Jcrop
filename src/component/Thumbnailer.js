@@ -122,21 +122,27 @@
       },
       initEvents: function(){
         var t = this;
-        t.core.container.on('cropimage cropstart cropmove cropend',function(e,s,c){
+        t.core.container.on('croprotstart croprotend cropimage cropstart cropmove cropend',function(e,s,c){
           if (t.selectionTarget && (t.selectionTarget !== e.target)) return false;
 
           switch(e.type){
+
             case 'cropimage':
               t.updateImage(c);
               break;
+
             case 'cropstart':
               t.selectionStart(s);
+            case 'croprotstart':
               t.show();
               break;
+
             case 'cropend':
               t.renderCoords(c);
+            case 'croprotend':
               if (t.autoHide) t.hide();
               break;
+
             case 'cropmove':
               t.renderCoords(c);
               break;
