@@ -19,6 +19,10 @@ $.extend(AbstractStage,{
       this.core = core;
       core.ui.stage = this;
     },
+    triggerEvent: function(ev){
+      $(this.element).trigger(ev);
+      return this;
+    },
     getElement: function(){
       return this.element;
     }

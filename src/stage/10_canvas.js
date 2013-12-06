@@ -41,6 +41,10 @@ $.extend(CanvasStage.prototype,{
     this.fillstyle = "rgb(0,0,0)";
     this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
   },
+  triggerEvent: function(ev){
+    this.$canvas.trigger(ev);
+    return this;
+  },
   // clear: function() {{{
   clear: function() {
     this.context.fillStyle = this.fillstyle;

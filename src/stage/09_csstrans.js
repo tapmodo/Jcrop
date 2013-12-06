@@ -58,6 +58,10 @@ $.extend(TransformStage.prototype,{
   clear: function() {
   },
   // }}}
+  triggerEvent: function(ev){
+    this.$img.trigger(ev);
+    return this;
+  },
   // redraw: function() {{{
   redraw: function() {
 
