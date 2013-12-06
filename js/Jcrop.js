@@ -431,6 +431,7 @@
       var t = this;
 
       this.scale = this.stage.boundScale(this.scale);
+      t.stage.triggerEvent('croprotstart');
 
       t.getElement().animate({
         top: t.offset[0]+'px',
@@ -441,6 +442,7 @@
         easing: t.core.opt.animEasing,
         duration: t.core.opt.animDuration,
         complete: function(){
+          t.stage.triggerEvent('croprotend');
           (typeof cb == 'function') && cb.call(this);
         },
         progress: function(anim){
@@ -1449,6 +1451,20 @@
             t.refresh();
           });
         }
+        else if (Jcrop.supportsCSSTransforms) {
+          t.core.container.on('cropredraw',function(e){
+            t.copyTransforms();
+            t.refresh();
+          });
+        }
+      },
+      copyTransforms: function(){
+        var s = this.core.ui.stage;
+        this.preview.css({
+          transform: 'rotate('+s.angle+'deg) '+
+            'scale('+s.scale+','+s.scale+') '+
+            'translate('+s.offset[0]+'px,'+s.offset[1]+'px)'
+        });
       },
       updateImage: function(imgel){
         this.preview.remove();
@@ -1514,21 +1530,27 @@
       },
       initEvents: function(){
         var t = this;
-        t.core.container.on('cropimage cropstart cropmove cropend',function(e,s,c){
+        t.core.container.on('croprotstart croprotend cropimage cropstart cropmove cropend',function(e,s,c){
           if (t.selectionTarget && (t.selectionTarget !== e.target)) return false;
 
           switch(e.type){
+
             case 'cropimage':
               t.updateImage(c);
               break;
+
             case 'cropstart':
               t.selectionStart(s);
+            case 'croprotstart':
               t.show();
               break;
+
             case 'cropend':
               t.renderCoords(c);
+            case 'croprotend':
               if (t.autoHide) t.hide();
               break;
+
             case 'cropmove':
               t.renderCoords(c);
               break;
@@ -1543,6 +1565,13 @@ var AbstractStage = function(){
 };
 
 $.extend(AbstractStage,{
+  isSupported: function(el,o){
+    // @todo: should actually check if it's an HTML element
+    return true;
+  },
+  // A higher priority means less desirable
+  // AbstractStage is the last one we want to use
+  priority: 100,
   create: function(el,options,callback){
     var obj = new AbstractStage;
     obj.element = el;
@@ -1552,6 +1581,10 @@ $.extend(AbstractStage,{
     attach: function(core){
       this.core = core;
       core.ui.stage = this;
+    },
+    triggerEvent: function(ev){
+      $(this.element).trigger(ev);
+      return this;
     },
     getElement: function(){
       return this.element;
@@ -1567,6 +1600,10 @@ var ImageStage = function(){
 ImageStage.prototype = new AbstractStage();
 
 $.extend(ImageStage,{
+  isSupported: function(el,o){
+    if (el.tagName == 'IMG') return true;
+  },
+  priority: 90,
   create: function(el,options,callback){
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
       var obj = new ImageStage;
@@ -1583,7 +1620,7 @@ $.extend(ImageStage,{
 
 
 
-var CanvasStage = function(){
+var TransformStage = function(){
   this.angle = 0;
   this.scale = 1;
   this.scaleMin = 0.2;
@@ -1591,9 +1628,88 @@ var CanvasStage = function(){
   this.offset = [0,0];
 };
 
-CanvasStage.prototype = new AbstractStage();
+TransformStage.prototype = new ImageStage();
+
+$.extend(TransformStage,{
+  isSupported: function(el,o){
+    if ($.Jcrop.supportsCSSTransforms && (el.tagName == 'IMG')) return true;
+  },
+  priority: 10,
+  create: function(el,options,callback){
+    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
+      var obj = new TransformStage;
+      obj.$img = $(el);
+      obj.element = obj.$img.wrap('<div />').parent();
+      obj.element.width(w).height(h);
+      obj.imgsrc = el;
+
+      if (typeof callback == 'function')
+        callback.call(this,obj,options);
+    });
+  }
+});
+
+$.extend(TransformStage.prototype,{
+  init: function(core){
+    this.core = core;
+  },
+  boundScale: function(v){
+    if (v<this.scaleMin) v = this.scaleMin;
+    else if (v>this.scaleMax) v = this.scaleMax;
+    return v;
+  },
+  // setOffset: function(x,y) {{{
+  setOffset: function(x,y) {
+    this.offset = [x,y];
+    return this;
+  },
+  // }}}
+  // setAngle: function(v) {{{
+  setAngle: function(v) {
+    this.angle = v;
+    return this;
+  },
+  // }}}
+  // setScale: function(v) {{{
+  setScale: function(v) {
+    this.scale = this.boundScale(v);
+    return this;
+  },
+  // }}}
+  // clear: function() {{{
+  clear: function() {
+  },
+  // }}}
+  triggerEvent: function(ev){
+    this.$img.trigger(ev);
+    return this;
+  },
+  // redraw: function() {{{
+  redraw: function() {
+
+    this.$img.css({
+      transform: 'rotate('+this.angle+'deg) '+
+        'scale('+this.scale+','+this.scale+') '+
+        'translate('+this.offset[0]+'px,'+this.offset[1]+'px)'
+    });
+
+    this.$img.trigger('cropredraw');
+    return this;
+  },
+  // }}}
+});
+
+
+var CanvasStage = function(){
+};
+
+CanvasStage.prototype = new TransformStage();
 
 $.extend(CanvasStage,{
+  isSupported: function(el,o){
+    if ($.Jcrop.supportsCanvas && (el.tagName == 'IMG')) return true;
+  },
+  priority: 60,
   create: function(el,options,callback){
     var $el = $(el);
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
@@ -1627,6 +1743,10 @@ $.extend(CanvasStage.prototype,{
     this.fillstyle = "rgb(0,0,0)";
     this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
   },
+  triggerEvent: function(ev){
+    this.$canvas.trigger(ev);
+    return this;
+  },
   // clear: function() {{{
   clear: function() {
     this.context.fillStyle = this.fillstyle;
@@ -1654,29 +1774,6 @@ $.extend(CanvasStage.prototype,{
     // And restore the updated context
     this.context.restore();
     this.$canvas.trigger('cropredraw');
-    return this;
-  },
-  // }}}
-  // setOffset: function(x,y) {{{
-  setOffset: function(x,y) {
-    this.offset = [x,y];
-    return this;
-  },
-  // }}}
-  // setAngle: function(v) {{{
-  setAngle: function(v) {
-    this.angle = v;
-    return this;
-  },
-  // }}}
-  boundScale: function(v){
-    if (v<this.scaleMin) v = this.scaleMin;
-    else if (v>this.scaleMax) v = this.scaleMax;
-    return v;
-  },
-  // setScale: function(v) {{{
-  setScale: function(v) {
-    this.scale = this.boundScale(v);
     return this;
   },
   // }}}
@@ -1731,11 +1828,16 @@ $.extend(CanvasStage.prototype,{
     Selection: Selection,
     Keyboard: KeyWatcher,
     Thumbnailer: Thumbnailer,
-    AbstractStage: AbstractStage,
-    ImageStage: ImageStage,
-    CanvasStage: CanvasStage,
     CanvasAnimator: CanvasAnimator,
     Touch: JcropTouch
+  };
+
+  // Jcrop stage constructors
+  Jcrop.stage = {
+    Block: AbstractStage,
+    Image: ImageStage,
+    Canvas: CanvasStage,
+    Transform: TransformStage
   };
 
   // Jcrop static functions
@@ -1870,26 +1972,27 @@ $.extend(CanvasStage.prototype,{
           else return [ w, w / ratio ];
     },
     // }}}
+    // stageConstructor: function(el,options,callback){{{
     stageConstructor: function(el,options,callback){
 
-      function done_loading(obj,opt){
-        if (typeof callback == 'function')
-          callback.call(this,obj,opt);
-      };
+      // Get a priority-ordered list of available stages
+      var stages = [];
+      $.each(Jcrop.stage,function(i,e){
+        stages.push(e);
+      });
+      stages.sort(function(a,b){ return a.priority - b.priority; });
 
-      if (el.tagName == 'IMG'){
-
-        if ($.Jcrop.supportsCanvas)
-          $.Jcrop.component.CanvasStage.create(el,options,done_loading);
-
-        else
-          $.Jcrop.component.ImageStage.create(el,options,done_loading);
+      // Find the first one that supports this element
+      for(var i=0,l=stages.length;i<l;i++){
+        if (stages[i].isSupported(el,options)){
+          stages[i].create(el,options,function(obj,opt){
+            if (typeof callback == 'function') callback(obj,opt);
+          });
+          break;
+        }
       }
-
-      else
-        $.Jcrop.component.AbstractStage.create(el,options,done_loading);
-
     },
+    // }}}
     // supportsColorFade: function(){{{
     supportsColorFade: function(){
       return $.fx.step.hasOwnProperty('backgroundColor');
@@ -1914,7 +2017,7 @@ $.extend(CanvasStage.prototype,{
       this.ui.manager = new this.opt.stagemanagerComponent(this);
       this.applyFilters();
 
-      if ($.Jcrop.component.Touch.support())
+      if ($.Jcrop.supportsTouch)
         new $.Jcrop.component.Touch(this);
 
       this.initEvents();
@@ -2302,16 +2405,14 @@ $.extend(CanvasStage.prototype,{
   };
   // }}}
 
-/* Modernizr 2.7.0 (Custom Build) | MIT & BSD
- * Build: http://modernizr.com/download/#-canvas-canvastext-draganddrop-inlinesvg-svg-svgclippaths-hasevent-url_data_uri
+/* Modernizr 2.7.1 (Custom Build) | MIT & BSD
+ * Build: http://modernizr.com/download/#-csstransforms-canvas-canvastext-draganddrop-inlinesvg-svg-svgclippaths-touch-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes-url_data_uri
  */
 ;
 
-
-
 var Modernizr = (function( window, document, undefined ) {
 
-    var version = '2.7.0',
+    var version = '2.7.1',
 
     Modernizr = {},
 
@@ -2327,7 +2428,15 @@ var Modernizr = (function( window, document, undefined ) {
 
     toString = {}.toString,
 
+    prefixes = ' -webkit- -moz- -o- -ms- '.split(' '),
 
+
+
+    omPrefixes = 'Webkit Moz O ms',
+
+    cssomPrefixes = omPrefixes.split(' '),
+
+    domPrefixes = omPrefixes.toLowerCase().split(' '),
 
     ns = {'svg': 'http://www.w3.org/2000/svg'},
 
@@ -2339,7 +2448,49 @@ var Modernizr = (function( window, document, undefined ) {
 
     slice = classes.slice,
 
-    featureName,
+    featureName, 
+
+
+    injectElementWithStyles = function( rule, callback, nodes, testnames ) {
+
+      var style, ret, node, docOverflow,
+          div = document.createElement('div'),
+                body = document.body,
+                fakeBody = body || document.createElement('body');
+
+      if ( parseInt(nodes, 10) ) {
+                      while ( nodes-- ) {
+              node = document.createElement('div');
+              node.id = testnames ? testnames[nodes] : mod + (nodes + 1);
+              div.appendChild(node);
+          }
+      }
+
+                style = ['&#173;','<style id="s', mod, '">', rule, '</style>'].join('');
+      div.id = mod;
+          (body ? div : fakeBody).innerHTML += style;
+      fakeBody.appendChild(div);
+      if ( !body ) {
+                fakeBody.style.background = '';
+                fakeBody.style.overflow = 'hidden';
+          docOverflow = docElement.style.overflow;
+          docElement.style.overflow = 'hidden';
+          docElement.appendChild(fakeBody);
+      }
+
+      ret = callback(div, rule);
+        if ( !body ) {
+          fakeBody.parentNode.removeChild(fakeBody);
+          docElement.style.overflow = docOverflow;
+      } else {
+          div.parentNode.removeChild(div);
+      }
+
+      return !!ret;
+
+    },
+
+
 
     isEventSupported = (function() {
 
@@ -2450,6 +2601,15 @@ var Modernizr = (function( window, document, undefined ) {
         return !!~('' + str).indexOf(substr);
     }
 
+    function testProps( props, prefixed ) {
+        for ( var i in props ) {
+            var prop = props[i];
+            if ( !contains(prop, "-") && mStyle[prop] !== undefined ) {
+                return prefixed == 'pfx' ? prop : true;
+            }
+        }
+        return false;
+    }
 
     function testDOMProps( props, obj, elem ) {
         for ( var i in props ) {
@@ -2466,7 +2626,25 @@ var Modernizr = (function( window, document, undefined ) {
             }
         }
         return false;
-    }    tests['canvas'] = function() {
+    }
+
+    function testPropsAll( prop, prefixed, elem ) {
+
+        var ucProp  = prop.charAt(0).toUpperCase() + prop.slice(1),
+            props   = (prop + ' ' + cssomPrefixes.join(ucProp + ' ') + ucProp).split(' ');
+
+            if(is(prefixed, "string") || is(prefixed, "undefined")) {
+          return testProps(props, prefixed);
+
+            } else {
+          props = (prop + ' ' + (domPrefixes).join(ucProp + ' ') + ucProp).split(' ');
+          return testDOMProps(props, prefixed, elem);
+        }
+    }
+
+
+
+    tests['canvas'] = function() {
         var elem = document.createElement('canvas');
         return !!(elem.getContext && elem.getContext('2d'));
     };
@@ -2474,11 +2652,32 @@ var Modernizr = (function( window, document, undefined ) {
     tests['canvastext'] = function() {
         return !!(Modernizr['canvas'] && is(document.createElement('canvas').getContext('2d').fillText, 'function'));
     };
+    tests['touch'] = function() {
+        var bool;
+
+        if(('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch) {
+          bool = true;
+        } else {
+          injectElementWithStyles(['@media (',prefixes.join('touch-enabled),('),mod,')','{#modernizr{top:9px;position:absolute}}'].join(''), function( node ) {
+            bool = node.offsetTop === 9;
+          });
+        }
+
+        return bool;
+    };
 
     tests['draganddrop'] = function() {
         var div = document.createElement('div');
         return ('draggable' in div) || ('ondragstart' in div && 'ondrop' in div);
-    };    tests['svg'] = function() {
+    };
+
+
+    tests['csstransforms'] = function() {
+        return !!testPropsAll('transform');
+    };
+
+
+    tests['svg'] = function() {
         return !!document.createElementNS && !!document.createElementNS(ns.svg, 'svg').createSVGRect;
     };
 
@@ -2539,11 +2738,25 @@ var Modernizr = (function( window, document, undefined ) {
 
     Modernizr._version      = version;
 
+    Modernizr._prefixes     = prefixes;
+    Modernizr._domPrefixes  = domPrefixes;
+    Modernizr._cssomPrefixes  = cssomPrefixes;
 
 
-    Modernizr.hasEvent      = isEventSupported;    return Modernizr;
+    Modernizr.hasEvent      = isEventSupported;
 
-})(window, window.document); // data uri test.
+    Modernizr.testProp      = function(prop){
+        return testProps([prop]);
+    };
+
+    Modernizr.testAllProps  = testPropsAll;
+
+
+    Modernizr.testStyles    = injectElementWithStyles;
+    return Modernizr;
+
+})(window, window.document);
+// data uri test.
 // https://github.com/Modernizr/Modernizr/issues/14
 
 // This test is asynchronous. Watch out.
@@ -2571,7 +2784,6 @@ var Modernizr = (function( window, document, undefined ) {
 })();
 ;
 
-
   // Attach to jQuery object
   $.Jcrop = Jcrop;
 
@@ -2579,8 +2791,10 @@ var Modernizr = (function( window, document, undefined ) {
   $.Jcrop.supportsCanvasText = Modernizr.canvastext;
   $.Jcrop.supportsDragAndDrop = Modernizr.draganddrop;
   $.Jcrop.supportsDataURI = Modernizr.datauri;
-  $.Jcrop.supportsInlineSVG = Modernizr.svg;
+  $.Jcrop.supportsSVG = Modernizr.svg;
   $.Jcrop.supportsInlineSVG = Modernizr.inlinesvg;
   $.Jcrop.supportsSVGClipPaths = Modernizr.svgclippaths;
+  $.Jcrop.supportsCSSTransforms = Modernizr.csstransforms;
+  $.Jcrop.supportsTouch = Modernizr.touch;
 
 })(jQuery);
