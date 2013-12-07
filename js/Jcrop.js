@@ -1296,7 +1296,7 @@
       var origy = e.pageY - o.top + this.offset[1];
       var m = c.ui.multi;
 
-      // Determinenewly dragged crop behavior if multi disabled
+      // Determine newly dragged crop behavior if multi disabled
       if (!c.opt.multi) {
         // For multiCleaanup true, remove all existing selections
         if (c.opt.multiCleanup){
@@ -1460,10 +1460,12 @@
       },
       copyTransforms: function(){
         var s = this.core.ui.stage;
+        var rx = this.cw/this.preview.width();
+        var ry = this.ch/this.preview.height();
         this.preview.css({
           transform: 'rotate('+s.angle+'deg) '+
             'scale('+s.scale+','+s.scale+') '+
-            'translate('+s.offset[0]+'px,'+s.offset[1]+'px)'
+            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
         });
       },
       updateImage: function(imgel){
@@ -1688,9 +1690,10 @@ $.extend(TransformStage.prototype,{
   redraw: function() {
 
     this.$img.css({
-      transform: 'rotate('+this.angle+'deg) '+
-        'scale('+this.scale+','+this.scale+') '+
-        'translate('+this.offset[0]+'px,'+this.offset[1]+'px)'
+      transform:
+        'translate('+(-this.offset[0])+'px,'+(-this.offset[1])+'px) '+
+        'rotate('+this.angle+'deg) '+
+        'scale('+this.scale+','+this.scale+')'
     });
 
     this.$img.trigger('cropredraw');
