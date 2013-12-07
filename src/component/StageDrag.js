@@ -34,7 +34,7 @@
       var origy = e.pageY - o.top + this.offset[1];
       var m = c.ui.multi;
 
-      // Determinenewly dragged crop behavior if multi disabled
+      // Determine newly dragged crop behavior if multi disabled
       if (!c.opt.multi) {
         // For multiCleaanup true, remove all existing selections
         if (c.opt.multiCleanup){
