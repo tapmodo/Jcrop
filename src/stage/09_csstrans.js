@@ -66,9 +66,10 @@ $.extend(TransformStage.prototype,{
   redraw: function() {
 
     this.$img.css({
-      transform: 'rotate('+this.angle+'deg) '+
-        'scale('+this.scale+','+this.scale+') '+
-        'translate('+this.offset[0]+'px,'+this.offset[1]+'px)'
+      transform:
+        'translate('+(-this.offset[0])+'px,'+(-this.offset[1])+'px) '+
+        'rotate('+this.angle+'deg) '+
+        'scale('+this.scale+','+this.scale+')'
     });
 
     this.$img.trigger('cropredraw');

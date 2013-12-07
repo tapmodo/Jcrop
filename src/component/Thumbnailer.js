@@ -52,10 +52,12 @@
       },
       copyTransforms: function(){
         var s = this.core.ui.stage;
+        var rx = this.cw/this.preview.width();
+        var ry = this.ch/this.preview.height();
         this.preview.css({
           transform: 'rotate('+s.angle+'deg) '+
             'scale('+s.scale+','+s.scale+') '+
-            'translate('+s.offset[0]+'px,'+s.offset[1]+'px)'
+            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
         });
       },
       updateImage: function(imgel){
