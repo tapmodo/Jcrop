@@ -1636,7 +1636,7 @@ $.extend(TransformStage,{
   isSupported: function(el,o){
     if ($.Jcrop.supportsCSSTransforms && (el.tagName == 'IMG')) return true;
   },
-  priority: 10,
+  priority: 101,
   create: function(el,options,callback){
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
       var obj = new TransformStage;
@@ -1715,16 +1715,18 @@ $.extend(CanvasStage,{
   priority: 60,
   create: function(el,options,callback){
     var $el = $(el);
+    var opt = $.extend({},options);
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
       var obj = new CanvasStage;
       $el.hide();
       obj.createCanvas(el,w,h);
       $el.before(obj.element);
       obj.imgsrc = el;
+      opt.imgsrc = el;
       obj.redraw();
 
       if (typeof callback == 'function')
-        callback(obj,options);
+        callback(obj,opt);
     });
   }
 });
