@@ -12,7 +12,7 @@ $.extend(TransformStage,{
   isSupported: function(el,o){
     if ($.Jcrop.supportsCSSTransforms && (el.tagName == 'IMG')) return true;
   },
-  priority: 10,
+  priority: 101,
   create: function(el,options,callback){
     $.Jcrop.component.ImageLoader.attach(el,function(w,h){
       var obj = new TransformStage;
