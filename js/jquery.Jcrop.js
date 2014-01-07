@@ -629,7 +629,7 @@
         if (p[0] > boundx) p[0] = boundx;
         if (p[1] > boundy) p[1] = boundy;
 
-        return [Math.round(p[0]), Math.round(p[1])];
+        return [p[0], p[1]];
       }
       //}}}
       function flipCoords(x1, y1, x2, y2) //{{{
