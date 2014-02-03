@@ -5,6 +5,10 @@
 .jcrop-vline.right{right:0;}
 .jcrop-hline{height:1px!important;width:100%;}
 .jcrop-hline.bottom{bottom:0;}
+.jcrop-vline.midleft{left:33.33%;}
+.jcrop-vline.midright{right:33.33%;}
+.jcrop-hline.midtop{top:33.33%;}
+.jcrop-hline.midbottom{bottom:33.33%;}
 .jcrop-tracker{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;height:100%;width:100%;}
 .jcrop-handle{background-color:#333;border:1px #EEE solid;font-size:1px;height:7px;width:7px;}
 .jcrop-handle.ord-n{left:50%;margin-left:-4px;margin-top:-4px;top:0;}
