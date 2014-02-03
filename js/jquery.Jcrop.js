@@ -922,6 +922,10 @@
             case's': cl='hline bottom'; break;
             case'e': cl='vline right'; break;
             case'w': cl='vline'; break;
+            case'mn': cl='hline midtop'; break;
+            case'ms': cl='hline midbottom'; break;
+            case'me': cl='vline midright'; break;
+            case'mw': cl='vline midleft'; break;
           }
           borders[li[i]] = insertBorder(cl);
         }
