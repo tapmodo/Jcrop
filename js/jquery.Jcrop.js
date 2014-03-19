@@ -228,10 +228,10 @@
     function newSelection(e) //{{{
     {
       if (options.disabled) {
-        return false;
+        return;
       }
       if (!options.allowSelect) {
-        return false;
+        return;
       }
       btndown = true;
       docOffset = getPos($img);
