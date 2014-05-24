@@ -43,7 +43,7 @@ MIT License
 
 **Jcrop is free software under MIT License.**
 
-#### Copyright (c) 2008-2012 Tapmodo Interactive LLC,<br />http://github.com/tapmodo/Jcrop
+#### Copyright (c) 2008-2014 Tapmodo Interactive LLC,<br />http://github.com/tapmodo/Jcrop
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
