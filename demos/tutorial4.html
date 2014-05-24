@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Animations + Transitions | Jcrop Demo</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.Jcrop.js"></script>
+<script src="../js/jquery.color.js"></script>
+<script type="text/javascript">
+  jQuery(function($){
+
+    var jcrop_api;
+
+    $('#target').Jcrop({
+      bgFade:     true,
+      bgOpacity: .2,
+      setSelect: [ 60, 70, 540, 330 ]
+    },function(){
+      jcrop_api = this;
+    });
+
+    $('#fadetog').change(function(){
+      jcrop_api.setOptions({
+        bgFade: this.checked
+      });
+    }).attr('checked','checked');
+
+    $('#shadetog').change(function(){
+      if (this.checked) $('#shadetxt').slideDown();
+        else $('#shadetxt').slideUp();
+      jcrop_api.setOptions({
+        shade: this.checked
+      });
+    }).attr('checked',false);
+
+    // Define page sections
+    var sections = {
+      bgc_buttons: 'Change bgColor',
+      bgo_buttons: 'Change bgOpacity',
+      anim_buttons: 'Animate Selection'
+    };
+    // Define animation buttons
+    var ac = {
+      anim1: [217,122,382,284],
+      anim2: [20,20,580,380],
+      anim3: [24,24,176,376],
+      anim4: [347,165,550,355],
+      anim5: [136,55,472,183]
+    };
+    // Define bgOpacity buttons
+    var bgo = {
+      Low: .2,
+      Mid: .5,
+      High: .8,
+      Full: 1
+    };
+    // Define bgColor buttons
+    var bgc = {
+      R: '#900',
+      B: '#4BB6F0',
+      Y: '#F0B207',
+      G: '#46B81C',
+      W: 'white',
+      K: 'black'
+    };
+    // Create fieldset targets for buttons
+    for(i in sections)
+      insertSection(i,sections[i]);
+
+    function create_btn(c) {
+      var $o = $('<button />').addClass('btn btn-small');
+      if (c) $o.append(c);
+      return $o;
+    }
+
+    var a_count = 1;
+    // Create animation buttons
+    for(i in ac) {
+      $('#anim_buttons .btn-group')
+        .append(
+          create_btn(a_count++).click(animHandler(ac[i])),
+          ' '
+        );
+    }
+
+    $('#anim_buttons .btn-group').append(
+      create_btn('Bye!').click(function(e){
+        $(e.target).addClass('active');
+        jcrop_api.animateTo(
+          [300,200,300,200],
+          function(){
+            this.release();
+            $(e.target).closest('.btn-group').find('.active').removeClass('active');
+          }
+        );
+        return false;
+      })
+    );
+
+    // Create bgOpacity buttons
+    for(i in bgo) {
+      $('#bgo_buttons .btn-group').append(
+        create_btn(i).click(setoptHandler('bgOpacity',bgo[i])),
+        ' '
+      );
+    }
+    // Create bgColor buttons
+    for(i in bgc) {
+      $('#bgc_buttons .btn-group').append(
+        create_btn(i).css({
+          background: bgc[i],
+          color: ((i == 'K') || (i == 'R'))?'white':'black'
+        }).click(setoptHandler('bgColor',bgc[i])), ' '
+      );
+    }
+    // Function to insert named sections into interface
+    function insertSection(k,v) {
+      $('#interface').prepend(
+        $('<fieldset></fieldset>').attr('id',k).append(
+          $('<legend></legend>').append(v),
+          '<div class="btn-toolbar"><div class="btn-group"></div></div>'
+        )
+      );
+    };
+    // Handler for option-setting buttons
+    function setoptHandler(k,v) {
+      return function(e) {
+        $(e.target).closest('.btn-group').find('.active').removeClass('active');
+        $(e.target).addClass('active');
+        var opt = { };
+        opt[k] = v;
+        jcrop_api.setOptions(opt);
+        return false;
+      };
+    };
+    // Handler for animation buttons
+    function animHandler(v) {
+      return function(e) {
+        $(e.target).addClass('active');
+        jcrop_api.animateTo(v,function(){
+          $(e.target).closest('.btn-group').find('.active').removeClass('active');
+        });
+        return false;
+      };
+    };
+
+    $('#bgo_buttons .btn:first,#bgc_buttons .btn:last').addClass('active');
+    $('#interface').show();
+
+  });
+
+
+</script>
+<link rel="stylesheet" href="demo_files/main.css" type="text/css" />
+<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+<link rel="stylesheet" href="../css/jquery.Jcrop.extras.css" type="text/css" />
+
+</head>
+<body>
+
+<div class="container">
+<div class="row">
+<div class="span12">
+<div class="jc-demo-box">
+
+<div class="page-header">
+<ul class="breadcrumb first">
+  <li><a href="../index.html">Jcrop</a> <span class="divider">/</span></li>
+  <li><a href="../index.html">Demos</a> <span class="divider">/</span></li>
+  <li class="active">Animations + Transitions</li>
+</ul>
+<h1>Animations + Transitions</h1>
+</div>
+
+
+  <div class="row-fluid">
+    <div class="span9">
+    <img src="demo_files/sago.jpg" id="target" alt="Jcrop Image" />
+
+<div class="description">
+  <p id="shadetxt" style="display:none; color:#900;">
+    <b>Experimental shader active.</b>
+    Jcrop now includes a shading mode that facilitates building
+    better transparent Jcrop instances. The experimental shader is less
+    robust than Jcrop's default shading method and should only be
+    used if you require this functionality. 
+  </p>
+
+  <p>
+    <b>Animation/Transitions.</b>
+    Demonstration of animateTo API method and transitions for bgColor
+    and bgOpacity options. Color fading requires inclusion of John Resig's
+    jQuery <a href="http://plugins.jquery.com/project/color">Color 
+    Animations</a> plugin. If it is not included, colors will not fade.
+  </p>
+</div>
+
+    </div>
+    <div class="span3" id="interface">
+      <label class="checkbox">
+        <input type="checkbox" id="fadetog" /> Enable fading (bgFade: true)
+      </label>
+      <label class="checkbox">
+        <input type="checkbox" id="shadetog" /> Use experimental shader (shade: true)
+      </label>
+    </div>
+  </div>
+
+<div class="tapmodo-footer">
+  <a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+  <div class="segment"><b>&copy; 2008-2014 Tapmodo Interactive LLC</b><br />
+    Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a>
+  </div>
+</div>
+
+<div class="clearfix"></div>
+
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
+
