@@ -1,0 +1,43 @@
+/* Jcrop Demo Site CSS - 2014 Tapmodo Interactive LLC - MIT License
+   Not required to run Jcrop - contains twitter bootstrap code */
+
+@import "./_bootstrap.less";
+@import "./_tapmodo.less";
+
+.page-header {
+  .breadcrumb {
+    font-size: 11px;
+    padding: 5px 12px;
+    margin: 0;
+    list-style: none;
+    background-color: #f5f5f5;
+    .border-radius(@baseBorderRadius @baseBorderRadius 0 0);
+    li {
+      display: inline-block;
+      .ie7-inline-block();
+      text-shadow: 0 1px 0 @white;
+    }
+    .divider {
+      padding: 0 5px;
+      color: #ccc;
+    }
+    .active {
+      color: @grayLight;
+    }
+  }
+  h1 {
+    .border-radius(0 0 @baseBorderRadius @baseBorderRadius);
+    background-color: lighten(#f5f5f5,1%);
+    #gradient > .vertical(#f5f5f5, white);
+    margin: 0;
+    padding: 10px 12px;
+  }
+  margin-top: 4px;
+  padding-bottom: 0;
+  margin-left: -12px;
+  margin-right: -12px;
+}
+
+.modal-body {
+  max-height: 60%;
+}
