@@ -12,9 +12,8 @@ MYBUILD="${JCROP_VERSION} (build:${JCROP_BUILD})"
 
 echo "/* $OUTFILE $MYBUILD */" > ../css/${OUTFILE}
 
-csstidy ../css/jquery.Jcrop.css \
-  --silent=true --template=high \
-  --sort_properties=true \
+cleancss --s1 \
+  ../css/jquery.Jcrop.css \
   >> ../css/${OUTFILE}
 
 popd > /dev/null
