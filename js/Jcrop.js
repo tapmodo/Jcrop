@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20130914
+/*! Jcrop.js v2.0.0-RC1 - build: 20140525
  *  @copyright 2008-2013 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
