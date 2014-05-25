@@ -10,7 +10,7 @@
 // Setting some variables to 
 // Used to set handle and dragbar size/width
 // To center on a 1px selection line, use an odd number
-@grabSize: 8px;
+@grabSize: 7px;
 
 // Used to offset handles and dragbar
 // Default value will center on 1px selection line
@@ -81,6 +81,7 @@
 .handles (@handleSize;@handleOffset;@bgColor;@bgOpacity;@borderWidth;@borderColor;@borderStyle) {
 
   @ieopacity: @bgOpacity * 100;
+  box-sizing: content-box;
   font-size: 0;
   z-index: 10;
   background-color: @bgColor;

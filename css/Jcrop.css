@@ -1,4 +1,4 @@
-/*! Jcrop.css v2.0.0-RC1 - build: 20130909
+/*! Jcrop.css v2.0.0-RC1 - build: 20140525
  *  Copyright 2008-2013 Tapmodo Interactive LLC
  *  Free software under MIT License
  **/
@@ -76,11 +76,12 @@
 }
 /* Selection Handles */
 .jcrop-handle {
+  box-sizing: content-box;
   z-index: 10;
   background-color: rgba(49, 28, 28, 0.58);
   border: 1px #eeeeee solid;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   font-size: 0;
   position: absolute;
   filter: alpha(opacity=80) !important;
@@ -88,67 +89,68 @@
 }
 .jcrop-handle.ord-n {
   left: 50%;
-  margin-left: -5px;
-  margin-top: -5px;
+  margin-left: -4px;
+  margin-top: -4px;
   top: 0;
   cursor: n-resize;
 }
 .jcrop-handle.ord-s {
   bottom: 0;
   left: 50%;
-  margin-bottom: -5px;
-  margin-left: -5px;
+  margin-bottom: -4px;
+  margin-left: -4px;
   cursor: s-resize;
 }
 .jcrop-handle.ord-e {
-  margin-right: -5px;
-  margin-top: -5px;
+  margin-right: -4px;
+  margin-top: -4px;
   right: 0;
   top: 50%;
   cursor: e-resize;
 }
 .jcrop-handle.ord-w {
   left: 0;
-  margin-left: -5px;
-  margin-top: -5px;
+  margin-left: -4px;
+  margin-top: -4px;
   top: 50%;
   cursor: w-resize;
 }
 .jcrop-handle.ord-nw {
   left: 0;
-  margin-left: -5px;
-  margin-top: -5px;
+  margin-left: -4px;
+  margin-top: -4px;
   top: 0;
   cursor: nw-resize;
 }
 .jcrop-handle.ord-ne {
-  margin-right: -5px;
-  margin-top: -5px;
+  margin-right: -4px;
+  margin-top: -4px;
   right: 0;
   top: 0;
   cursor: ne-resize;
 }
 .jcrop-handle.ord-se {
   bottom: 0;
-  margin-bottom: -5px;
-  margin-right: -5px;
+  margin-bottom: -4px;
+  margin-right: -4px;
   right: 0;
   cursor: se-resize;
 }
 .jcrop-handle.ord-sw {
   bottom: 0;
   left: 0;
-  margin-bottom: -5px;
-  margin-left: -5px;
+  margin-bottom: -4px;
+  margin-left: -4px;
   cursor: sw-resize;
 }
 /* Larger Selection Handles for Touch */
 .jcrop-touch .jcrop-handle {
+  box-sizing: content-box;
   z-index: 10;
   background-color: rgba(49, 28, 28, 0.58);
   border: 1px #eeeeee solid;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   font-size: 0;
   position: absolute;
   filter: alpha(opacity=80) !important;
@@ -156,58 +158,58 @@
 }
 .jcrop-touch .jcrop-handle.ord-n {
   left: 50%;
-  margin-left: -9px;
-  margin-top: -9px;
+  margin-left: -8px;
+  margin-top: -8px;
   top: 0;
   cursor: n-resize;
 }
 .jcrop-touch .jcrop-handle.ord-s {
   bottom: 0;
   left: 50%;
-  margin-bottom: -9px;
-  margin-left: -9px;
+  margin-bottom: -8px;
+  margin-left: -8px;
   cursor: s-resize;
 }
 .jcrop-touch .jcrop-handle.ord-e {
-  margin-right: -9px;
-  margin-top: -9px;
+  margin-right: -8px;
+  margin-top: -8px;
   right: 0;
   top: 50%;
   cursor: e-resize;
 }
 .jcrop-touch .jcrop-handle.ord-w {
   left: 0;
-  margin-left: -9px;
-  margin-top: -9px;
+  margin-left: -8px;
+  margin-top: -8px;
   top: 50%;
   cursor: w-resize;
 }
 .jcrop-touch .jcrop-handle.ord-nw {
   left: 0;
-  margin-left: -9px;
-  margin-top: -9px;
+  margin-left: -8px;
+  margin-top: -8px;
   top: 0;
   cursor: nw-resize;
 }
 .jcrop-touch .jcrop-handle.ord-ne {
-  margin-right: -9px;
-  margin-top: -9px;
+  margin-right: -8px;
+  margin-top: -8px;
   right: 0;
   top: 0;
   cursor: ne-resize;
 }
 .jcrop-touch .jcrop-handle.ord-se {
   bottom: 0;
-  margin-bottom: -9px;
-  margin-right: -9px;
+  margin-bottom: -8px;
+  margin-right: -8px;
   right: 0;
   cursor: se-resize;
 }
 .jcrop-touch .jcrop-handle.ord-sw {
   bottom: 0;
   left: 0;
-  margin-bottom: -9px;
-  margin-left: -9px;
+  margin-bottom: -8px;
+  margin-left: -8px;
   cursor: sw-resize;
 }
 /* Selection Dragbars */
@@ -218,32 +220,32 @@
 }
 .jcrop-dragbar.ord-n,
 .jcrop-dragbar.ord-s {
-  height: 8px !important;
+  height: 7px !important;
   width: 100%;
 }
 .jcrop-dragbar.ord-e,
 .jcrop-dragbar.ord-w {
   top: 0px;
   height: 100%;
-  width: 8px !important;
+  width: 7px !important;
 }
 .jcrop-dragbar.ord-n {
-  margin-top: -5px;
+  margin-top: -4px;
   cursor: n-resize;
   top: 0px;
 }
 .jcrop-dragbar.ord-s {
   bottom: 0;
-  margin-bottom: -5px;
+  margin-bottom: -4px;
   cursor: s-resize;
 }
 .jcrop-dragbar.ord-e {
-  margin-right: -5px;
+  margin-right: -4px;
   right: 0;
   cursor: e-resize;
 }
 .jcrop-dragbar.ord-w {
-  margin-left: -5px;
+  margin-left: -4px;
   cursor: w-resize;
 }
 /* Shading panels */
