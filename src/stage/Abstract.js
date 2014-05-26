@@ -16,7 +16,7 @@ $.extend(AbstractStage,{
   },
   prototype: {
     attach: function(core){
-      this.core = core;
+      this.init(core);
       core.ui.stage = this;
     },
     triggerEvent: function(ev){

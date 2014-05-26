@@ -1,4 +1,9 @@
 var CanvasStage = function(){
+  this.angle = 0;
+  this.scale = 1;
+  this.scaleMin = 0.2;
+  this.scaleMax = 1.25;
+  this.offset = [0,0];
 };
 
 CanvasStage.prototype = new TransformStage();
@@ -18,10 +23,11 @@ $.extend(CanvasStage,{
       $el.before(obj.element);
       obj.imgsrc = el;
       opt.imgsrc = el;
-      obj.redraw();
 
-      if (typeof callback == 'function')
+      if (typeof callback == 'function'){
         callback(obj,opt);
+        obj.redraw();
+      }
     });
   }
 });
@@ -63,7 +69,7 @@ $.extend(CanvasStage.prototype,{
     // Translate to the center point of our image
     this.context.translate(parseInt(this.width * 0.5), parseInt(this.height * 0.5));
     // Perform the rotation and scaling
-    this.context.translate(this.offset[0],this.offset[1]);
+    this.context.translate(this.offset[0]/this.core.opt.xscale,this.offset[1]/this.core.opt.yscale);
     this.context.rotate(this.angle * (Math.PI/180));
     this.context.scale(this.scale,this.scale);
     // Translate back to the top left of our image
