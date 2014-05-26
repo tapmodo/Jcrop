@@ -7,6 +7,7 @@
     StageManager: StageManager,
     Selection: Selection,
     Keyboard: KeyWatcher,
+    Thumbnailer: Thumbnailer,
     Touch: JcropTouch
   };
 
