@@ -10,17 +10,18 @@
       jQuery(function($){
       
         // Create a new Selection object extended from Selection
-        var CircleSel = function(core){
-          this.core = core;
-        };
+        var CircleSel = function(){ };
         
-        // Extend this object's prototype with the Selection.prototype
-        // And extend with some additional/updated methods
-        $.extend(CircleSel.prototype,$.Jcrop.component.Selection.prototype,{
-          zoomscale: 1.4,
+        // Set the custom selection's prototype object to be an instance
+        // of the built-in Selection object
+        CircleSel.prototype = new $.Jcrop.component.Selection();
+        
+        // Then we can continue extending it
+        $.extend(CircleSel.prototype,{
+          zoomscale: 1,
           attach: function(){
             this.frame.css({
-              background: 'url(' + $('#target')[0].src.replace('750','1050') + ')'
+              background: 'url(' + $('#target')[0].src.replace('750','750') + ')'
             });
           },
           positionBg: function(b){
@@ -28,7 +29,8 @@
             var midy = ( b.y + b.y2 ) / 2;
             var ox = (-midx*this.zoomscale)+(b.w/2);
             var oy = (-midy*this.zoomscale)+(b.h/2);
-            this.frame.css({ backgroundPosition: ox+'px '+oy+'px' });
+            //this.frame.css({ backgroundPosition: ox+'px '+oy+'px' });
+            this.frame.css({ backgroundPosition: -(b.x+1)+'px '+(-b.y-1)+'px' });
           },
           redraw: function(b){
           
@@ -41,14 +43,28 @@
           prototype: $.Jcrop.component.Selection.prototype
         });
         
-        // Now set it as the component that is used for new selections
-        
+        // Jcrop Initialization
         $('#target').Jcrop({
+        
+          // Change default Selection component for new selections
           selectionComponent: CircleSel,
+          
+          // Use a default filter chain that omits shader
+          applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'round' ],
+          
+          // Start with circles only
           aspectRatio: 1,
+          
+          // Set an initial selection
+          setSelect: [ 147, 55, 456, 390 ],
+          
+          // Only n/s/e/w handles
           handles: [ 'n','s','e','w' ],
+          
+          // No dragbars or borders
           dragbars: [ ],
           borders: [ ]
+          
         },function(){
           this.container.addClass('jcrop-circle-demo');
           interface_load(this);
@@ -57,22 +73,8 @@
         function interface_load(obj){
           cb = obj;
           
-          cb.ui.stage.dragger.multi = false;
-          //cb.ui.stage.dragger.offset = [ -10, -10 ];
-          
-          cb.container.append($('<div />').css({
-            position: 'absolute',
-            top: '0px',
-            left: '0px',
-            backgroundColor: 'black',
-            width: '100%',
-            height: '100%',
-            opacity: .4
-          }));
-          
-          cb.newSelection().update($.Jcrop.wrapFromXywh([ 147, 55, 456, 390 ])).refresh();
-          cb.ui.selection.removeFilter(cb.filter.shader);
-          cb.ui.selection.refresh();
+          // Add in a custom shading element...
+          cb.container.append($('<div />').addClass('custom-shade'));
           
           function random_coords() {
             return [
@@ -134,8 +136,32 @@
     </script>
     <link rel="stylesheet" href="demo_files/main.css">
     <link rel="stylesheet" href="demo_files/demos.css">
-    <link rel="stylesheet" href="../css/Jcrop.css">
-    <link rel="stylesheet" href="http://jcrop-dev.tapmodo.com/Jcrop/demos/demo_files/extras.css">
+    <link rel="stylesheet" href="../css/Jcrop.css"><style type="text/css">.jcrop-circle-demo .jcrop-box {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  border: 1px rgba(255, 255, 255, 0.4) solid;
+  border-radius: 50%;
+  -webkit-box-shadow: 1px 1px 26px #000000;
+  -moz-box-shadow: 1px 1px 26px #000000;
+  box-shadow: 1px 1px 26px #000000;
+  overflow: hidden;
+}
+.jcrop-circle-demo .jcrop-box:focus {
+  outline: none;
+}
+.custom-shade {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-color: black;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+}
+</style>
   </head>
   <body>
     <div class="navbar navbar-fixed-top">
@@ -172,7 +198,7 @@
                 <li><b>Circles</b></li>
               </ul>
             </div>
-            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/lake3-750.jpg" id="target">
+            <div class="page-interface"><img src="http://jcrop-cdn.tapmodo.com/assets/images/sierra2-750.jpg" id="target">
               <div class="btn-toolbar"><a href="#" data-action="random-move" id="moveselection" class="btn btn-small">Move</a><span class="btn-group"><a href="#" data-setting="aspectRatio" data-value="1" class="btn active btn-small">Circle</a><a href="#" data-setting="aspectRatio" data-value="0" class="btn btn-small">Ellipse</a></span><span class="btn-group"><a href="#" data-setting="multi" data-value="0" class="btn active btn-small">Single </a><a href="#" data-setting="multi" data-value="1" class="btn btn-small">Multi</a></span></div>
               <h3>About This Demo</h3><p><strong>And you thought Jcrop could only do rectangles!</strong> Well, that&#39;s still
 mostly true. This demo implements a custom <code>Selection</code> object that
@@ -185,14 +211,6 @@ selection an appearance of a circle or an ellipse. The built-in
 shader filter has been disabled, and a semi-opaque <code>&lt;div&gt;</code> has been
 inserted over the image to give the appearance of shading.</p>
 
-<h4>Magnification Illusion</h4>
-
-<p>The custom <code>Selection</code> object also inserts an image as its background
-to enable the shading effect. In this case, the image is similar to
-the original image but slightly larger, to provide the illusion of
-magnification. As the selection is moved, the background position is
-updated to reflect the correct position over the underlying image.</p>
-
 <h4>Cropping Irregular Selections</h4>
 
 <p>If you actually want to <em>crop</em> a circle or an ellipse, you&#39;re on
@@ -201,7 +219,7 @@ crops, and further processing can be done to extract the circle
 or ellipse from the image.</p>
             </div>
             <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
-              <div class="segment"><b>&copy; 2008-2014 Tapmodo Interactive LLC</b>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
                 <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
               </div>
             </div>

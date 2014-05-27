@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< HEAD
   <head>
     <title>Non-image Cropping | Jcrop Demos</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -79,7 +78,7 @@ You are now cropping over &lt;div&gt; content.</p>
 <code>canvas</code> or over an arbitrary <code>div</code>.</p>
             </div>
             <div class="tapmodo-footer"><a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
-              <div class="segment"><b>&copy; 2008-2014 Tapmodo Interactive LLC</b>
+              <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b>
                 <div>Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a></div>
               </div>
             </div>
@@ -90,89 +89,3 @@ You are now cropping over &lt;div&gt; content.</p>
     </div>
   </body>
 </html>
-=======
-<head>
-  <title>Non-image Cropping | Jcrop Demo</title>
-  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-
-<script src="../js/jquery.min.js"></script>
-<script src="../js/jquery.Jcrop.js"></script>
-<script type="text/javascript">
-  jQuery(function($){
-
-    // I did JSON.stringify(jcrop_api.tellSelect()) on a crop I liked:
-    var c = {"x":13,"y":7,"x2":487,"y2":107,"w":474,"h":100};
-
-    $('#target').Jcrop({
-      bgFade: true,
-      setSelect: [c.x,c.y,c.x2,c.y2]
-    });
-
-  });
-
-
-</script>
-<link rel="stylesheet" href="demo_files/main.css" type="text/css" />
-<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
-<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
-<style type="text/css">
-  #target {
-    background-color: #ccc;
-    width: 500px;
-    height: 330px;
-    font-size: 24px;
-    display: block;
-  }
-
-
-</style>
-
-</head>
-<body>
-
-<div class="container">
-<div class="row">
-<div class="span12">
-<div class="jc-demo-box">
-
-<div class="page-header">
-<ul class="breadcrumb first">
-  <li><a href="../index.html">Jcrop</a> <span class="divider">/</span></li>
-  <li><a href="../index.html">Demos</a> <span class="divider">/</span></li>
-  <li class="active">Non-image Cropping</li>
-</ul>
-<h1>Non-image Cropping</h1>
-</div>
-
-  <p id="target">
-    <b style="display:block; padding: .5em 1em;">
-      This is an example of attaching Jcrop to a target that is not an image. You are now cropping a paragraph tag.
-    </b>
-  </p>
-
-  <div class="description">
-  <p>
-    <b>Attaching Jcrop to a non-image element.</b><br />
-    This is mostly useful to implement other interfaces, such as <tt>canvas</tt> or over an arbitrary <tt>div</tt>.
-  </p>
-  </div>
-
-
-<div class="tapmodo-footer">
-  <a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
-  <div class="segment"><b>&copy; 2008-2014 Tapmodo Interactive LLC</b><br />
-    Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a>
-  </div>
-</div>
-
-<div class="clearfix"></div>
-
-</div>
-</div>
-</div>
-</div>
-
-</body>
-</html>
-
->>>>>>> Year updates

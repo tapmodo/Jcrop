@@ -1,0 +1,263 @@
+/* Jcrop Demo Site CSS - 2013 Tapmodo Interactive LLC - MIT License
+   Not required to run Jcrop - contains twitter bootstrap code */
+/* To build these CSS files you must have LESS and run
+ * $ git submodule init
+ * $ git submodule update
+ * ...to pull in the Twitter bootstrap files
+ */
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* JCROP DEMOS CSS */
+li small {
+  color: #f07878;
+}
+.inline-labels label {
+  display: inline;
+}
+div#interface.span3 fieldset {
+  margin-bottom: 1.5em;
+}
+div#interface.span3 fieldset legend {
+  margin-bottom: 2px;
+  padding-bottom: 2px;
+  line-height: 1.2;
+}
+.article h1 {
+  color: #333;
+  margin-top: .2em;
+}
+.jc-demo {
+  text-align: center;
+}
+.jcropper-holder {
+  border: 1px #bbb solid;
+}
+.jc-demo-box {
+  text-align: left;
+  margin: 3.4em auto 2em;
+  background: white;
+  border: 1px #bbb solid;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.25);
+  box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.25);
+  padding: 1em 2em 2em;
+}
+form {
+  margin: 1.5em 0;
+}
+form.coords label {
+  margin-right: 1em;
+  font-weight: bold;
+  color: #900;
+}
+form.coords input {
+  width: 3em;
+}
+.ui-widget-overlay {
+  opacity: 0.80;
+  filter: alpha(opacity=70);
+}
+.jc-dialog {
+  padding-top: 1em;
+}
+.ui-dialog p tt {
+  color: yellow;
+}
+.jcrop-light .jcrop-selection {
+  -moz-box-shadow: 0px 0px 15px #999;
+  /* Firefox */
+
+  -webkit-box-shadow: 0px 0px 15px #999;
+  /* Safari, Chrome */
+
+  box-shadow: 0px 0px 15px #999;
+  /* CSS3 */
+
+}
+.jcrop-dark .jcrop-selection {
+  -moz-box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.35);
+  /* Firefox */
+
+  -webkit-box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.35);
+  /* Safari, Chrome */
+
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.35);
+  /* CSS3 */
+
+}
+.jcrop-dark .jcrop-selection:hover {
+  -moz-box-shadow: 0px 0px 6px #000000;
+  /* Firefox */
+
+  -webkit-box-shadow: 0px 0px 6px #000000;
+  /* Safari, Chrome */
+
+  box-shadow: 0px 0px 6px #000000;
+  /* CSS3 */
+
+}
+.jcrop-dark .jcrop-selection.jcrop-current {
+  -moz-box-shadow: 0px 0px 15px #000;
+  /* Firefox */
+
+  -webkit-box-shadow: 0px 0px 15px #000;
+  /* Safari, Chrome */
+
+  box-shadow: 0px 0px 15px #000;
+  /* CSS3 */
+
+}
+.jcrop-fancy .jcrop-handle.ord-e {
+  -webkit-border-top-left-radius: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-w {
+  -webkit-border-top-right-radius: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-nw {
+  -webkit-border-bottom-right-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-ne {
+  -webkit-border-bottom-left-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-sw {
+  -webkit-border-top-right-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-se {
+  -webkit-border-top-left-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-s {
+  -webkit-border-top-left-radius: 0px;
+  -webkit-border-top-right-radius: 0px;
+}
+.jcrop-fancy .jcrop-handle.ord-n {
+  -webkit-border-bottom-left-radius: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+}
+.description {
+  margin: 16px 0;
+}
+.jcrop-droptarget canvas {
+  background-color: #f0f0f0;
+}
+div.nav-box {
+  border: 1px #ccc solid;
+  -webkit-box-shadow: inset 0px 0px 12px #cccccc;
+  -moz-box-shadow: inset 0px 0px 12px #cccccc;
+  box-shadow: inset 0px 0px 12px #cccccc;
+  margin-bottom: 0.5em;
+  padding: 0 0 1em 1em;
+}
+div.nav-box h3 {
+  line-height: 1;
+  color: #777;
+}
+ul.icons-only {
+  list-style: none outside;
+  margin: 0 0 0 0.5em;
+}
+ul.icons-only li i {
+  margin-right: 0.5em;
+  line-height: 22px;
+}
+.bolder {
+  font-weight: bolder;
+}
+.menu-box {
+  border: 1px #c4c4c4 solid;
+  border-radius: 3px;
+  background: white;
+  margin-right: -40px;
+  margin-left: 15px;
+  font-size: 11.2px;
+  line-height: 1.3;
+  padding: 4px 8px;
+}
+.menu-box h3 {
+  background: #307b93;
+  color: white;
+  padding: 4px 4px 4px 12px;
+  line-height: 1;
+  margin-left: -14px;
+  font-size: 16px;
+  position: relative;
+}
+.menu-box h3::after {
+  content: '';
+  border-right: #15485c 5px solid;
+  border-bottom: transparent 5px solid;
+  position: absolute;
+  bottom: -5px;
+  left: 0px;
+}
+.menu-box ul.links {
+  padding: 0;
+  margin: 0 3px 1em;
+  border-bottom: 1px #ebebeb solid;
+  list-style: none outside;
+}
+.menu-box ul.links li {
+  border-top: 1px #ebebeb solid;
+  padding: 0;
+}
+.menu-box.demo-nav {
+  float: right;
+  width: 135px;
+}
+.menu-box.main-menu {
+  float: right;
+  width: 180px;
+  margin-top: -95px;
+}
+pre {
+  margin: 0 0 1.2em;
+}
+.alert p {
+  margin-bottom: 0;
+}
+table.option-list tbody td.col1 {
+  color: #777;
+  font-weight: bolder;
+}
+table.option-list td.col1 {
+  width: 19%;
+}
+table.option-list td.col2 {
+  width: 31%;
+}
+table.option-list td.col3 {
+  width: 50%;
+}
+code {
+  border: none;
+  color: #555;
+}
