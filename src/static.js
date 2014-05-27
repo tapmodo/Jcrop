@@ -62,7 +62,7 @@
 
       // Startup options
       applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'shader', 'round' ],
-      borders:  [ 'n', 's', 'e', 'w' ],
+      borders:  [ 'e', 'w', 's', 'n' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
       dragbars: [ 'n', 'e', 'w', 's' ],
 
@@ -130,12 +130,13 @@
     // canvasClone: function(imgel){{{
     canvasClone: function(imgel){
       var canvas = document.createElement('canvas'),
-          $canvas = $(canvas).width(imgel.width).height(imgel.height),
           ctx = canvas.getContext('2d');
+
+      $(canvas).width(imgel.width).height(imgel.height),
       canvas.width = imgel.naturalWidth;
       canvas.height = imgel.naturalHeight;
       ctx.drawImage(imgel,0,0,imgel.naturalWidth,imgel.naturalHeight);
-      return $canvas;
+      return canvas;
     },
     // }}}
     // propagate: function(plist,config,obj){{{

@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20140526
+/*! Jcrop.js v2.0.0-RC1 - build: 20140527
  *  @copyright 2008-2014 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -1141,16 +1141,13 @@
         this.active = false;
         this.element
           .removeClass('jcrop-current')
-          .removeClass('jcrop-focus')
-          .css({zIndex:20});
+          .removeClass('jcrop-focus');
       },
       // }}}
       // toFront: function(){{{
       toFront: function(){
         this.active = true;
-        this.element
-          .addClass('jcrop-current')
-          .css({zIndex:30});
+        this.element.addClass('jcrop-current').appendTo(this.core.container);
         this.callFilterFunction('refresh');
         this.refresh();
       },
@@ -1246,14 +1243,14 @@
           h = o.handles,
           d = o.dragbars;
 
-        for(i=0; i<b.length; i++)
-          fr.append(t.createElement(o.css_borders,b[i]));
-
         for(i=0; i<d.length; i++)
           fr.append(t.createElement(o.css_dragbars,d[i]));
 
         for(i=0; i<h.length; i++)
           fr.append(t.createElement(o.css_handles,h[i]));
+
+        for(i=0; i<b.length; i++)
+          fr.append(t.createElement(o.css_borders,b[i]));
       }
       //}}}
     }
@@ -1581,7 +1578,7 @@ $.extend(AbstractStage,{
   },
   prototype: {
     attach: function(core){
-      this.core = core;
+      this.init(core);
       core.ui.stage = this;
     },
     triggerEvent: function(ev){
@@ -1704,6 +1701,11 @@ $.extend(TransformStage.prototype,{
 
 
 var CanvasStage = function(){
+  this.angle = 0;
+  this.scale = 1;
+  this.scaleMin = 0.2;
+  this.scaleMax = 1.25;
+  this.offset = [0,0];
 };
 
 CanvasStage.prototype = new TransformStage();
@@ -1723,10 +1725,11 @@ $.extend(CanvasStage,{
       $el.before(obj.element);
       obj.imgsrc = el;
       opt.imgsrc = el;
-      obj.redraw();
 
-      if (typeof callback == 'function')
+      if (typeof callback == 'function'){
         callback(obj,opt);
+        obj.redraw();
+      }
     });
   }
 });
@@ -1768,7 +1771,7 @@ $.extend(CanvasStage.prototype,{
     // Translate to the center point of our image
     this.context.translate(parseInt(this.width * 0.5), parseInt(this.height * 0.5));
     // Perform the rotation and scaling
-    this.context.translate(this.offset[0],this.offset[1]);
+    this.context.translate(this.offset[0]/this.core.opt.xscale,this.offset[1]/this.core.opt.yscale);
     this.context.rotate(this.angle * (Math.PI/180));
     this.context.scale(this.scale,this.scale);
     // Translate back to the top left of our image
@@ -1887,7 +1890,7 @@ $.extend(CanvasStage.prototype,{
 
       // Startup options
       applyFilters: [ 'constrain', 'extent', 'backoff', 'ratio', 'shader', 'round' ],
-      borders:  [ 'n', 's', 'e', 'w' ],
+      borders:  [ 'e', 'w', 's', 'n' ],
       handles:  [ 'n', 's', 'e', 'w', 'sw', 'ne', 'nw', 'se' ],
       dragbars: [ 'n', 'e', 'w', 's' ],
 
@@ -1955,12 +1958,13 @@ $.extend(CanvasStage.prototype,{
     // canvasClone: function(imgel){{{
     canvasClone: function(imgel){
       var canvas = document.createElement('canvas'),
-          $canvas = $(canvas).width(imgel.width).height(imgel.height),
           ctx = canvas.getContext('2d');
+
+      $(canvas).width(imgel.width).height(imgel.height),
       canvas.width = imgel.naturalWidth;
       canvas.height = imgel.naturalHeight;
       ctx.drawImage(imgel,0,0,imgel.naturalWidth,imgel.naturalHeight);
-      return $canvas;
+      return canvas;
     },
     // }}}
     // propagate: function(plist,config,obj){{{

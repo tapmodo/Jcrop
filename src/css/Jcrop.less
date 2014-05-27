@@ -43,6 +43,13 @@
   /* IE10 touch compatibility */ -ms-touch-action: none;
 }
 
+/*
+.jcrop-selection {
+  z-index: 45;
+  &.jcrop-current { z-index: 50; }
+}
+*/
+
 /* Selection Borders */
 .jcrop-border {
   background: @selectionBackground;
@@ -69,21 +76,19 @@
   border: none;
   padding: 0;
   font-size: 0;
-  z-index: 15;
   &:focus {
     outline: 1px rgba(128,128,128,.65) dotted;
   }
 }
 
 .jcrop-active, .jcrop-box { position: relative; }
-.jcrop-box { z-index: 2; width: 100%; height: 100%; cursor: move; }
+.jcrop-box { width: 100%; height: 100%; cursor: move; }
 
 .handles (@handleSize;@handleOffset;@bgColor;@bgOpacity;@borderWidth;@borderColor;@borderStyle) {
 
   @ieopacity: @bgOpacity * 100;
   box-sizing: content-box;
   font-size: 0;
-  z-index: 10;
   background-color: @bgColor;
   border: @borderWidth @borderColor @borderStyle;
   width: @handleSize;
@@ -126,7 +131,6 @@
 .jcrop-dragbar {
 
   font-size: 0;
-  z-index: 8;
   position: absolute;
 
   &.ord-n, &.ord-s {height:@dragbarWidth !important;width:100%;}
@@ -144,7 +148,6 @@
   position: relative;
   top: 0;
   left: 0;
-  z-index: 10;
   div { cursor: crosshair; }
 }
 
@@ -205,7 +208,7 @@
 .jcrop-thumb {
   position: absolute;
   overflow: hidden;
-  z-index: 35;
+  z-index: 5;
 }
 
 /* Fix for twitter bootstrap et al. */

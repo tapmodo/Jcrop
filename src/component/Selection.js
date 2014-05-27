@@ -220,16 +220,13 @@
         this.active = false;
         this.element
           .removeClass('jcrop-current')
-          .removeClass('jcrop-focus')
-          .css({zIndex:20});
+          .removeClass('jcrop-focus');
       },
       // }}}
       // toFront: function(){{{
       toFront: function(){
         this.active = true;
-        this.element
-          .addClass('jcrop-current')
-          .css({zIndex:30});
+        this.element.addClass('jcrop-current').appendTo(this.core.container);
         this.callFilterFunction('refresh');
         this.refresh();
       },
@@ -325,14 +322,14 @@
           h = o.handles,
           d = o.dragbars;
 
-        for(i=0; i<b.length; i++)
-          fr.append(t.createElement(o.css_borders,b[i]));
-
         for(i=0; i<d.length; i++)
           fr.append(t.createElement(o.css_dragbars,d[i]));
 
         for(i=0; i<h.length; i++)
           fr.append(t.createElement(o.css_handles,h[i]));
+
+        for(i=0; i<b.length; i++)
+          fr.append(t.createElement(o.css_borders,b[i]));
       }
       //}}}
     }
