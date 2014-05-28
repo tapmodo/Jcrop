@@ -43,22 +43,6 @@
             t.refresh();
           });
         }
-        else if (Jcrop.supportsCSSTransforms) {
-          t.core.container.on('cropredraw',function(e){
-            t.copyTransforms();
-            t.refresh();
-          });
-        }
-      },
-      copyTransforms: function(){
-        var s = this.core.ui.stage;
-        var rx = this.cw/this.preview.width();
-        var ry = this.ch/this.preview.height();
-        this.preview.css({
-          transform: 'rotate('+s.angle+'deg) '+
-            'scale('+s.scale+','+s.scale+') '+
-            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
-        });
       },
       updateImage: function(imgel){
         this.preview.remove();
