@@ -3,25 +3,26 @@
    * This is a little hacky, it was adapted from some previous/old code
    * Plan to update this API in the future
    */
-  var DialDrag = function(core,actuator,callback) {
-    var that = this;
+  var DialDrag = function() { };
 
-    if (!actuator) actuator = core.container;
-    this.$btn = $(actuator);
-    this.$targ = $(actuator);
-    this.core = core;
-
-    this.$btn
-      .addClass('dialdrag')
-      .on('mousedown.dialdrag',this.mousedown())
-      .data('dialdrag',this);
-
-    if (!$.isFunction(callback)) callback = function(){ };
-    this.callback = callback;
-    this.ondone = callback;
-
-  };
   DialDrag.prototype = {
+    init: function(core,actuator,callback){
+      var that = this;
+
+      if (!actuator) actuator = core.container;
+      this.$btn = $(actuator);
+      this.$targ = $(actuator);
+      this.core = core;
+
+      this.$btn
+        .addClass('dialdrag')
+        .on('mousedown.dialdrag',this.mousedown())
+        .data('dialdrag',this);
+
+      if (!$.isFunction(callback)) callback = function(){ };
+      this.callback = callback;
+      this.ondone = callback;
+    },
     remove: function(){
       this.$btn
         .removeClass('dialdrag')

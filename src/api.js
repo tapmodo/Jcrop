@@ -44,6 +44,16 @@
       }
     },
     // }}}
+    initComponent: function(name){
+      if (Jcrop.component[name]) {
+        var args = Array.prototype.slice.call(arguments);
+        var obj = new Jcrop.component[name];
+        args.shift();
+        args.unshift(this);
+        obj.init.apply(obj,args);
+        return obj;
+      }
+    },
     // setOptions: function(opt){{{
     setOptions: function(opt,proptype){
 

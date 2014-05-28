@@ -1,7 +1,4 @@
-  var Thumbnailer = function(core,options){
-    this.core = core;
-    $.extend(this,Thumbnailer.defaults,options);
-    this.init();
+  var Thumbnailer = function(){
   };
 
   $.extend(Thumbnailer,{
@@ -24,8 +21,10 @@
         var s = this.core.ui.stage, cxt = s.context;
         this.context.putImageData(cxt.getImageData(0,0,s.canvas.width,s.canvas.height),0,0);
       },
-      init: function(){
+      init: function(core,options){
         var t = this;
+        this.core = core;
+        $.extend(this,Thumbnailer.defaults,options);
         t.initEvents();
         t.refresh();
         t.insertElements();
