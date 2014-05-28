@@ -1,10 +1,160 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20140527
+/*! Jcrop.js v2.0.0-RC1 - build: 20140528
  *  @copyright 2008-2014 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
  **/
 (function($){
   'use strict';
+
+  // Jcrop constructor
+  var Jcrop = function(element,opt){
+    var _ua = navigator.userAgent.toLowerCase();
+
+    this.opt = $.extend({},Jcrop.defaults,opt || {});
+
+    this.container = $(element);
+
+    this.opt.is_msie = /msie/.test(_ua);
+    this.opt.is_ie_lt9 = /msie [1-8]\./.test(_ua);
+
+    this.container.addClass(this.opt.css_container);
+
+    this.ui = {};
+    this.state = null;
+    this.ui.multi = [];
+    this.ui.selection = null;
+    this.filter = {};
+
+    this.init();
+    this.setOptions(opt);
+    this.applySizeConstraints();
+    this.container.trigger('cropinit',this);
+      
+    // IE<9 doesn't work if mouse events are attached to window
+    if (this.opt.is_ie_lt9)
+      this.opt.dragEventTarget = document.body;
+  };
+
+
+  // Jcrop component storage
+  /*
+  Jcrop.component = {
+    Animator: CropAnimator,
+    DragState: DragState,
+    EventManager: EventManager,
+    ImageLoader: ImageLoader,
+    StageManager: StageManager,
+    Selection: Selection,
+    Keyboard: KeyWatcher,
+    Thumbnailer: Thumbnailer,
+    CanvasAnimator: CanvasAnimator,
+    Touch: JcropTouch
+  };
+
+  // Jcrop stage constructors
+  Jcrop.stage = {
+    Block: AbstractStage,
+    Image: ImageStage,
+    Canvas: CanvasStage,
+    Transform: TransformStage
+  };
+  */
+
+  // Jcrop static functions
+  $.extend(Jcrop,{
+    component: { },
+    filter: { },
+    stage: { },
+    registerComponent: function(name,component){
+      Jcrop.component[name] = component;
+    },
+    registerFilter: function(name,filter){
+      Jcrop.filter[name] = filter;
+    },
+    registerStageType: function(name,stage){
+      Jcrop.stage[name] = stage;
+    },
+    // attach: function(element,opt){{{
+    attach: function(element,opt){
+      var obj = new $.Jcrop(element,opt);
+      return obj;
+    },
+    // }}}
+    // imgCopy: function(imgel){{{
+    imgCopy: function(imgel){
+      var img = new Image;
+      img.src = imgel.src;
+      return img;
+    },
+    // }}}
+    // imageClone: function(imgel){{{
+    imageClone: function(imgel){
+      return $.Jcrop.supportsCanvas?
+        Jcrop.canvasClone(imgel):
+        Jcrop.imgCopy(imgel);
+    },
+    // }}}
+    // canvasClone: function(imgel){{{
+    canvasClone: function(imgel){
+      var canvas = document.createElement('canvas'),
+          ctx = canvas.getContext('2d');
+
+      $(canvas).width(imgel.width).height(imgel.height),
+      canvas.width = imgel.naturalWidth;
+      canvas.height = imgel.naturalHeight;
+      ctx.drawImage(imgel,0,0,imgel.naturalWidth,imgel.naturalHeight);
+      return canvas;
+    },
+    // }}}
+    // propagate: function(plist,config,obj){{{
+    propagate: function(plist,config,obj){
+      for(var i=0,l=plist.length;i<l;i++)
+        if (config.hasOwnProperty(plist[i]))
+          obj[plist[i]] = config[plist[i]];
+    },
+    // }}}
+    // getLargestBox: function(ratio,w,h){{{
+    getLargestBox: function(ratio,w,h){
+      if ((w/h) > ratio)
+        return [ h * ratio, h ];
+          else return [ w, w / ratio ];
+    },
+    // }}}
+    // stageConstructor: function(el,options,callback){{{
+    stageConstructor: function(el,options,callback){
+
+      // Get a priority-ordered list of available stages
+      var stages = [];
+      $.each(Jcrop.stage,function(i,e){
+        stages.push(e);
+      });
+      stages.sort(function(a,b){ return a.priority - b.priority; });
+
+      // Find the first one that supports this element
+      for(var i=0,l=stages.length;i<l;i++){
+        if (stages[i].isSupported(el,options)){
+          stages[i].create(el,options,function(obj,opt){
+            if (typeof callback == 'function') callback(obj,opt);
+          });
+          break;
+        }
+      }
+    },
+    // }}}
+    // supportsColorFade: function(){{{
+    supportsColorFade: function(){
+      return $.fx.step.hasOwnProperty('backgroundColor');
+    },
+    // }}}
+    // wrapFromXywh: function(xywh){{{
+    wrapFromXywh: function(xywh){
+      var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
+      b.x2 = b.x + b.w;
+      b.y2 = b.y + b.h;
+      return b;
+    }
+    // }}}
+  });
 
   /**
    *  BackoffFilter
@@ -41,6 +191,7 @@
       };
     }
   });
+  Jcrop.registerFilter('backoff',BackoffFilter);
 
   /**
    *  ConstrainFilter
@@ -77,6 +228,7 @@
       this.maxy = this.elh + sel.edge.s;
     }
   });
+  Jcrop.registerFilter('constrain',ConstrainFilter);
 
   /**
    *  ExtentFilter
@@ -134,6 +286,8 @@
       };
     }
   });
+  Jcrop.registerFilter('extent',ExtentFilter);
+
 
   /**
    *  GridFilter
@@ -162,6 +316,8 @@
       return n;
     }
   });
+  Jcrop.registerFilter('grid',GridFilter);
+
 
   /**
    *  RatioFilter
@@ -239,6 +395,8 @@
       this.elh = sel.core.container.height();
     }
   });
+  Jcrop.registerFilter('ratio',RatioFilter);
+
 
   /**
    *  RoundFilter
@@ -265,6 +423,8 @@
       return n;
     }
   });
+  Jcrop.registerFilter('round',RoundFilter);
+
 
   /**
    *  ShadeFilter
@@ -387,6 +547,8 @@
       return b;
     }
   });
+  Jcrop.registerFilter('shader',ShadeFilter);
+  
 
   /**
    *  CanvasAnimator
@@ -405,7 +567,7 @@
   };
   // }}}
 
-  $.extend(CanvasAnimator.prototype,{
+  CanvasAnimator.prototype = {
     cloneStagePosition: function(){
       var s = this.stage;
       this.angle = s.angle;
@@ -459,7 +621,9 @@
       });
     }
     // }}}
-  });
+  };
+  Jcrop.registerComponent('CanvasAnimator',CanvasAnimator);
+
 
   /**
    *  CropAnimator
@@ -477,7 +641,7 @@
   };
   // }}}
 
-  $.extend(CropAnimator.prototype,{
+  CropAnimator.prototype = {
     // getElement: function(){{{
     getElement: function(){
       var b = this.selection.get();
@@ -531,7 +695,9 @@
       });
     }
     // }}}
-  });
+  };
+  Jcrop.registerComponent('Animator',CropAnimator);
+
 
   /**
    *  DragState
@@ -567,7 +733,7 @@
   };
   // }}}
 
-  $.extend(DragState.prototype,{
+  DragState.prototype = {
     // getOppositeCornerOffset: function(){{{
     // Calculate relative offset of locked corner
     getOppositeCornerOffset: function(){
@@ -683,7 +849,9 @@
       }
     }
     //}}}
-  });
+  };
+  Jcrop.registerComponent('DragState',DragState);
+
 
   /**
    *  EventManager
@@ -692,13 +860,13 @@
   var EventManager = function(core){
     this.core = core;
   };
-  $.extend(EventManager,{
-    prototype: {
+  EventManager.prototype = {
       on: function(n,cb){ $(this).on(n,cb); },
       off: function(n){ $(this).off(n); },
       trigger: function(n){ $(this).trigger(n); }
-    }
-  });
+  };
+  Jcrop.registerComponent('EventManager',EventManager);
+
 
   /**
    * Image Loader
@@ -755,7 +923,8 @@
     }
     // }}}
   });
-  // }}}
+  Jcrop.registerComponent('ImageLoader',ImageLoader);
+
 
   /**
    * JcropTouch
@@ -854,6 +1023,8 @@
       // }}}
     }
   });
+  Jcrop.registerComponent('Touch',JcropTouch);
+
 
   /**
    *  KeyWatcher
@@ -918,6 +1089,8 @@
       // }}}
     }
   });
+  Jcrop.registerComponent('Keyboard',KeyWatcher);
+
 
   /**
    * Selection
@@ -1255,6 +1428,7 @@
       //}}}
     }
   });
+  Jcrop.registerComponent('Selection',Selection);
 
 
   /**
@@ -1328,6 +1502,8 @@
     }
     // }}}
   });
+  Jcrop.registerComponent('StageDrag',StageDrag);
+
 
   /**
    * StageManager
@@ -1402,6 +1578,8 @@
     }
     // }}}
   });
+  Jcrop.registerComponent('StageManager',StageManager);
+
 
   var Thumbnailer = function(core,options){
     this.core = core;
@@ -1558,6 +1736,7 @@
       }
     }
   });
+  Jcrop.registerComponent('Thumbnailer',Thumbnailer);
 
 
 var AbstractStage = function(){
@@ -1590,7 +1769,7 @@ $.extend(AbstractStage,{
     }
   }
 });
-
+Jcrop.registerStageType('Block',AbstractStage);
 
 
 var ImageStage = function(){
@@ -1616,88 +1795,7 @@ $.extend(ImageStage,{
     });
   }
 });
-
-
-
-var TransformStage = function(){
-  this.angle = 0;
-  this.scale = 1;
-  this.scaleMin = 0.2;
-  this.scaleMax = 1.25;
-  this.offset = [0,0];
-};
-
-TransformStage.prototype = new ImageStage();
-
-$.extend(TransformStage,{
-  isSupported: function(el,o){
-    if ($.Jcrop.supportsCSSTransforms && (el.tagName == 'IMG')) return true;
-  },
-  priority: 101,
-  create: function(el,options,callback){
-    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
-      var obj = new TransformStage;
-      obj.$img = $(el);
-      obj.element = obj.$img.wrap('<div />').parent();
-      obj.element.width(w).height(h);
-      obj.imgsrc = el;
-
-      if (typeof callback == 'function')
-        callback.call(this,obj,options);
-    });
-  }
-});
-
-$.extend(TransformStage.prototype,{
-  init: function(core){
-    this.core = core;
-  },
-  boundScale: function(v){
-    if (v<this.scaleMin) v = this.scaleMin;
-    else if (v>this.scaleMax) v = this.scaleMax;
-    return v;
-  },
-  // setOffset: function(x,y) {{{
-  setOffset: function(x,y) {
-    this.offset = [x,y];
-    return this;
-  },
-  // }}}
-  // setAngle: function(v) {{{
-  setAngle: function(v) {
-    this.angle = v;
-    return this;
-  },
-  // }}}
-  // setScale: function(v) {{{
-  setScale: function(v) {
-    this.scale = this.boundScale(v);
-    return this;
-  },
-  // }}}
-  // clear: function() {{{
-  clear: function() {
-  },
-  // }}}
-  triggerEvent: function(ev){
-    this.$img.trigger(ev);
-    return this;
-  },
-  // redraw: function() {{{
-  redraw: function() {
-
-    this.$img.css({
-      transform:
-        'translate('+(-this.offset[0])+'px,'+(-this.offset[1])+'px) '+
-        'rotate('+this.angle+'deg) '+
-        'scale('+this.scale+','+this.scale+')'
-    });
-
-    this.$img.trigger('cropredraw');
-    return this;
-  },
-  // }}}
-});
+Jcrop.registerStageType('Image',ImageStage);
 
 
 var CanvasStage = function(){
@@ -1708,7 +1806,7 @@ var CanvasStage = function(){
   this.offset = [0,0];
 };
 
-CanvasStage.prototype = new TransformStage();
+//CanvasStage.prototype = new TransformStage();
 
 $.extend(CanvasStage,{
   isSupported: function(el,o){
@@ -1738,6 +1836,24 @@ $.extend(CanvasStage.prototype,{
   init: function(core){
     this.core = core;
   },
+  // setOffset: function(x,y) {{{
+  setOffset: function(x,y) {
+    this.offset = [x,y];
+    return this;
+  },
+  // }}}
+  // setAngle: function(v) {{{
+  setAngle: function(v) {
+    this.angle = v;
+    return this;
+  },
+  // }}}
+  // setScale: function(v) {{{
+  setScale: function(v) {
+    this.scale = this.boundScale(v);
+    return this;
+  },
+  // }}}
   createCanvas: function(img,w,h){
     this.width = w;
     this.height = h;
@@ -1793,65 +1909,13 @@ $.extend(CanvasStage.prototype,{
   // }}}
 });
 
+Jcrop.registerStageType('Canvas',CanvasStage);
 
-  // Jcrop constructor
-  // var Jcrop = function(element,opt){{{
-  var Jcrop = function(element,opt){
-    var _ua = navigator.userAgent.toLowerCase();
 
-    this.opt = $.extend({},Jcrop.defaults,opt || {});
+    /////////////////////////////////
+    // DEFAULT SETTINGS
 
-    this.container = $(element);
-
-    this.opt.is_msie = /msie/.test(_ua);
-    this.opt.is_ie_lt9 = /msie [1-8]\./.test(_ua);
-
-    this.container.addClass(this.opt.css_container);
-
-    this.ui = {};
-    this.state = null;
-    this.ui.multi = [];
-    this.ui.selection = null;
-    this.filter = {};
-
-    this.init();
-    this.setOptions(opt);
-    this.applySizeConstraints();
-    this.container.trigger('cropinit',this);
-      
-    // IE<9 doesn't work if mouse events are attached to window
-    if (this.opt.is_ie_lt9)
-      this.opt.dragEventTarget = document.body;
-
-  };
-  // }}}
-
-  // Jcrop component storage
-  Jcrop.component = {
-    Animator: CropAnimator,
-    DragState: DragState,
-    EventManager: EventManager,
-    ImageLoader: ImageLoader,
-    StageManager: StageManager,
-    Selection: Selection,
-    Keyboard: KeyWatcher,
-    Thumbnailer: Thumbnailer,
-    CanvasAnimator: CanvasAnimator,
-    Touch: JcropTouch
-  };
-
-  // Jcrop stage constructors
-  Jcrop.stage = {
-    Block: AbstractStage,
-    Image: ImageStage,
-    Canvas: CanvasStage,
-    Transform: TransformStage
-  };
-
-  // Jcrop static functions
-  $.extend(Jcrop,{
-    //defaults: default settings {{{
-    defaults: {
+    Jcrop.defaults = {
 
       // Selection Behavior
       edge: { n: 0, s: 0, e: 0, w: 0 },
@@ -1922,100 +1986,9 @@ $.extend(CanvasStage.prototype,{
         onChange: 'cropmove',
         onSelect: 'cropend'
       }
-    },
-    //}}}
-    //filter: built-in filter collection {{{
-    filter: {
-      constrain: ConstrainFilter,
-      extent: ExtentFilter,
-      grid: GridFilter,
-      backoff: BackoffFilter,
-      shader: ShadeFilter,
-      ratio: RatioFilter,
-      round: RoundFilter
-    },
-    //}}}
-    // attach: function(element,opt){{{
-    attach: function(element,opt){
-      var obj = new $.Jcrop(element,opt);
-      return obj;
-    },
-    // }}}
-    // imgCopy: function(imgel){{{
-    imgCopy: function(imgel){
-      var img = new Image;
-      img.src = imgel.src;
-      return img;
-    },
-    // }}}
-    // imageClone: function(imgel){{{
-    imageClone: function(imgel){
-      return $.Jcrop.supportsCanvas?
-        Jcrop.canvasClone(imgel):
-        Jcrop.imgCopy(imgel);
-    },
-    // }}}
-    // canvasClone: function(imgel){{{
-    canvasClone: function(imgel){
-      var canvas = document.createElement('canvas'),
-          ctx = canvas.getContext('2d');
 
-      $(canvas).width(imgel.width).height(imgel.height),
-      canvas.width = imgel.naturalWidth;
-      canvas.height = imgel.naturalHeight;
-      ctx.drawImage(imgel,0,0,imgel.naturalWidth,imgel.naturalHeight);
-      return canvas;
-    },
-    // }}}
-    // propagate: function(plist,config,obj){{{
-    propagate: function(plist,config,obj){
-      for(var i=0,l=plist.length;i<l;i++)
-        if (config.hasOwnProperty(plist[i]))
-          obj[plist[i]] = config[plist[i]];
-    },
-    // }}}
-    // getLargestBox: function(ratio,w,h){{{
-    getLargestBox: function(ratio,w,h){
-      if ((w/h) > ratio)
-        return [ h * ratio, h ];
-          else return [ w, w / ratio ];
-    },
-    // }}}
-    // stageConstructor: function(el,options,callback){{{
-    stageConstructor: function(el,options,callback){
+    };
 
-      // Get a priority-ordered list of available stages
-      var stages = [];
-      $.each(Jcrop.stage,function(i,e){
-        stages.push(e);
-      });
-      stages.sort(function(a,b){ return a.priority - b.priority; });
-
-      // Find the first one that supports this element
-      for(var i=0,l=stages.length;i<l;i++){
-        if (stages[i].isSupported(el,options)){
-          stages[i].create(el,options,function(obj,opt){
-            if (typeof callback == 'function') callback(obj,opt);
-          });
-          break;
-        }
-      }
-    },
-    // }}}
-    // supportsColorFade: function(){{{
-    supportsColorFade: function(){
-      return $.fx.step.hasOwnProperty('backgroundColor');
-    },
-    // }}}
-    // wrapFromXywh: function(xywh){{{
-    wrapFromXywh: function(xywh){
-      var b = { x: xywh[0], y: xywh[1], w: xywh[2], h: xywh[3] };
-      b.x2 = b.x + b.w;
-      b.y2 = b.y + b.h;
-      return b;
-    }
-    // }}}
-  });
 
   // Jcrop API methods
   $.extend(Jcrop.prototype,{
