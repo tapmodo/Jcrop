@@ -74,7 +74,7 @@
           cb = obj;
           
           // Add in a custom shading element...
-          cb.container.append($('<div />').addClass('custom-shade'));
+          cb.container.prepend($('<div />').addClass('custom-shade'));
           
           function random_coords() {
             return [
