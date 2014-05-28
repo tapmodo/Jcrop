@@ -23,7 +23,7 @@
       var c = this.core;
 
       // Do nothing if allowSelect is off
-      if (!c.opt.allowSelect) return false;
+      if (!c.opt.allowSelect) return;
 
       // Also do nothing if we can't draw any more selections
       if (c.opt.multi && c.opt.multiMax && (c.ui.multi.length >= c.opt.multiMax)) return false;
