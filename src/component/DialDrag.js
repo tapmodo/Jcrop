@@ -54,6 +54,7 @@
       function mouseUp(e){
         $(window).off('.dialdrag');
         that.ondone.call(that,that.relMouse(e));
+        that.core.container.trigger('croprotend');
         //return false;
       }
 
@@ -69,6 +70,7 @@
         that.angleOffset = -that.core.ui.stage.angle+rel[2];
         that.distOffset = rel[3];
         that.dragOffset = [rel[0],rel[1]];
+        that.core.container.trigger('croprotstart');
 
         $(window)
           .on('mousemove.dialdrag',mouseMove)
