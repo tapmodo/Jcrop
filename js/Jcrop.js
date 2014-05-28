@@ -737,22 +737,21 @@ Jcrop.registerStageType('Canvas',CanvasStage);
    *  is used to update the selection coordinates of the
    *  visible selection in realtime.
    */
-  // var CanvasAnimator = function(stage){{{
   var CanvasAnimator = function(stage){
     this.stage = stage;
     this.core = stage.core;
     this.cloneStagePosition();
   };
-  // }}}
 
   CanvasAnimator.prototype = {
+
     cloneStagePosition: function(){
       var s = this.stage;
       this.angle = s.angle;
       this.scale = s.scale;
       this.offset = s.offset;
     },
-    // getElement: function(){{{
+
     getElement: function(){
       var s = this.stage;
 
@@ -765,8 +764,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
           height: s.scale+'px'
         });
     },
-    // }}}
-    // animate: function(cb){{{
+
     animate: function(cb){
       var t = this;
 
@@ -798,7 +796,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         }
       });
     }
-    // }}}
+
   };
   Jcrop.stage.Canvas.prototype.getAnimator = function(){
     return new CanvasAnimator(this);
@@ -823,7 +821,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
   // }}}
 
   CropAnimator.prototype = {
-    // getElement: function(){{{
+
     getElement: function(){
       var b = this.selection.get();
 
@@ -836,8 +834,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
           height: b.h+'px'
         });
     },
-    // }}}
-    // animate: function(x,y,w,h,cb){{{
+
     animate: function(x,y,w,h,cb){
       var t = this;
 
@@ -875,7 +872,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         }
       });
     }
-    // }}}
+
   };
   Jcrop.registerComponent('Animator',CropAnimator);
 
@@ -1806,22 +1803,6 @@ Jcrop.registerStageType('Canvas',CanvasStage);
             t.refresh();
           });
         }
-        else if (Jcrop.supportsCSSTransforms) {
-          t.core.container.on('cropredraw',function(e){
-            t.copyTransforms();
-            t.refresh();
-          });
-        }
-      },
-      copyTransforms: function(){
-        var s = this.core.ui.stage;
-        var rx = this.cw/this.preview.width();
-        var ry = this.ch/this.preview.height();
-        this.preview.css({
-          transform: 'rotate('+s.angle+'deg) '+
-            'scale('+s.scale+','+s.scale+') '+
-            'translate('+rx*s.offset[0]+'px,'+ry*s.offset[1]+'px)'
-        });
       },
       updateImage: function(imgel){
         this.preview.remove();
@@ -1927,10 +1908,10 @@ Jcrop.registerStageType('Canvas',CanvasStage);
   var DialDrag = function() { };
 
   DialDrag.prototype = {
+
     init: function(core,actuator,callback){
       var that = this;
 
-debugger;
       if (!actuator) actuator = core.container;
       this.$btn = $(actuator);
       this.$targ = $(actuator);
@@ -1945,6 +1926,7 @@ debugger;
       this.callback = callback;
       this.ondone = callback;
     },
+
     remove: function(){
       this.$btn
         .removeClass('dialdrag')
@@ -1952,10 +1934,12 @@ debugger;
         .data('dialdrag',null);
       return this;
     },
+
     setTarget: function(obj){
       this.$targ = $(obj);
       return this;
     },
+
     getOffset: function(){
       var targ = this.$targ, pos = targ.offset();
       return [
@@ -1963,6 +1947,7 @@ debugger;
         pos.top + (targ.height()/2)
       ];
     },
+
     relMouse: function(e){
       var x = e.pageX - this.offset[0],
           y = e.pageY - this.offset[1],
@@ -1970,28 +1955,27 @@ debugger;
           vec = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
       return [ x, y, ang, vec ];
     },
+
     mousedown: function(){
-    
       var that = this;
 
       function mouseUp(e){
         $(window).off('.dialdrag');
         that.ondone.call(that,that.relMouse(e));
-        //return false;
+        that.core.container.trigger('croprotend');
       }
 
       function mouseMove(e){
         that.callback.call(that,that.relMouse(e));
-        //return false;
       }
 
       return function(e) {
-        //if (e.button) return true;
         that.offset = that.getOffset();
         var rel = that.relMouse(e);
         that.angleOffset = -that.core.ui.stage.angle+rel[2];
         that.distOffset = rel[3];
         that.dragOffset = [rel[0],rel[1]];
+        that.core.container.trigger('croprotstart');
 
         $(window)
           .on('mousemove.dialdrag',mouseMove)
@@ -2002,6 +1986,7 @@ debugger;
         return false;
       };
     }
+    
   };
   Jcrop.registerComponent('DialDrag',DialDrag);
 
@@ -2130,6 +2115,16 @@ debugger;
       }
     },
     // }}}
+    initComponent: function(name){
+      if (Jcrop.component[name]) {
+        var args = Array.prototype.slice.call(arguments);
+        var obj = new Jcrop.component[name];
+        args.shift();
+        args.unshift(this);
+        obj.init.apply(obj,args);
+        return obj;
+      }
+    },
     // setOptions: function(opt){{{
     setOptions: function(opt,proptype){
 
