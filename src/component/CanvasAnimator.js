@@ -7,22 +7,21 @@
    *  is used to update the selection coordinates of the
    *  visible selection in realtime.
    */
-  // var CanvasAnimator = function(stage){{{
   var CanvasAnimator = function(stage){
     this.stage = stage;
     this.core = stage.core;
     this.cloneStagePosition();
   };
-  // }}}
 
   CanvasAnimator.prototype = {
+
     cloneStagePosition: function(){
       var s = this.stage;
       this.angle = s.angle;
       this.scale = s.scale;
       this.offset = s.offset;
     },
-    // getElement: function(){{{
+
     getElement: function(){
       var s = this.stage;
 
@@ -35,8 +34,7 @@
           height: s.scale+'px'
         });
     },
-    // }}}
-    // animate: function(cb){{{
+
     animate: function(cb){
       var t = this;
 
@@ -68,7 +66,7 @@
         }
       });
     }
-    // }}}
+
   };
   Jcrop.stage.Canvas.prototype.getAnimator = function(){
     return new CanvasAnimator(this);

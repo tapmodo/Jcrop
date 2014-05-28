@@ -15,7 +15,7 @@
   // }}}
 
   CropAnimator.prototype = {
-    // getElement: function(){{{
+
     getElement: function(){
       var b = this.selection.get();
 
@@ -28,8 +28,7 @@
           height: b.h+'px'
         });
     },
-    // }}}
-    // animate: function(x,y,w,h,cb){{{
+
     animate: function(x,y,w,h,cb){
       var t = this;
 
@@ -67,7 +66,7 @@
         }
       });
     }
-    // }}}
+
   };
   Jcrop.registerComponent('Animator',CropAnimator);
 

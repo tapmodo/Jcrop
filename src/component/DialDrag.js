@@ -6,6 +6,7 @@
   var DialDrag = function() { };
 
   DialDrag.prototype = {
+
     init: function(core,actuator,callback){
       var that = this;
 
@@ -23,6 +24,7 @@
       this.callback = callback;
       this.ondone = callback;
     },
+
     remove: function(){
       this.$btn
         .removeClass('dialdrag')
@@ -30,10 +32,12 @@
         .data('dialdrag',null);
       return this;
     },
+
     setTarget: function(obj){
       this.$targ = $(obj);
       return this;
     },
+
     getOffset: function(){
       var targ = this.$targ, pos = targ.offset();
       return [
@@ -41,6 +45,7 @@
         pos.top + (targ.height()/2)
       ];
     },
+
     relMouse: function(e){
       var x = e.pageX - this.offset[0],
           y = e.pageY - this.offset[1],
@@ -48,24 +53,21 @@
           vec = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
       return [ x, y, ang, vec ];
     },
+
     mousedown: function(){
-    
       var that = this;
 
       function mouseUp(e){
         $(window).off('.dialdrag');
         that.ondone.call(that,that.relMouse(e));
         that.core.container.trigger('croprotend');
-        //return false;
       }
 
       function mouseMove(e){
         that.callback.call(that,that.relMouse(e));
-        //return false;
       }
 
       return function(e) {
-        //if (e.button) return true;
         that.offset = that.getOffset();
         var rel = that.relMouse(e);
         that.angleOffset = -that.core.ui.stage.angle+rel[2];
@@ -82,6 +84,7 @@
         return false;
       };
     }
+    
   };
   Jcrop.registerComponent('DialDrag',DialDrag);
 

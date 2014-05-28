@@ -1762,10 +1762,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
   Jcrop.registerComponent('StageManager',StageManager);
 
 
-  var Thumbnailer = function(core,options){
-    this.core = core;
-    $.extend(this,Thumbnailer.defaults,options);
-    this.init();
+  var Thumbnailer = function(){
   };
 
   $.extend(Thumbnailer,{
@@ -1788,8 +1785,10 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         var s = this.core.ui.stage, cxt = s.context;
         this.context.putImageData(cxt.getImageData(0,0,s.canvas.width,s.canvas.height),0,0);
       },
-      init: function(){
+      init: function(core,options){
         var t = this;
+        this.core = core;
+        $.extend(this,Thumbnailer.defaults,options);
         t.initEvents();
         t.refresh();
         t.insertElements();
@@ -1925,25 +1924,27 @@ Jcrop.registerStageType('Canvas',CanvasStage);
    * This is a little hacky, it was adapted from some previous/old code
    * Plan to update this API in the future
    */
-  var DialDrag = function(core,actuator,callback) {
-    var that = this;
+  var DialDrag = function() { };
 
-    if (!actuator) actuator = core.container;
-    this.$btn = $(actuator);
-    this.$targ = $(actuator);
-    this.core = core;
-
-    this.$btn
-      .addClass('dialdrag')
-      .on('mousedown.dialdrag',this.mousedown())
-      .data('dialdrag',this);
-
-    if (!$.isFunction(callback)) callback = function(){ };
-    this.callback = callback;
-    this.ondone = callback;
-
-  };
   DialDrag.prototype = {
+    init: function(core,actuator,callback){
+      var that = this;
+
+debugger;
+      if (!actuator) actuator = core.container;
+      this.$btn = $(actuator);
+      this.$targ = $(actuator);
+      this.core = core;
+
+      this.$btn
+        .addClass('dialdrag')
+        .on('mousedown.dialdrag',this.mousedown())
+        .data('dialdrag',this);
+
+      if (!$.isFunction(callback)) callback = function(){ };
+      this.callback = callback;
+      this.ondone = callback;
+    },
     remove: function(){
       this.$btn
         .removeClass('dialdrag')
