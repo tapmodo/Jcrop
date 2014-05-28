@@ -7,7 +7,7 @@
    *  is used to update the selection coordinates of the
    *  visible selection in realtime.
    */
-  // var CanvasAnimator = function(selection){{{
+  // var CanvasAnimator = function(stage){{{
   var CanvasAnimator = function(stage){
     this.stage = stage;
     this.core = stage.core;
@@ -69,6 +69,9 @@
       });
     }
     // }}}
+  };
+  Jcrop.stage.Canvas.prototype.getAnimator = function(){
+    return new CanvasAnimator(this);
   };
   Jcrop.registerComponent('CanvasAnimator',CanvasAnimator);
 

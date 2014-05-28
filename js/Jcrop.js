@@ -156,6 +156,184 @@
     // }}}
   });
 
+var AbstractStage = function(){
+};
+
+$.extend(AbstractStage,{
+  isSupported: function(el,o){
+    // @todo: should actually check if it's an HTML element
+    return true;
+  },
+  // A higher priority means less desirable
+  // AbstractStage is the last one we want to use
+  priority: 100,
+  create: function(el,options,callback){
+    var obj = new AbstractStage;
+    obj.element = el;
+    callback.call(this,obj,options);
+  },
+  prototype: {
+    attach: function(core){
+      this.init(core);
+      core.ui.stage = this;
+    },
+    triggerEvent: function(ev){
+      $(this.element).trigger(ev);
+      return this;
+    },
+    getElement: function(){
+      return this.element;
+    }
+  }
+});
+Jcrop.registerStageType('Block',AbstractStage);
+
+
+var ImageStage = function(){
+};
+
+ImageStage.prototype = new AbstractStage();
+
+$.extend(ImageStage,{
+  isSupported: function(el,o){
+    if (el.tagName == 'IMG') return true;
+  },
+  priority: 90,
+  create: function(el,options,callback){
+    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
+      var obj = new ImageStage;
+      obj.element = $(el).wrap('<div />').parent();
+
+      obj.element.width(w).height(h);
+      obj.imgsrc = el;
+
+      if (typeof callback == 'function')
+        callback.call(this,obj,options);
+    });
+  }
+});
+Jcrop.registerStageType('Image',ImageStage);
+
+
+var CanvasStage = function(){
+  this.angle = 0;
+  this.scale = 1;
+  this.scaleMin = 0.2;
+  this.scaleMax = 1.25;
+  this.offset = [0,0];
+};
+
+CanvasStage.prototype = new ImageStage();
+
+$.extend(CanvasStage,{
+  isSupported: function(el,o){
+    if ($.Jcrop.supportsCanvas && (el.tagName == 'IMG')) return true;
+  },
+  priority: 60,
+  create: function(el,options,callback){
+    var $el = $(el);
+    var opt = $.extend({},options);
+    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
+      var obj = new CanvasStage;
+      $el.hide();
+      obj.createCanvas(el,w,h);
+      $el.before(obj.element);
+      obj.imgsrc = el;
+      opt.imgsrc = el;
+
+      if (typeof callback == 'function'){
+        callback(obj,opt);
+        obj.redraw();
+      }
+    });
+  }
+});
+
+$.extend(CanvasStage.prototype,{
+  init: function(core){
+    this.core = core;
+  },
+  // setOffset: function(x,y) {{{
+  setOffset: function(x,y) {
+    this.offset = [x,y];
+    return this;
+  },
+  // }}}
+  // setAngle: function(v) {{{
+  setAngle: function(v) {
+    this.angle = v;
+    return this;
+  },
+  // }}}
+  // setScale: function(v) {{{
+  setScale: function(v) {
+    this.scale = this.boundScale(v);
+    return this;
+  },
+  // }}}
+  boundScale: function(v){
+    if (v<this.scaleMin) v = this.scaleMin;
+    else if (v>this.scaleMax) v = this.scaleMax;
+    return v;
+  },
+  createCanvas: function(img,w,h){
+    this.width = w;
+    this.height = h;
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.$canvas = $(this.canvas)
+      .width(w)
+      .height(h);
+    this.context = this.canvas.getContext('2d');
+    this.fillstyle = "rgb(0,0,0)";
+    this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
+  },
+  triggerEvent: function(ev){
+    this.$canvas.trigger(ev);
+    return this;
+  },
+  // clear: function() {{{
+  clear: function() {
+    this.context.fillStyle = this.fillstyle;
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    return this;
+  },
+  // }}}
+  // redraw: function() {{{
+  redraw: function() {
+    // Save the current context
+    this.context.save();
+    this.clear();
+
+    // Translate to the center point of our image
+    this.context.translate(parseInt(this.width * 0.5), parseInt(this.height * 0.5));
+    // Perform the rotation and scaling
+    this.context.translate(this.offset[0]/this.core.opt.xscale,this.offset[1]/this.core.opt.yscale);
+    this.context.rotate(this.angle * (Math.PI/180));
+    this.context.scale(this.scale,this.scale);
+    // Translate back to the top left of our image
+    this.context.translate(-parseInt(this.width * 0.5), -parseInt(this.height * 0.5));
+    // Finally we draw the image
+    this.context.drawImage(this.imgsrc,0,0,this.width,this.height);
+
+    // And restore the updated context
+    this.context.restore();
+    this.$canvas.trigger('cropredraw');
+    return this;
+  },
+  // }}}
+  // setFillStyle: function(v) {{{
+  setFillStyle: function(v) {
+    this.fillstyle = v;
+    return this;
+  }
+  // }}}
+});
+
+Jcrop.registerStageType('Canvas',CanvasStage);
+
+
   /**
    *  BackoffFilter
    *  move out-of-bounds selection into allowed position at same size
@@ -559,7 +737,7 @@
    *  is used to update the selection coordinates of the
    *  visible selection in realtime.
    */
-  // var CanvasAnimator = function(selection){{{
+  // var CanvasAnimator = function(stage){{{
   var CanvasAnimator = function(stage){
     this.stage = stage;
     this.core = stage.core;
@@ -621,6 +799,10 @@
       });
     }
     // }}}
+  };
+  Jcrop.stage.Canvas.prototype.animate = function(){
+    var anim = new CanvasAnimator(this);
+    anim.animate();
   };
   Jcrop.registerComponent('CanvasAnimator',CanvasAnimator);
 
@@ -1739,179 +1921,6 @@
   Jcrop.registerComponent('Thumbnailer',Thumbnailer);
 
 
-var AbstractStage = function(){
-};
-
-$.extend(AbstractStage,{
-  isSupported: function(el,o){
-    // @todo: should actually check if it's an HTML element
-    return true;
-  },
-  // A higher priority means less desirable
-  // AbstractStage is the last one we want to use
-  priority: 100,
-  create: function(el,options,callback){
-    var obj = new AbstractStage;
-    obj.element = el;
-    callback.call(this,obj,options);
-  },
-  prototype: {
-    attach: function(core){
-      this.init(core);
-      core.ui.stage = this;
-    },
-    triggerEvent: function(ev){
-      $(this.element).trigger(ev);
-      return this;
-    },
-    getElement: function(){
-      return this.element;
-    }
-  }
-});
-Jcrop.registerStageType('Block',AbstractStage);
-
-
-var ImageStage = function(){
-};
-
-ImageStage.prototype = new AbstractStage();
-
-$.extend(ImageStage,{
-  isSupported: function(el,o){
-    if (el.tagName == 'IMG') return true;
-  },
-  priority: 90,
-  create: function(el,options,callback){
-    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
-      var obj = new ImageStage;
-      obj.element = $(el).wrap('<div />').parent();
-
-      obj.element.width(w).height(h);
-      obj.imgsrc = el;
-
-      if (typeof callback == 'function')
-        callback.call(this,obj,options);
-    });
-  }
-});
-Jcrop.registerStageType('Image',ImageStage);
-
-
-var CanvasStage = function(){
-  this.angle = 0;
-  this.scale = 1;
-  this.scaleMin = 0.2;
-  this.scaleMax = 1.25;
-  this.offset = [0,0];
-};
-
-//CanvasStage.prototype = new TransformStage();
-
-$.extend(CanvasStage,{
-  isSupported: function(el,o){
-    if ($.Jcrop.supportsCanvas && (el.tagName == 'IMG')) return true;
-  },
-  priority: 60,
-  create: function(el,options,callback){
-    var $el = $(el);
-    var opt = $.extend({},options);
-    $.Jcrop.component.ImageLoader.attach(el,function(w,h){
-      var obj = new CanvasStage;
-      $el.hide();
-      obj.createCanvas(el,w,h);
-      $el.before(obj.element);
-      obj.imgsrc = el;
-      opt.imgsrc = el;
-
-      if (typeof callback == 'function'){
-        callback(obj,opt);
-        obj.redraw();
-      }
-    });
-  }
-});
-
-$.extend(CanvasStage.prototype,{
-  init: function(core){
-    this.core = core;
-  },
-  // setOffset: function(x,y) {{{
-  setOffset: function(x,y) {
-    this.offset = [x,y];
-    return this;
-  },
-  // }}}
-  // setAngle: function(v) {{{
-  setAngle: function(v) {
-    this.angle = v;
-    return this;
-  },
-  // }}}
-  // setScale: function(v) {{{
-  setScale: function(v) {
-    this.scale = this.boundScale(v);
-    return this;
-  },
-  // }}}
-  createCanvas: function(img,w,h){
-    this.width = w;
-    this.height = h;
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = w;
-    this.canvas.height = h;
-    this.$canvas = $(this.canvas)
-      .width(w)
-      .height(h);
-    this.context = this.canvas.getContext('2d');
-    this.fillstyle = "rgb(0,0,0)";
-    this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
-  },
-  triggerEvent: function(ev){
-    this.$canvas.trigger(ev);
-    return this;
-  },
-  // clear: function() {{{
-  clear: function() {
-    this.context.fillStyle = this.fillstyle;
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    return this;
-  },
-  // }}}
-  // redraw: function() {{{
-  redraw: function() {
-    // Save the current context
-    this.context.save();
-    this.clear();
-
-    // Translate to the center point of our image
-    this.context.translate(parseInt(this.width * 0.5), parseInt(this.height * 0.5));
-    // Perform the rotation and scaling
-    this.context.translate(this.offset[0]/this.core.opt.xscale,this.offset[1]/this.core.opt.yscale);
-    this.context.rotate(this.angle * (Math.PI/180));
-    this.context.scale(this.scale,this.scale);
-    // Translate back to the top left of our image
-    this.context.translate(-parseInt(this.width * 0.5), -parseInt(this.height * 0.5));
-    // Finally we draw the image
-    this.context.drawImage(this.imgsrc,0,0,this.width,this.height);
-
-    // And restore the updated context
-    this.context.restore();
-    this.$canvas.trigger('cropredraw');
-    return this;
-  },
-  // }}}
-  // setFillStyle: function(v) {{{
-  setFillStyle: function(v) {
-    this.fillstyle = v;
-    return this;
-  }
-  // }}}
-});
-
-Jcrop.registerStageType('Canvas',CanvasStage);
-
-
     /////////////////////////////////
     // DEFAULT SETTINGS
 
@@ -2333,7 +2342,6 @@ Jcrop.registerStageType('Canvas',CanvasStage);
   });
 
   // Jcrop jQuery plugin function
-  // $.fn.Jcrop = function(options,callback){{{
   $.fn.Jcrop = function(options,callback){
 
     var first = this.eq(0).data('Jcrop');
@@ -2385,7 +2393,6 @@ Jcrop.registerStageType('Canvas',CanvasStage);
       return this;
     });
   };
-  // }}}
 
 /* Modernizr 2.7.1 (Custom Build) | MIT & BSD
  * Build: http://modernizr.com/download/#-csstransforms-canvas-canvastext-draganddrop-inlinesvg-svg-svgclippaths-touch-teststyles-testprop-testallprops-hasevent-prefixes-domprefixes-url_data_uri

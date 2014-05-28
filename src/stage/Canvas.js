@@ -6,7 +6,7 @@ var CanvasStage = function(){
   this.offset = [0,0];
 };
 
-//CanvasStage.prototype = new TransformStage();
+CanvasStage.prototype = new ImageStage();
 
 $.extend(CanvasStage,{
   isSupported: function(el,o){
@@ -54,6 +54,11 @@ $.extend(CanvasStage.prototype,{
     return this;
   },
   // }}}
+  boundScale: function(v){
+    if (v<this.scaleMin) v = this.scaleMin;
+    else if (v>this.scaleMax) v = this.scaleMax;
+    return v;
+  },
   createCanvas: function(img,w,h){
     this.width = w;
     this.height = h;
