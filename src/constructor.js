@@ -1,5 +1,4 @@
   // Jcrop constructor
-  // var Jcrop = function(element,opt){{{
   var Jcrop = function(element,opt){
     var _ua = navigator.userAgent.toLowerCase();
 
@@ -26,6 +25,5 @@
     // IE<9 doesn't work if mouse events are attached to window
     if (this.opt.is_ie_lt9)
       this.opt.dragEventTarget = document.body;
-
   };
-  // }}}
+

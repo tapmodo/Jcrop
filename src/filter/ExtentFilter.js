@@ -54,3 +54,5 @@
       };
     }
   });
+  Jcrop.registerFilter('extent',ExtentFilter);
+

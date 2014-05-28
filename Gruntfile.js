@@ -5,6 +5,8 @@ module.exports = function(grunt) {
   // also used for the watch task
   var jcrop_sources = [
     'src/intro.js',
+    'src/constructor.js',
+    'src/static.js',
     'src/filter/BackoffFilter.js',
     'src/filter/ConstrainFilter.js',
     'src/filter/ExtentFilter.js',
@@ -27,8 +29,7 @@ module.exports = function(grunt) {
     'src/stage/Image.js',
     'src/stage/CssTransform.js',
     'src/stage/Canvas.js',
-    'src/constructor.js',
-    'src/static.js',
+    'src/defaults.js',
     'src/api.js',
     'src/plugin.js',
     'src/modernizr.js',

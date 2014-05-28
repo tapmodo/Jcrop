@@ -71,3 +71,5 @@
     }
     // }}}
   });
+  Jcrop.registerComponent('StageManager',StageManager);
+

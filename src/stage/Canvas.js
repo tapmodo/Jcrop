@@ -91,3 +91,5 @@ $.extend(CanvasStage.prototype,{
   // }}}
 });
 
+Jcrop.registerStageType('Canvas',CanvasStage);
+

@@ -15,7 +15,7 @@
   };
   // }}}
 
-  $.extend(CanvasAnimator.prototype,{
+  CanvasAnimator.prototype = {
     cloneStagePosition: function(){
       var s = this.stage;
       this.angle = s.angle;
@@ -69,4 +69,6 @@
       });
     }
     // }}}
-  });
+  };
+  Jcrop.registerComponent('CanvasAnimator',CanvasAnimator);
+

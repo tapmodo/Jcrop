@@ -74,3 +74,5 @@
       this.elh = sel.core.container.height();
     }
   });
+  Jcrop.registerFilter('ratio',RatioFilter);
+

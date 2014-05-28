@@ -21,5 +21,5 @@ $.extend(ImageStage,{
     });
   }
 });
-
+Jcrop.registerStageType('Image',ImageStage);
 

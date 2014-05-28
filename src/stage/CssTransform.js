@@ -26,7 +26,6 @@ $.extend(TransformStage,{
     });
   }
 });
-
 $.extend(TransformStage.prototype,{
   init: function(core){
     this.core = core;
@@ -77,4 +76,5 @@ $.extend(TransformStage.prototype,{
   },
   // }}}
 });
+Jcrop.registerStageType('Transform',TransformStage);
 

@@ -153,4 +153,5 @@
       }
     }
   });
+  Jcrop.registerComponent('Thumbnailer',Thumbnailer);
 

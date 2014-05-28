@@ -33,3 +33,4 @@
       };
     }
   });
+  Jcrop.registerFilter('backoff',BackoffFilter);

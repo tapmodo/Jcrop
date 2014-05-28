@@ -25,3 +25,5 @@
       return n;
     }
   });
+  Jcrop.registerFilter('grid',GridFilter);
+

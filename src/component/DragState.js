@@ -32,7 +32,7 @@
   };
   // }}}
 
-  $.extend(DragState.prototype,{
+  DragState.prototype = {
     // getOppositeCornerOffset: function(){{{
     // Calculate relative offset of locked corner
     getOppositeCornerOffset: function(){
@@ -148,4 +148,6 @@
       }
     }
     //}}}
-  });
+  };
+  Jcrop.registerComponent('DragState',DragState);
+

@@ -119,3 +119,5 @@
       return b;
     }
   });
+  Jcrop.registerFilter('shader',ShadeFilter);
+  

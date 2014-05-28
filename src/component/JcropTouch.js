@@ -95,3 +95,5 @@
       // }}}
     }
   });
+  Jcrop.registerComponent('Touch',JcropTouch);
+

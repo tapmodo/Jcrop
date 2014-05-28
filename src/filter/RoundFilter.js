@@ -23,3 +23,5 @@
       return n;
     }
   });
+  Jcrop.registerFilter('round',RoundFilter);
+

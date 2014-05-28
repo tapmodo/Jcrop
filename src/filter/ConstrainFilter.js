@@ -33,3 +33,4 @@
       this.maxy = this.elh + sel.edge.s;
     }
   });
+  Jcrop.registerFilter('constrain',ConstrainFilter);

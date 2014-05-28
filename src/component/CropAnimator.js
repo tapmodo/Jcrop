@@ -14,7 +14,7 @@
   };
   // }}}
 
-  $.extend(CropAnimator.prototype,{
+  CropAnimator.prototype = {
     // getElement: function(){{{
     getElement: function(){
       var b = this.selection.get();
@@ -68,4 +68,6 @@
       });
     }
     // }}}
-  });
+  };
+  Jcrop.registerComponent('Animator',CropAnimator);
+

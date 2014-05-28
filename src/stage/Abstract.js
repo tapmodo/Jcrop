@@ -28,5 +28,5 @@ $.extend(AbstractStage,{
     }
   }
 });
-
+Jcrop.registerStageType('Block',AbstractStage);
 

@@ -61,3 +61,5 @@
       // }}}
     }
   });
+  Jcrop.registerComponent('Keyboard',KeyWatcher);
+

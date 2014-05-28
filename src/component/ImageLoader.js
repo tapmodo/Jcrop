@@ -53,4 +53,5 @@
     }
     // }}}
   });
-  // }}}
+  Jcrop.registerComponent('ImageLoader',ImageLoader);
+

@@ -334,4 +334,5 @@
       //}}}
     }
   });
+  Jcrop.registerComponent('Selection',Selection);
 
