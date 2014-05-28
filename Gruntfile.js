@@ -27,7 +27,7 @@ module.exports = function(grunt) {
     'src/component/Thumbnailer.js',
     'src/stage/Abstract.js',
     'src/stage/Image.js',
-    'src/stage/CssTransform.js',
+    //'src/stage/CssTransform.js',
     'src/stage/Canvas.js',
     'src/defaults.js',
     'src/api.js',

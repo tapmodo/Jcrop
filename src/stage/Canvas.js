@@ -6,7 +6,7 @@ var CanvasStage = function(){
   this.offset = [0,0];
 };
 
-CanvasStage.prototype = new TransformStage();
+//CanvasStage.prototype = new TransformStage();
 
 $.extend(CanvasStage,{
   isSupported: function(el,o){
@@ -36,6 +36,24 @@ $.extend(CanvasStage.prototype,{
   init: function(core){
     this.core = core;
   },
+  // setOffset: function(x,y) {{{
+  setOffset: function(x,y) {
+    this.offset = [x,y];
+    return this;
+  },
+  // }}}
+  // setAngle: function(v) {{{
+  setAngle: function(v) {
+    this.angle = v;
+    return this;
+  },
+  // }}}
+  // setScale: function(v) {{{
+  setScale: function(v) {
+    this.scale = this.boundScale(v);
+    return this;
+  },
+  // }}}
   createCanvas: function(img,w,h){
     this.width = w;
     this.height = h;
