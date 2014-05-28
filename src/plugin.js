@@ -1,5 +1,4 @@
   // Jcrop jQuery plugin function
-  // $.fn.Jcrop = function(options,callback){{{
   $.fn.Jcrop = function(options,callback){
 
     var first = this.eq(0).data('Jcrop');
@@ -51,4 +50,3 @@
       return this;
     });
   };
-  // }}}
