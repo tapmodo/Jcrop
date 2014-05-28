@@ -29,6 +29,7 @@ module.exports = function(grunt) {
     'src/component/StageDrag.js',
     'src/component/StageManager.js',
     'src/component/Thumbnailer.js',
+    'src/component/DialDrag.js',
     'src/defaults.js',
     'src/api.js',
     'src/plugin.js',
