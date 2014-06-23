@@ -27,6 +27,11 @@ Feature Overview
 * Support for CSS styling
 * Experimental touch-screen support (iOS, Android, etc)
 
+Workflow Overview
+----------------
+
+![](http://maxoffsky.com/word/wp-content/uploads/2014/06/jcrop-workflow-01.png)
+
 Contributors
 ============
 
