@@ -1019,6 +1019,8 @@
       {
         disableHandles();
         $sel.hide();
+        
+        setSelectRaw([0, 0, 0, 0]);
 
         if (options.shade) Shade.opacity(1);
           else setBgOpacity(1);
