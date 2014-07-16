@@ -530,9 +530,7 @@
         // This function could use some optimization I think...
         var aspect = options.aspectRatio,
             min_x = options.minSize[0] / xscale,
-            
-            
-            //min_y = options.minSize[1]/yscale,
+            min_y = options.minSize[1] / yscale,
             max_x = options.maxSize[0] / xscale,
             max_y = options.maxSize[1] / yscale,
             rw = x2 - x1,
@@ -577,28 +575,74 @@
           }
         }
 
-        // Magic %-)
-        if (xx > x1) { // right side
-          if (xx - x1 < min_x) {
-            xx = x1 + min_x;
-          } else if (xx - x1 > max_x) {
-            xx = x1 + max_x;
-          }
+        // Make sure minSize and maxSize options are respected.
+        if (xx > x1) {
+
+          // Bottom right corner.
           if (yy > y1) {
+            if (xx - x1 < min_x) {
+              xx = x1 + min_x;
+            } else if (xx - x1 > max_x) {
+              xx = x1 + max_x;
+            }
             yy = y1 + (xx - x1) / aspect;
+
+            if (yy - y1 < min_y) {
+              yy = y1 + min_y;
+            } else if (yy - y1 > max_y) {
+              yy = y1 + max_y;
+            }
+            xx = x1 + (yy - y1) * aspect;
+
+          // Top right corner.
           } else {
+            if (xx - x1 < min_x) {
+              xx = x1 + min_x;
+            } else if (xx - x1 > max_x) {
+              xx = x1 + max_x;
+            }
             yy = y1 - (xx - x1) / aspect;
+
+            if (y1 - yy < min_y) {
+              yy = y1 - min_y;
+            } else if (y1 -yy > max_y) {
+              yy = y1 - max_y;
+            }
+            xx = x1 + (y1 - yy) * aspect;
           }
-        } else if (xx < x1) { // left side
-          if (x1 - xx < min_x) {
-            xx = x1 - min_x;
-          } else if (x1 - xx > max_x) {
-            xx = x1 - max_x;
-          }
+        } else if (xx < x1) {
+
+          // Bottom left corner.
           if (yy > y1) {
+            if (x1 - xx < min_x) {
+              xx = x1 - min_x;
+            } else if (x1 - xx > max_x) {
+              xx = x1 - max_x;
+            }
             yy = y1 + (x1 - xx) / aspect;
+
+            if (yy - y1 < min_y) {
+              yy = y1 + min_y;
+            } else if (yy - y1 > max_y) {
+              yy = y1 + max_y;
+            }
+            xx = x1 - (yy - y1) * aspect;
+
+            // Top left corner.
           } else {
+            if (x1 - xx < min_x) {
+              xx = x1 - min_x;
+            } else if (x1 - xx > max_x) {
+              xx = x1 - max_x;
+            }
             yy = y1 - (x1 - xx) / aspect;
+
+            if (y1 - yy < min_y) {
+              yy = y1 - min_y;
+            } else if (y1 -yy > max_y) {
+              yy = y1 - max_y;
+            }
+            xx = x1 - (y1 - yy) * aspect;
           }
         }
 
