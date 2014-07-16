@@ -1431,14 +1431,16 @@
       $(obj).removeData('Jcrop');
     }
     //}}}
+    var iw, ih, ir;
     function setImage(src, callback) //{{{
     {
       Selection.release();
       disableCrop();
       var img = new Image();
       img.onload = function () {
-        var iw = img.width;
-        var ih = img.height;
+        iw = img.width;
+        ih = img.height;
+        ir = iw / ih;
         var bw = options.boxWidth;
         var bh = options.boxHeight;
         $img.width(iw).height(ih);
@@ -1573,7 +1575,37 @@
       ui: {
         holder: $div,
         selection: $sel
-      }
+      },
+
+      resizeImage: function(boxWidth, boxHeight) {
+        options.boxWidth = boxWidth;
+        options.boxHeight = boxHeight;
+
+        var tmp_sel = tellSelect();
+
+        var nw, nh;
+        if (options.boxWidth / options.boxHeight < ir) {
+          nw = options.boxWidth;
+          nh = Math.floor((nw / iw) * ih);
+        } else {
+          nh = options.boxHeight;
+          nw = Math.floor((nh / ih) * iw);
+        }
+
+        boundx = nw;
+        boundy = nh;
+
+        xscale = iw / nw;
+        yscale = ih / nh;
+
+        $([$img2, $img, $div, $trk]).each(function(index, element) {
+          element.width(nw).height(nh);
+        });
+
+         if (!isNaN(tmp_sel.x)) {
+           setSelect( [tmp_sel.x, tmp_sel.y, tmp_sel.x2, tmp_sel.y2]);
+         }
+       }
     };
 
     if (is_msie) $div.bind('selectstart', function () { return false; });
