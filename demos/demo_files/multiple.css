@@ -1,0 +1,16 @@
+.target_multi {
+  width: 400px;
+  height: 300px;
+}
+
+.target_multi .target, .target_multi img {
+  width: 400px;
+  height: 300px;
+  position: absolute;
+}
+.jcrop-holder {
+  width: 400px !important;
+  height: 300px !important;
+  background: none !important;
+  position: absolute !important;
+}
