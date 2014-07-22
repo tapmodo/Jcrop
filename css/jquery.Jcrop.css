@@ -15,12 +15,15 @@
   -ms-touch-action: none;
 }
 /* Selection Border */
+.jcrop-vguide,
+.jcrop-hguide,
 .jcrop-vline,
 .jcrop-hline {
   background: #ffffff url("Jcrop.gif");
   font-size: 0;
   position: absolute;
 }
+.jcrop-vguide,
 .jcrop-vline {
   height: 100%;
   width: 1px !important;
@@ -28,6 +31,7 @@
 .jcrop-vline.right {
   right: 0;
 }
+.jcrop-hguide,
 .jcrop-hline {
   height: 1px !important;
   width: 100%;
@@ -35,6 +39,7 @@
 .jcrop-hline.bottom {
   bottom: 0;
 }
+
 /* Invisible click targets */
 .jcrop-tracker {
   height: 100%;
@@ -128,6 +133,8 @@
   margin-left: -4px;
 }
 /* The "jcrop-light" class/extension */
+.jcrop-light .jcrop-vguide,
+.jcrop-light .jcrop-hguide,
 .jcrop-light .jcrop-vline,
 .jcrop-light .jcrop-hline {
   background: #ffffff;
@@ -142,6 +149,8 @@
   border-radius: 3px;
 }
 /* The "jcrop-dark" class/extension */
+.jcrop-dark .jcrop-vguide,
+.jcrop-dark .jcrop-hguide,
 .jcrop-dark .jcrop-vline,
 .jcrop-dark .jcrop-hline {
   background: #000000;
@@ -156,6 +165,8 @@
   border-radius: 3px;
 }
 /* Simple macro to turn off the antlines */
+.solid-line .jcrop-vguide,
+.solid-line .jcrop-hguide,
 .solid-line .jcrop-vline,
 .solid-line .jcrop-hline {
   background: #ffffff;

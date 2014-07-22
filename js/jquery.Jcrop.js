@@ -36,7 +36,9 @@
         docOffset,
         _ua = navigator.userAgent.toLowerCase(),
         is_msie = /msie/.test(_ua),
-        ie6mode = /msie [1-6]\./.test(_ua);
+        ie6mode = /msie [1-6]\./.test(_ua),
+        selectMode,
+        startCoords;
 
     // Internal Methods {{{
     function px(n) {
@@ -69,62 +71,61 @@
       });
     }
     //}}}
+    function restrictMovement(pos, mode, coords) //{{{
+    {
+      if (!options.aspectRatio) {
+        switch (selectMode) {
+          case 'e':
+          case 'w':
+            pos[1] = coords.y2;
+            break;
+          case 'n':
+          case 's':
+            pos[0] = coords.x2;
+            break;
+        }
+      } else {
+        switch (selectMode) {
+          case 'e':
+          case 'w':
+            pos[1] = coords.y + 1;
+            break;
+          case 'n':
+          case 's':
+            pos[0] = coords.x + 1;
+            break;
+        }
+      }
+    }
+    //}}}
     function startDragMode(mode, pos, touch) //{{{
     {
       docOffset = getPos($img);
       Tracker.setCursor(mode === 'move' ? mode : mode + '-resize');
 
       if (mode === 'move') {
+        selectMode = null;
+        startCoords = null;
         return Tracker.activateHandlers(createMover(pos), doneSelect, touch);
       }
 
-      var fc = Coords.getFixed();
+      selectMode = mode;
+      startCoords = Coords.getFixed();
       var opp = oppLockCorner(mode);
       var opc = Coords.getCorner(oppLockCorner(opp));
 
       Coords.setPressed(Coords.getCorner(opp));
       Coords.setCurrent(opc);
 
-      Tracker.activateHandlers(dragmodeHandler(mode, fc), doneSelect, touch);
+      Tracker.activateHandlers(dragmodeHandler, doneSelect, touch);
+      return false;
     }
     //}}}
-    function dragmodeHandler(mode, f) //{{{
+    function dragmodeHandler(pos) //{{{
     {
-      return function (pos) {
-        if (!options.aspectRatio) {
-          switch (mode) {
-          case 'e':
-            pos[1] = f.y2;
-            break;
-          case 'w':
-            pos[1] = f.y2;
-            break;
-          case 'n':
-            pos[0] = f.x2;
-            break;
-          case 's':
-            pos[0] = f.x2;
-            break;
-          }
-        } else {
-          switch (mode) {
-          case 'e':
-            pos[1] = f.y + 1;
-            break;
-          case 'w':
-            pos[1] = f.y + 1;
-            break;
-          case 'n':
-            pos[0] = f.x + 1;
-            break;
-          case 's':
-            pos[0] = f.x + 1;
-            break;
-          }
-        }
-        Coords.setCurrent(pos);
-        Selection.update();
-      };
+      restrictMovement(pos, selectMode, startCoords);
+      Coords.setCurrent(pos);
+      Selection.update(false, selectMode, startCoords);
     }
     //}}}
     function createMover(pos) //{{{
@@ -215,10 +216,10 @@
     //}}}
     function doneSelect(pos) //{{{
     {
-      var c = Coords.getFixed();
+      var c = Coords.getFixed(selectMode, startCoords);
       if ((c.w > options.minSelect[0]) && (c.h > options.minSelect[1])) {
         Selection.enableHandles();
-        Selection.done();
+        Selection.done(selectMode, startCoords);
       } else {
         Selection.release();
       }
@@ -239,8 +240,12 @@
       Tracker.setCursor('crosshair');
       var pos = mouseAbs(e);
       Coords.setPressed(pos);
+      Coords.setCurrent(pos);
       Selection.update();
-      Tracker.activateHandlers(selectDrag, doneSelect, e.type.substring(0,5)==='touch');
+
+      selectMode = 'se';
+      startCoords = Coords.getFixed();
+      Tracker.activateHandlers(selectDrag, doneSelect, e.type.substring(0, 5) === 'touch');
       KeyManager.watchKeys();
 
       e.stopPropagation();
@@ -250,8 +255,21 @@
     //}}}
     function selectDrag(pos) //{{{
     {
+      switchSelectMode(pos);
+      restrictMovement(pos, selectMode, startCoords);
       Coords.setCurrent(pos);
-      Selection.update();
+      Selection.update(false, selectMode, startCoords);
+        
+      function switchSelectMode(pos)
+      {
+        if (!options.aspectRatio && !options.resizeCentered) { return; }
+          
+        var currentAspect = Math.abs(pos[0] - startCoords.x) / Math.abs(pos[1] - startCoords.y);
+        var aspectDiff = options.aspectRatio - currentAspect;
+        if (Math.abs(aspectDiff) < options.aspectRatio / 3) { selectMode = 'se'; }
+        else if (aspectDiff > 0) { selectMode = 's'; }
+        else { selectMode = 'e'; }
+      }
     }
     //}}}
     function newTracker() //{{{
@@ -522,7 +540,7 @@
         }
       }
       //}}}
-      function getFixed() //{{{
+      function getFixed(mode, startCoords) //{{{
       {
         if (!options.aspectRatio) {
           return getRect();
@@ -530,95 +548,109 @@
         // This function could use some optimization I think...
         var aspect = options.aspectRatio,
             min_x = options.minSize[0] / xscale,
-            
-            
             //min_y = options.minSize[1]/yscale,
             max_x = options.maxSize[0] / xscale,
-            max_y = options.maxSize[1] / yscale,
-            rw = x2 - x1,
-            rh = y2 - y1,
-            rwa = Math.abs(rw),
-            rha = Math.abs(rh),
-            real_ratio = rwa / rha,
-            xx, yy, w, h;
+            //max_y = options.maxSize[1] / yscale,
 
-        if (max_x === 0) {
-          max_x = boundx * 10;
-        }
-        if (max_y === 0) {
-          max_y = boundy * 10;
-        }
+            flipX = x2 < x1,
+            flipY = y2 < y1,
+            width = Math.abs(x2 - x1),
+            height = Math.abs(y2 - y1),
+            
+            real_ratio = width / height,
+
+            pos2X = x2,
+            pos2Y = y2,
+            pos1X = x1,
+            pos1Y = y1;
+          
+        var resizeCentered = startCoords && options.resizeCentered;
+        resizeCentered &= (mode === 'e' || mode === "w" || mode === "n" || mode === "s");
+
+        if (max_x === 0) { max_x = boundx * 10; }
+        //if (max_y === 0) { max_y = boundy * 10; }
+          
         if (real_ratio < aspect) {
-          yy = y2;
-          w = rha * aspect;
-          xx = rw < 0 ? x1 - w : w + x1;
+          width = height * aspect;
+          if (width > boundx) { width = boundx; }
+          
+          var pos1XAdjust = resizeCentered ? (width - startCoords.w) / 2 : 0;
+          
+          pos1X -= pos1XAdjust;
+          pos2X = flipX ? pos1X - width : pos1X + width;
+          
+          if (pos2X < 0) {
+            pos1X = width;
+            pos2X = 0;
+          } else if (pos2X > boundx) {
+            pos1X = boundx - width;
+            pos2X = boundx;
+          }
+          
+          if (pos1X < 0) {
+            pos1X = 0;
+            pos2X = width;
+          } else if (pos1X > boundx) {
+            pos1X = boundx;
+            pos2X = boundx - width;
+          }
 
-          if (xx < 0) {
-            xx = 0;
-            h = Math.abs((xx - x1) / aspect);
-            yy = rh < 0 ? y1 - h : h + y1;
-          } else if (xx > boundx) {
-            xx = boundx;
-            h = Math.abs((xx - x1) / aspect);
-            yy = rh < 0 ? y1 - h : h + y1;
-          }
+          height = Math.abs((pos2X - pos1X) / aspect);
+          pos2Y = flipY ? pos1Y - height : pos1Y + height;
         } else {
-          xx = x2;
-          h = rwa / aspect;
-          yy = rh < 0 ? y1 - h : y1 + h;
-          if (yy < 0) {
-            yy = 0;
-            w = Math.abs((yy - y1) * aspect);
-            xx = rw < 0 ? x1 - w : w + x1;
-          } else if (yy > boundy) {
-            yy = boundy;
-            w = Math.abs(yy - y1) * aspect;
-            xx = rw < 0 ? x1 - w : w + x1;
+          height = width / aspect;
+          if (height > boundy) { height = boundy; }
+
+          var pos1YAdjust = resizeCentered ? (height - startCoords.h) / 2 : 0;
+
+          pos1Y -= pos1YAdjust;
+          pos2Y = flipY ? pos1Y - height : pos1Y + height;
+            
+          if (pos2Y < 0) {
+            pos1Y = height;
+            pos2Y = 0;
+          } else if (pos2Y > boundy) {
+            pos1Y = boundy - height;
+            pos2Y = boundy;
           }
+            
+          if (pos1Y < 0) {
+            pos1Y = 0;
+            pos2Y = height;
+          } else if (pos1Y > boundy) {
+            pos1Y = boundy;
+            pos2Y = boundy - height;
+          }
+            
+          width = Math.abs(pos2Y - pos1Y) * aspect;
+          pos2X = flipX ? pos1X - width : pos1X + width;
         }
 
         // Magic %-)
-        if (xx > x1) { // right side
-          if (xx - x1 < min_x) {
-            xx = x1 + min_x;
-          } else if (xx - x1 > max_x) {
-            xx = x1 + max_x;
+        if (pos2X > pos1X) { // right side
+          if (pos2X - pos1X < min_x) {
+            pos2X = pos1X + min_x;
+          } else if (pos2X - pos1X > max_x) {
+            pos2X = pos1X + max_x;
           }
-          if (yy > y1) {
-            yy = y1 + (xx - x1) / aspect;
+          if (pos2Y > pos1Y) { pos2Y = pos1Y + (pos2X - pos1X) / aspect;
           } else {
-            yy = y1 - (xx - x1) / aspect;
+            pos2Y = pos1Y - (pos2X - pos1X) / aspect;
           }
-        } else if (xx < x1) { // left side
-          if (x1 - xx < min_x) {
-            xx = x1 - min_x;
-          } else if (x1 - xx > max_x) {
-            xx = x1 - max_x;
+        } else if (pos2X < pos1X) { // left side
+          if (pos1X - pos2X < min_x) {
+            pos2X = pos1X - min_x;
+          } else if (x1 - pos2X > max_x) {
+            pos2X = pos1X - max_x;
           }
-          if (yy > y1) {
-            yy = y1 + (x1 - xx) / aspect;
+          if (pos2Y > pos1Y) {
+            pos2Y = pos1Y + (pos1X - pos2X) / aspect;
           } else {
-            yy = y1 - (x1 - xx) / aspect;
+            pos2Y = pos1Y - (pos1X - pos2X) / aspect;
           }
         }
 
-        if (xx < 0) {
-          x1 -= xx;
-          xx = 0;
-        } else if (xx > boundx) {
-          x1 -= xx - boundx;
-          xx = boundx;
-        }
-
-        if (yy < 0) {
-          y1 -= yy;
-          yy = 0;
-        } else if (yy > boundy) {
-          y1 -= yy - boundy;
-          yy = boundy;
-        }
-
-        return makeObj(flipCoords(x1, y1, xx, yy));
+        return makeObj(flipCoords(pos1X, pos1Y, pos2X, pos2Y));
       }
       //}}}
       function rebound(p) //{{{
@@ -634,10 +666,10 @@
       //}}}
       function flipCoords(x1, y1, x2, y2) //{{{
       {
-        var xa = x1,
-            xb = x2,
-            ya = y1,
-            yb = y2;
+        var xa = Math.round(x1),
+            xb = Math.round(x2),
+            ya = Math.round(y1),
+            yb = Math.round(y2);
         if (x2 < x1) {
           xa = x2;
           xb = x1;
@@ -856,6 +888,8 @@
       var awake,
           hdep = 370,
           borders = {},
+          hGuides = [],
+          vGuides = [],
           handle = {},
           dragbar = {},
           seehandles = false;
@@ -927,6 +961,20 @@
         }
       }
       //}}}
+      function createHGuides(guides) //{{{
+      {
+          for (var i=0; i<guides.length; i++) {
+              hGuides.push(insertBorder('hguide').data('position', guides[i]));
+          }
+      }
+      //}}}
+      function createVGuides(guides) //{{{
+      {
+          for (var i = 0; i < guides.length; i++) {
+              vGuides.push(insertBorder('vguide').data('position', guides[i]));
+          }
+      }
+        //}}}
       function createHandles(li) //{{{
       {
         var i;
@@ -951,12 +999,18 @@
       //}}}
       function resize(w, h) //{{{
       {
-        $sel.width(Math.round(w)).height(Math.round(h));
+          $sel.width(Math.round(w)).height(Math.round(h));
+          for (var i = 0; i < hGuides.length; i++) {
+              hGuides[i].css({ top: px(h * hGuides[i].data('position')) });
+          }
+          for (var i = 0; i < vGuides.length; i++) {
+              vGuides[i].css({ left: px(w * vGuides[i].data('position')) });
+          }
       }
       //}}}
-      function refresh() //{{{
+      function refresh(mode, startCoords) //{{{
       {
-        var c = Coords.getFixed();
+        var c = Coords.getFixed(mode, startCoords);
 
         Coords.setPressed([c.x, c.y]);
         Coords.setCurrent([c.x2, c.y2]);
@@ -973,9 +1027,9 @@
         }
       }
       //}}}
-      function update(select) //{{{
+      function update(select, mode, startCoords) //{{{
       {
-        var c = Coords.getFixed();
+        var c = Coords.getFixed(mode, startCoords);
 
         resize(c.w, c.h);
         moveto(c.x, c.y);
@@ -1060,10 +1114,10 @@
         }
       } 
       //}}}
-      function done() //{{{
+      function done(mode, startCoords) //{{{
       {
         animMode(false);
-        refresh();
+        refresh(mode, startCoords);
       } 
       //}}}
       // Insert draggable elements {{{
@@ -1077,6 +1131,12 @@
 
       if (options.drawBorders && $.isArray(options.createBorders))
         createBorders(options.createBorders);
+
+      if (options.drawBorders && $.isArray(options.createHGuides))
+          createHGuides(options.createHGuides);
+        
+      if (options.drawBorders && $.isArray(options.createVGuides))
+          createVGuides(options.createVGuides);
 
       //}}}
 
@@ -1665,8 +1725,11 @@
     createHandles: ['n','s','e','w','nw','ne','se','sw'],
     createDragbars: ['n','s','e','w'],
     createBorders: ['n','s','e','w'],
+    createHGuides: null,
+    createVGuides: null,
     drawBorders: true,
     dragEdges: true,
+    resizeCentered: false,
     fixedSupport: true,
     touchSupport: null,
 
