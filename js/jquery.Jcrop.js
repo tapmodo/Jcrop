@@ -1015,7 +1015,7 @@
         awake = true;
       }
       //}}}
-      function release() //{{{
+      function release(silent) //{{{
       {
         disableHandles();
         $sel.hide();
@@ -1024,7 +1024,7 @@
           else setBgOpacity(1);
 
         awake = false;
-        options.onRelease.call(api);
+        if (!silent) options.onRelease.call(api);
       }
       //}}}
       function showHandles() //{{{
@@ -1373,10 +1373,10 @@
       queueAnimator();
     }
     //}}}
-    function setSelect(rect) //{{{
+    function setSelect(rect, silent) //{{{
     {
       setSelectRaw([rect[0] / xscale, rect[1] / yscale, rect[2] / xscale, rect[3] / yscale]);
-      options.onSelect.call(api, unscale(Coords.getFixed()));
+      if (!silent) options.onSelect.call(api, unscale(Coords.getFixed()));
       Selection.enableHandles();
     }
     //}}}
