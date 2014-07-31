@@ -1257,7 +1257,9 @@
       function parseKey(e) //{{{
       {
         if (e.ctrlKey || e.metaKey) {
-          return true;
+          options.aspectRatio = 1;
+        } else {
+          options.aspectRatio = 0;
         }
         shift_down = e.shiftKey ? true : false;
         var nudge = shift_down ? 10 : 1;
@@ -1286,8 +1288,20 @@
       }
       //}}}
 
+      function keyUp(e) //{{{
+      {
+        if (e.ctrlKey) {
+          options.aspectRatio = 1;
+        } else {
+          options.aspectRatio = 0;
+        }
+      }
+      //}}}
+
       if (options.keySupport) {
         $keymgr.keydown(parseKey).blur(onBlur);
+        $keymgr.keyup(keyUp).blur(onBlur);
+
         if (ie6mode || !options.fixedSupport) {
           $keymgr.css({
             position: 'absolute',
@@ -1460,6 +1474,23 @@
       img.src = src;
     }
     //}}}
+    function setImageSize(size) //{{{
+    {
+      Selection.release();
+      disableCrop();
+
+      var bw = options.boxWidth;
+      var bh = options.boxHeight;
+      $img.width(size[0]).height(size[1]);
+      presize($img, bw, bh);
+      boundx = size[0];
+      boundy = size[1];
+      $img2.width(boundx).height(boundy);
+      $trk.width(boundx + (bound * 2)).height(boundy + (bound * 2));
+      $div.width(boundx).height(boundy);
+      enableCrop();
+    }
+    //}}}
     function colorChangeMacro($obj,color,now) {
       var mycolor = color || options.bgColor;
       if (options.bgFade && supportsColorFade() && options.fadeTime && !now) {
@@ -1541,6 +1572,7 @@
 
     var api = {
       setImage: setImage,
+      setImageSize: setImageSize,
       animateTo: animateTo,
       setSelect: setSelect,
       setOptions: setOptionsNew,
