@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0-RC1 - build: 20140525
+/*! Jcrop.js v2.0.0-RC1 - build: 20140827
  *  @copyright 2008-2013 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -1163,6 +1163,11 @@
         return rv;
       },
       //}}}
+      //getActual: function(){{{
+      getActual: function(){
+        return this.core.unscale(this.get());
+      },
+      //}}}
       //insertElements: function(){{{
       insertElements: function(){
         var t = this, i,
@@ -1185,7 +1190,6 @@
       //}}}
     }
   });
-
 
   /**
    * StageDrag
