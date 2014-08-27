@@ -315,6 +315,11 @@
         return rv;
       },
       //}}}
+      //getActual: function(){{{
+      getActual: function(){
+        return this.core.unscale(this.get());
+      },
+      //}}}
       //insertElements: function(){{{
       insertElements: function(){
         var t = this, i,
@@ -337,4 +342,3 @@
       //}}}
     }
   });
-
