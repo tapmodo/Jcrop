@@ -1535,8 +1535,8 @@
     function selectMax() //{{{
     {
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
 
         var
@@ -1560,8 +1560,8 @@
     //}}}
     function selectCenter() { //{{{
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
         var
             selected = tellSelect(),
@@ -1579,8 +1579,8 @@
     //}}}
     function selectTopLeft() { //{{{
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
         var
             selected = tellSelect(),
@@ -1598,8 +1598,8 @@
     //}}}
     function selectTopRight() { //{{{
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
         var
             selected = tellSelect(),
@@ -1617,8 +1617,8 @@
     //}}}
     function selectBottomLeft() { //{{{
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
         var
             selected = tellSelect(),
@@ -1636,8 +1636,8 @@
     //}}}
     function selectBottomRight() { //{{{
         var
-            originalHeight = $img.height(),
-            originalWidth = $img.width(),
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
             aspectRatio = options.aspectRatio;
         var
             selected = tellSelect(),
