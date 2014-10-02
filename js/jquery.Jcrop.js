@@ -1532,6 +1532,127 @@
       Selection.refresh();
     }
     //}}}
+    function selectMax() //{{{
+    {
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+
+        var
+            targetWidth,
+            targetHeight;
+
+        if (aspectRatio == 0) {
+            targetHeight = originalHeight;
+            targetWidth = originalWidth;
+        } else if (originalWidth > originalHeight && aspectRatio <= 1) {
+            targetHeight = originalHeight;
+            targetWidth = originalHeight * aspectRatio;
+        } else {
+            targetWidth = originalWidth;
+            targetHeight = originalWidth / aspectRatio;
+        }
+
+        setSelect([0, 0, targetWidth, targetHeight]);
+        selectCenter();
+    }
+    //}}}
+    function selectCenter() { //{{{
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+        var
+            selected = tellSelect(),
+            targetWidth = selected.x2 - selected.x,
+            targetHeight = selected.y2 - selected.y;
+
+        var
+            x1 = originalWidth / 2 - targetWidth / 2,
+            x2 = x1 + targetWidth,
+            y1 = originalHeight / 2 - targetHeight / 2,
+            y2 = y1 + targetHeight;
+
+        animateTo([x1, y1, x2, y2]);
+    }
+    //}}}
+    function selectTopLeft() { //{{{
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+        var
+            selected = tellSelect(),
+            targetWidth = selected.x2 - selected.x,
+            targetHeight = selected.y2 - selected.y;
+
+        var
+            x1 = 0,
+            x2 = targetWidth,
+            y1 = 0,
+            y2 = targetHeight;
+
+        animateTo([x1, y1, x2, y2]);
+    }
+    //}}}
+    function selectTopRight() { //{{{
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+        var
+            selected = tellSelect(),
+            targetWidth = selected.x2 - selected.x,
+            targetHeight = selected.y2 - selected.y;
+
+        var
+            x1 = originalWidth - targetWidth,
+            x2 = originalWidth,
+            y1 = 0,
+            y2 = originalHeight - targetHeight;
+
+        animateTo([x1, y1, x2, y2]);
+    }
+    //}}}
+    function selectBottomLeft() { //{{{
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+        var
+            selected = tellSelect(),
+            targetWidth = selected.x2 - selected.x,
+            targetHeight = selected.y2 - selected.y;
+
+        var
+            x1 = 0,
+            x2 = targetWidth,
+            y1 = originalHeight - targetHeight,
+            y2 = originalHeight;
+
+        animateTo([x1, y1, x2, y2]);
+    }
+    //}}}
+    function selectBottomRight() { //{{{
+        var
+            originalHeight = $origimg.height(),
+            originalWidth = $origimg.width(),
+            aspectRatio = options.aspectRatio;
+        var
+            selected = tellSelect(),
+            targetWidth = selected.x2 - selected.x,
+            targetHeight = selected.y2 - selected.y;
+
+        var
+            x1 = originalWidth - targetWidth,
+            x2 = originalWidth,
+            y1 = originalHeight - targetHeight,
+            y2 = originalHeight;
+
+        animateTo([x1, y1, x2, y2]);
+    }
+    //}}}
     //}}}
 
     if (Touch.support) $trk.bind('touchstart.jcrop', Touch.newSelection);
@@ -1547,6 +1668,13 @@
       tellSelect: tellSelect,
       tellScaled: tellScaled,
       setClass: setClass,
+
+      selectMax: selectMax,
+      selectCenter: selectCenter,
+      selectTopLeft: selectTopLeft,
+      selectTopRight: selectTopRight,
+      selectBottomLeft: selectBottomLeft,
+      selectBottomRight: selectBottomRight,
 
       disable: disableCrop,
       enable: enableCrop,
