@@ -1546,7 +1546,7 @@
         if (aspectRatio == 0) {
             targetHeight = originalHeight;
             targetWidth = originalWidth;
-        } else if (originalWidth > originalHeight && aspectRatio < 1) {
+        } else if (originalWidth > originalHeight && aspectRatio <= 1) {
             targetHeight = originalHeight;
             targetWidth = originalHeight * aspectRatio;
         } else {
