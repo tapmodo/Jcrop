@@ -10,7 +10,7 @@
 // Setting some variables to 
 // Used to set handle and dragbar size/width
 // To center on a 1px selection line, use an odd number
-@grabSize: 7px;
+@grabSize: 9px;
 
 // Used to offset handles and dragbar
 // Default value will center on 1px selection line
@@ -39,16 +39,21 @@
 .jcrop-active {
   direction: ltr;
   text-align: left;
+  box-sizing: border-box;
+
+  /* Prevent selections */
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 
   /* IE10 touch compatibility */ -ms-touch-action: none;
 }
 
-/*
 .jcrop-selection {
-  z-index: 45;
-  &.jcrop-current { z-index: 50; }
+  z-index: 2;
+  &.jcrop-current { z-index: 4; }
 }
-*/
 
 /* Selection Borders */
 .jcrop-border {
@@ -60,10 +65,12 @@
   filter: Alpha(opacity=50) !important;
   opacity: 0.5 !important;
   &.ord-w, &.ord-e, &.ord-n { top: 0px; }
-  &.ord-n, &.ord-s { left: 0px !important; width: 100%; height: @selectionBorderWidth !important; }
+  &.ord-n, &.ord-s { width: 100%; height: @selectionBorderWidth !important; }
   &.ord-w, &.ord-e { height: 100%; width: @selectionBorderWidth !important; }
-  &.ord-e { right: 0; }
-  &.ord-s { bottom: 0; }
+  &.ord-e { right: -@selectionBorderWidth; }
+  &.ord-n { top: -@selectionBorderWidth; }
+  &.ord-w { left: -@selectionBorderWidth; }
+  &.ord-s { bottom: -@selectionBorderWidth; }
 }
 
 .jcrop-selection {
@@ -71,14 +78,16 @@
 }
 
 .jcrop-box {
+  z-index: 2;
   display: block;
   background: none;
   border: none;
   padding: 0;
+  margin: 0;
   font-size: 0;
-  &:focus {
-    outline: 1px rgba(128,128,128,.65) dotted;
-  }
+  &:hover { background: none; }
+  &:active { background: none; }
+  &:focus { outline: 1px rgba(128,128,128,.65) dotted; }
 }
 
 .jcrop-active, .jcrop-box { position: relative; }
@@ -86,8 +95,8 @@
 
 .handles (@handleSize;@handleOffset;@bgColor;@bgOpacity;@borderWidth;@borderColor;@borderStyle) {
 
+  z-index: 4;
   @ieopacity: @bgOpacity * 100;
-  box-sizing: content-box;
   font-size: 0;
   background-color: @bgColor;
   border: @borderWidth @borderColor @borderStyle;
@@ -172,11 +181,8 @@
     opacity:.70!important;
   }
   .jcrop-handle {
-    -moz-border-radius:3px;
-    -webkit-border-radius:3px;
     background-color: @black;
     border-color: @white;
-    border-radius:3px;
   }
 }
 
@@ -189,11 +195,8 @@
     opacity: 0.7 !important;
   }
   .jcrop-handle {
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
     background-color: @white;
     border-color: @black;
-    border-radius: 3px;
   }
 }
 
@@ -270,3 +273,5 @@
   }
 }
 
+/* Prevent background on button element */
+button.jcrop-box { background: none; }
