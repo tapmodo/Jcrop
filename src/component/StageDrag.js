@@ -47,6 +47,8 @@
         }
       }
 
+      c.container.addClass('jcrop-dragging');
+
       // Create the new selection
       var sel = c.newSelection()
         // and position it
@@ -61,6 +63,8 @@
     end: function(x,y){
       this.drag(x,y);
       var b = this.sel.get();
+
+      this.core.container.removeClass('jcrop-dragging');
 
       if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
         this.core.requestDelete();

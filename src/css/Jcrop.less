@@ -41,13 +41,14 @@
   text-align: left;
   box-sizing: border-box;
 
-  /* Prevent selections */
+  /* IE10 touch compatibility */ -ms-touch-action: none;
+}
+
+.jcrop-dragging {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  /* IE10 touch compatibility */ -ms-touch-action: none;
 }
 
 .jcrop-selection {

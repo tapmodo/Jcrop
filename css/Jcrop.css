@@ -1,4 +1,4 @@
-/*! Jcrop.css v2.0.0 - build: 20141024
+/*! Jcrop.css v2.0.0 - build: 20141025
  *  Copyright 2008-2014 Tapmodo Interactive LLC
  *  Free software under MIT License
  **/
@@ -16,14 +16,14 @@
   direction: ltr;
   text-align: left;
   box-sizing: border-box;
-  /* Prevent selections */
-
+  /* IE10 touch compatibility */
+  -ms-touch-action: none;
+}
+.jcrop-dragging {
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  /* IE10 touch compatibility */
-  -ms-touch-action: none;
 }
 .jcrop-selection {
   z-index: 2;

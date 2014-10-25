@@ -60,8 +60,8 @@
 
         // Bind focus and blur events for this selection
         t.frame.on('focus.jcrop',function(e){
-          t.element.trigger('cropfocus',t);
           t.core.setSelection(t);
+          t.element.trigger('cropfocus',t);
           t.element.addClass('jcrop-focus');
         }).on('blur.jcrop',function(e){
           t.element.removeClass('jcrop-focus');
@@ -218,15 +218,13 @@
       // toBack: function(){{{
       toBack: function(){
         this.active = false;
-        this.element
-          .removeClass('jcrop-current')
-          .removeClass('jcrop-focus');
+        this.element.removeClass('jcrop-current jcrop-focus');
       },
       // }}}
       // toFront: function(){{{
       toFront: function(){
         this.active = true;
-        this.element.addClass('jcrop-current').appendTo(this.core.container);
+        this.element.addClass('jcrop-current');
         this.callFilterFunction('refresh');
         this.refresh();
       },

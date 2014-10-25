@@ -83,7 +83,9 @@
     // endDragEvent: function(e){{{
     endDragEvent: function(e){
       var sel = this.selection;
+      sel.core.container.removeClass('jcrop-dragging');
       sel.element.trigger('cropend',[sel,sel.core.unscale(sel.get())]);
+      sel.focus();
     },
     // }}}
     // createStopHandler: function(){{{

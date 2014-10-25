@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0 - build: 20141024
+/*! Jcrop.js v2.0.0 - build: 20141025
  *  @copyright 2008-2014 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -962,7 +962,9 @@ Jcrop.registerStageType('Canvas',CanvasStage);
     // endDragEvent: function(e){{{
     endDragEvent: function(e){
       var sel = this.selection;
+      sel.core.container.removeClass('jcrop-dragging');
       sel.element.trigger('cropend',[sel,sel.core.unscale(sel.get())]);
+      sel.focus();
     },
     // }}}
     // createStopHandler: function(){{{
@@ -1332,8 +1334,8 @@ Jcrop.registerStageType('Canvas',CanvasStage);
 
         // Bind focus and blur events for this selection
         t.frame.on('focus.jcrop',function(e){
-          t.element.trigger('cropfocus',t);
           t.core.setSelection(t);
+          t.element.trigger('cropfocus',t);
           t.element.addClass('jcrop-focus');
         }).on('blur.jcrop',function(e){
           t.element.removeClass('jcrop-focus');
@@ -1490,15 +1492,13 @@ Jcrop.registerStageType('Canvas',CanvasStage);
       // toBack: function(){{{
       toBack: function(){
         this.active = false;
-        this.element
-          .removeClass('jcrop-current')
-          .removeClass('jcrop-focus');
+        this.element.removeClass('jcrop-current jcrop-focus');
       },
       // }}}
       // toFront: function(){{{
       toFront: function(){
         this.active = true;
-        this.element.addClass('jcrop-current').appendTo(this.core.container);
+        this.element.addClass('jcrop-current');
         this.callFilterFunction('refresh');
         this.refresh();
       },
@@ -1658,6 +1658,8 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         }
       }
 
+      c.container.addClass('jcrop-dragging');
+
       // Create the new selection
       var sel = c.newSelection()
         // and position it
@@ -1672,6 +1674,8 @@ Jcrop.registerStageType('Canvas',CanvasStage);
     end: function(x,y){
       this.drag(x,y);
       var b = this.sel.get();
+
+      this.core.container.removeClass('jcrop-dragging');
 
       if ((b.w < this.minsize[0]) || (b.h < this.minsize[1]))
         this.core.requestDelete();
