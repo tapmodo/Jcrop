@@ -228,10 +228,10 @@
     function newSelection(e) //{{{
     {
       if (options.disabled) {
-        return;
+        return false;
       }
       if (!options.allowSelect) {
-        return;
+        return false;
       }
       btndown = true;
       docOffset = getPos($img);
@@ -1282,6 +1282,12 @@
           return true;
         }
 
+        $.each(options.onKeyPress, function(keycode, toDo){
+          if(e.keyCode == keycode){
+            toDo.call(this);
+          }
+        });
+
         return false;
       }
       //}}}
@@ -1687,8 +1693,12 @@
     onChange: function () {},
     onSelect: function () {},
     onDblClick: function () {},
-    onRelease: function () {}
+    onRelease: function () {},
+
+    // Keypress callbacks
+    onKeyPress: {}
   };
 
   // }}}
 }(jQuery));
+ 

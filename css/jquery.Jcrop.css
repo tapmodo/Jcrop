@@ -15,8 +15,7 @@
   -ms-touch-action: none;
 }
 /* Selection Border */
-.jcrop-vline,
-.jcrop-hline {
+.jcrop-vline, .jcrop-hline {
   background: #ffffff url("Jcrop.gif");
   font-size: 0;
   position: absolute;
@@ -103,13 +102,11 @@
   margin-left: -4px;
 }
 /* Dragbars */
-.jcrop-dragbar.ord-n,
-.jcrop-dragbar.ord-s {
+.jcrop-dragbar.ord-n, .jcrop-dragbar.ord-s {
   height: 7px;
   width: 100%;
 }
-.jcrop-dragbar.ord-e,
-.jcrop-dragbar.ord-w {
+.jcrop-dragbar.ord-e, .jcrop-dragbar.ord-w {
   height: 100%;
   width: 7px;
 }
@@ -128,8 +125,7 @@
   margin-left: -4px;
 }
 /* The "jcrop-light" class/extension */
-.jcrop-light .jcrop-vline,
-.jcrop-light .jcrop-hline {
+.jcrop-light .jcrop-vline, .jcrop-light .jcrop-hline {
   background: #ffffff;
   filter: alpha(opacity=70) !important;
   opacity: .70!important;
@@ -142,8 +138,7 @@
   border-radius: 3px;
 }
 /* The "jcrop-dark" class/extension */
-.jcrop-dark .jcrop-vline,
-.jcrop-dark .jcrop-hline {
+.jcrop-dark .jcrop-vline, .jcrop-dark .jcrop-hline {
   background: #000000;
   filter: alpha(opacity=70) !important;
   opacity: 0.7 !important;
@@ -156,12 +151,10 @@
   border-radius: 3px;
 }
 /* Simple macro to turn off the antlines */
-.solid-line .jcrop-vline,
-.solid-line .jcrop-hline {
+.solid-line .jcrop-vline, .solid-line .jcrop-hline {
   background: #ffffff;
 }
 /* Fix for twitter bootstrap et al. */
-.jcrop-holder img,
-img.jcrop-preview {
+.jcrop-holder img, img.jcrop-preview {
   max-width: none;
 }
