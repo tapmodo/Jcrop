@@ -213,7 +213,7 @@
       };
     }
     //}}}
-    function doneSelect(pos) //{{{
+    function doneSelect() //{{{
     {
       var c = Coords.getFixed();
       if ((c.w > options.minSelect[0]) && (c.h > options.minSelect[1])) {
@@ -386,7 +386,7 @@
     // Set more variables {{{
     var bgcolor = options.bgColor,
         bgopacity = options.bgOpacity,
-        xlimit, ylimit, xmin, ymin, xscale, yscale, enabled = true,
+        xlimit, ylimit, xmin, ymin, xscale, yscale,
         btndown, animating, shift_down;
 
     docOffset = getPos($img);
@@ -1239,7 +1239,7 @@
         }
       }
       //}}}
-      function onBlur(e) //{{{
+      function onBlur() //{{{
       {
         $keymgr.hide();
       }
@@ -1341,7 +1341,6 @@
       y2 = animat[3];
 
       Selection.animMode(true);
-      var anim_timer;
 
       function queueAnimator() {
         window.setTimeout(animator, interv);
@@ -1628,7 +1627,7 @@
 
     $img
       .bind('load.jcloader',completeCheck)
-      .bind('error.jcloader',function(e){
+      .bind('error.jcloader',function(){
         $img.unbind('.jcloader');
         if ($.isFunction(error)) error.call(img);
       });
