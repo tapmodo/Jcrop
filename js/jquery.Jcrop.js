@@ -48,6 +48,7 @@
 	}
 	
 	function isInternetExplorer6(ua) {
+		var msie = ua.indexOf("MSIE ");
 		var ieVersion = parseInt(ua.substring(msie + 5, ua.indexOf(".", msie)));
 		return ieVersion <= 6;
 	}
