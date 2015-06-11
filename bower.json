@@ -1,6 +1,5 @@
 {
   "name": "Jcrop",
-  "version": "0.9.12",
   "homepage": "https://github.com/tapmodo/Jcrop",
   "authors": [ "Tapmodo <khallman@tapmodo.com>" ],
   "description": "Image cropping plugin for jQuery",
