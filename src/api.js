@@ -70,7 +70,8 @@
           this.newSelection();
 
         // Use these values to update the current selection
-        this.ui.multi[0].update(Jcrop.wrapFromXywh(this.opt.setSelect));
+        this.setSelect(this.opt.setSelect);
+
         // Set to null so it doesn't get called again
         this.opt.setSelect = null;
       }
