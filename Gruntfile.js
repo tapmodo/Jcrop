@@ -55,7 +55,7 @@ module.exports = function(grunt) {
     concat: {
       options: {
         banner: '/*! <%= pkg.name %>.js v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
-          ' *  @copyright 2008-2014 Tapmodo Interactive LLC\n' +
+          ' *  @copyright 2008-2015 Tapmodo Interactive LLC\n' +
           ' *  @license Free software under MIT License\n'+
           ' *  @website http://jcrop.org/\n'+
           ' **/\n'
@@ -77,7 +77,7 @@ module.exports = function(grunt) {
         options: {
           keepSpecialComments: 0,
           banner: '/*! <%= pkg.name %>.min.css v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
-            ' *  Copyright 2008-2014 Tapmodo Interactive LLC\n' +
+            ' *  Copyright 2008-2015 Tapmodo Interactive LLC\n' +
             ' *  Free software under MIT License\n'+
             ' **/\n'
         },
@@ -90,7 +90,7 @@ module.exports = function(grunt) {
       dist: {
         options: {
           banner: '/*! <%= pkg.name %>.css v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n'+
-            ' *  Copyright 2008-2014 Tapmodo Interactive LLC\n' +
+            ' *  Copyright 2008-2015 Tapmodo Interactive LLC\n' +
             ' *  Free software under MIT License\n'+
             ' **/\n'
         },
@@ -102,7 +102,7 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         banner: '/*! <%= pkg.name %>.min.js v<%= pkg.version %> - build: <%= grunt.template.today("yyyymmdd") %>\n' +
-          ' *  Copyright 2008-2014 Tapmodo Interactive LLC\n' +
+          ' *  Copyright 2008-2015 Tapmodo Interactive LLC\n' +
           ' *  Free software under MIT License\n'+
           ' **/\n'
       },
