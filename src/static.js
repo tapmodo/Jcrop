@@ -1,27 +1,3 @@
-  // Jcrop component storage
-  /*
-  Jcrop.component = {
-    Animator: CropAnimator,
-    DragState: DragState,
-    EventManager: EventManager,
-    ImageLoader: ImageLoader,
-    StageManager: StageManager,
-    Selection: Selection,
-    Keyboard: KeyWatcher,
-    Thumbnailer: Thumbnailer,
-    CanvasAnimator: CanvasAnimator,
-    Touch: JcropTouch
-  };
-
-  // Jcrop stage constructors
-  Jcrop.stage = {
-    Block: AbstractStage,
-    Image: ImageStage,
-    Canvas: CanvasStage,
-    Transform: TransformStage
-  };
-  */
-
   // Jcrop static functions
   $.extend(Jcrop,{
     component: { },
