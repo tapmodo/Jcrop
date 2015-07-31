@@ -32,15 +32,25 @@
         exists.setOptions(options);
 
       else {
-        if (!options.stageConstructor) options.stageConstructor = $.Jcrop.stageConstructor;
+
+        if (!options.stageConstructor)
+          options.stageConstructor = $.Jcrop.stageConstructor;
 
         options.stageConstructor(this,options,function(stage,options){
+          var selection = options.setSelect;
+          if (selection) delete(options.setSelect);
+
           var obj = $.Jcrop.attach(stage.element,options);
 
           if (typeof stage.attach == 'function')
             stage.attach(obj);
 
           $t.data('Jcrop',obj);
+
+          if (selection) {
+            obj.newSelection();
+            obj.setSelect(selection);
+          }
 
           if (typeof callback == 'function')
             callback.call(obj);
