@@ -1,5 +1,5 @@
-/*! Jcrop.js v2.0.0 - build: 20141025
- *  @copyright 2008-2014 Tapmodo Interactive LLC
+/*! Jcrop.js v2.0.0 - build: 20150731
+ *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
  **/
@@ -2460,15 +2460,25 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         exists.setOptions(options);
 
       else {
-        if (!options.stageConstructor) options.stageConstructor = $.Jcrop.stageConstructor;
+
+        if (!options.stageConstructor)
+          options.stageConstructor = $.Jcrop.stageConstructor;
 
         options.stageConstructor(this,options,function(stage,options){
+          var selection = options.setSelect;
+          if (selection) delete(options.setSelect);
+
           var obj = $.Jcrop.attach(stage.element,options);
 
           if (typeof stage.attach == 'function')
             stage.attach(obj);
 
           $t.data('Jcrop',obj);
+
+          if (selection) {
+            obj.newSelection();
+            obj.setSelect(selection);
+          }
 
           if (typeof callback == 'function')
             callback.call(obj);
