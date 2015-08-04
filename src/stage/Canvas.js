@@ -65,9 +65,7 @@ $.extend(CanvasStage.prototype,{
     this.canvas = document.createElement('canvas');
     this.canvas.width = w;
     this.canvas.height = h;
-    this.$canvas = $(this.canvas)
-      .width(w)
-      .height(h);
+    this.$canvas = $(this.canvas).width('100%').height('100%');
     this.context = this.canvas.getContext('2d');
     this.fillstyle = "rgb(0,0,0)";
     this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);

@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0 - build: 20150731
+/*! Jcrop.js v2.0.0 - build: 20150804
  *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -258,9 +258,7 @@ $.extend(CanvasStage.prototype,{
     this.canvas = document.createElement('canvas');
     this.canvas.width = w;
     this.canvas.height = h;
-    this.$canvas = $(this.canvas)
-      .width(w)
-      .height(h);
+    this.$canvas = $(this.canvas).width('100%').height('100%');
     this.context = this.canvas.getContext('2d');
     this.fillstyle = "rgb(0,0,0)";
     this.element = this.$canvas.wrap('<div />').parent().width(w).height(h);
