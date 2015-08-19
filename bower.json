@@ -6,7 +6,7 @@
     "Tapmodo <khallman@tapmodo.com>"
   ],
   "description": "jQuery image cropping plugin",
-  "main": "js/Jcrop.js",
+  "main": ["js/Jcrop.js", "css/Jcrop.css"],
   "keywords": [
     "images",
     "forms",
