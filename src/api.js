@@ -85,7 +85,7 @@
       if (this.opt.imgsrc) {
         this.container.before(this.opt.imgsrc);
         this.container.remove();
-        $(this.opt.imgsrc).removeData('Jcrop');
+        $(this.opt.imgsrc).removeData('Jcrop').show();
       } else {
         // @todo: more elegant destroy() process for non-image containers
         this.container.remove();
