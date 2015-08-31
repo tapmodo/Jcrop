@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.0 - build: 20150804
+/*! Jcrop.js v2.0.2 - build: 20150831
  *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -2134,7 +2134,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
       if (this.opt.imgsrc) {
         this.container.before(this.opt.imgsrc);
         this.container.remove();
-        $(this.opt.imgsrc).removeData('Jcrop');
+        $(this.opt.imgsrc).removeData('Jcrop').show();
       } else {
         // @todo: more elegant destroy() process for non-image containers
         this.container.remove();
@@ -2329,7 +2329,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
     deleteSelection: function(){
       if (this.ui.selection) {
         this.removeSelection(this.ui.selection);
-        this.ui.multi[0].focus();
+        if (this.ui.multi.length) this.ui.multi[0].focus();
         this.ui.selection.refresh();
       }
     },

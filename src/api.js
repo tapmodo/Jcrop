@@ -280,7 +280,7 @@
     deleteSelection: function(){
       if (this.ui.selection) {
         this.removeSelection(this.ui.selection);
-        this.ui.multi[0].focus();
+        if (this.ui.multi.length) this.ui.multi[0].focus();
         this.ui.selection.refresh();
       }
     },
