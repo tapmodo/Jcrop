@@ -10,6 +10,9 @@
   ],
   "keywords": [ "img", "image", "form", "crop", "cropping", "cropper" ],
   "license": "MIT",
+  "dependencies" :{
+    "jquery": ">=1.8.1"
+  },
   "ignore": [
     "**/.*",
     "build",
