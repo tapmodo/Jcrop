@@ -1295,7 +1295,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         t.filter = t.core.getDefaultFilters();
 
         t.element = $('<div />').addClass(o.css_selection).data({ selection: t });
-        t.frame = $('<button />').addClass(o.css_button).data('ord','move');
+        t.frame = $('<button />').addClass(o.css_button).data('ord','move').attr('type', 'button');
         t.element.append(t.frame).appendTo(t.core.container);
 
         // IE background/draggable hack
