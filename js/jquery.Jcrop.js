@@ -358,7 +358,11 @@
           var c = Coords.getFixed();
           options.onDblClick.call(api,c);
         }).insertBefore($img).append($img_holder, $hdl_holder); 
-
+    
+    if (options.addBorderClass) {
+      $img_holder.addClass(options.addBorderClass);
+    }
+    
     if (img_mode) {
 
       $img2 = $('<img />')
