@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Jcrop resizable | Jcrop Demo</title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+
+<script src="../js/jquery.min.js"></script>
+<script src="../js/jquery.Jcrop.js"></script>
+<script type="text/javascript">
+$(function() {
+  var cropApi = null;
+  $('#target').Jcrop({ aspectRatio: 16 / 9 }, function() {
+    cropApi = this;
+  });
+
+  var $holder = cropApi.ui.holder;
+  var $imgs = $holder.find('img');
+
+
+  $('.J-get-crop-info').on('click', function() {
+    console.log(cropApi.tellSelect());
+    console.log(cropApi.tellScaled());
+  });
+
+  var scale = 1;
+
+  $('.J-zoom-in').on('click', function() {
+    scale = Math.max(scale - 0.1, 0.1);
+    zoom(scale);
+  });
+
+  $('.J-zoom-out').on('click', function() {
+    scale = Math.min(scale + 0.1, 2);
+    zoom(scale);
+  });
+
+  var originSize = null;
+  var currentSize = { width: 0, height: 0 }
+
+  function getImgOriginSize() {
+    if (!originSize) {
+      originSize = {
+        width: $imgs.width(),
+        height: $imgs.height()
+      };
+      
+      currentSize.width = originSize.width;
+      currentSize.height = originSize.height;
+    }
+    
+    return originSize;
+  }
+
+  function zoom(value) {
+    var size = getImgOriginSize();
+    value = value == undefined ? 1 : value;
+    
+    cropApi.resize(size.width * value, size.height * value);
+  }
+
+  });
+</script>
+<link rel="stylesheet" href="demo_files/main.css" type="text/css" />
+<link rel="stylesheet" href="demo_files/demos.css" type="text/css" />
+<link rel="stylesheet" href="../css/jquery.Jcrop.css" type="text/css" />
+<style type="text/css">
+
+#crop-wrapper {
+  width: 500px;
+  height: 375px;
+  margin: 0 auto;
+  
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px 2px rgba(0, 0, 0, .1);
+  overflow: visible;
+  position: relative;
+  z-index: 1;
+}
+
+#crop-wrapper .jcrop-holder > .jcrop-tracker:after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 500px;
+  height: 375px;
+  
+  box-shadow: 0 0 0 100000px rgba(0, 0, 0, .8);
+}
+
+#button-bar-wrapper {
+  padding-top: 10px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+#button-bar-wrapper button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #f2f2f2;
+  border-radius: 2px;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="container">
+<div class="row">
+<div class="span12">
+<div class="jc-demo-box">
+
+<div class="page-header">
+<ul class="breadcrumb first">
+  <li><a href="../index.html">Jcrop</a> <span class="divider">/</span></li>
+  <li><a href="../index.html">Demos</a> <span class="divider">/</span></li>
+  <li class="active">Jcrop resizable</li>
+</ul>
+<h1>Jcrop resizable</h1>
+</div>
+  <div style="overflow: hidden; padding: 50px 0 150px 0; margin-bottom: 50px">
+    <div id="crop-wrapper">
+      <img src="./demo_files/sago.jpg" id="target" alt="[Jcrop Example]" />
+    </div>
+  </div>
+    <div id="button-bar-wrapper">
+      <button class="J-zoom-in">Zoom In</button>
+      <button class="J-zoom-out">Zoom Out</button>
+      <button class="J-get-crop-info">Crop Info</button>
+    </div>
+  
+  <div class="description">
+  <p>
+  Jcrop resizable
+  </p>
+  <pre>
+var cropApi = null;
+$('#target').Jcrop({ }, function() {
+    cropApi = this;
+});
+cropApi.resize(500, 300);
+  </pre>
+  </div>
+
+<div class="tapmodo-footer">
+  <a href="http://tapmodo.com" class="tapmodo-logo segment">tapmodo.com</a>
+  <div class="segment"><b>&copy; 2008-2013 Tapmodo Interactive LLC</b><br />
+  Jcrop is free software released under <a href="../MIT-LICENSE.txt">MIT License</a>
+  </div>
+</div>
+
+<div class="clearfix"></div>
+
+</div>
+</div>
+</div>
+</div>
+
+</body>
+</html>
+
