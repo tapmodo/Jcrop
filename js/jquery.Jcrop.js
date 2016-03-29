@@ -228,10 +228,10 @@
     function newSelection(e) //{{{
     {
       if (options.disabled) {
-        return;
+        return false;
       }
       if (!options.allowSelect) {
-        return;
+        return false;
       }
       btndown = true;
       docOffset = getPos($img);
@@ -266,7 +266,42 @@
       return trk;
     }
     //}}}
-
+    function resize(width, height) {
+        $([$img[0], $img2[0], $div[0], $trk[0]]).css({
+            width: width,
+            height: height
+        })
+        boundx = width;
+        boundy = height;
+        var select = tellSelect();
+        var x = select.x;
+        var y = select.y;
+        var x2 = select.x2;
+        var y2 = select.y2;
+        
+        if (select.w <= 0 && select.h <= 0) {
+            return;
+        }
+        
+        if (x2 > boundx) {
+            x -= x2 - boundx;
+            x2 = x + select.w;
+        }
+        
+        if (y2 > boundy) {
+            y -= y2 - boundy;
+            y2 = y + select.h;
+        }
+        
+        setSelect([x, y, x2, y2]);
+        // if (select.x2 > boundx) {
+        //     //var 
+        //     select.x1 -= 
+        //     //select.x2 -= 
+        // }
+    } 
+    ///}}}
+    
     // }}}
     // Initialization {{{
     // Sanitize some options {{{
@@ -493,7 +528,7 @@
         if (0 > y1 + oy) {
           oy -= oy + y1;
         }
-
+        
         if (boundy < y2 + oy) {
           oy += boundy - (y2 + oy);
         }
@@ -654,7 +689,6 @@
         var xsize = x2 - x1,
             ysize = y2 - y1,
             delta;
-
         if (xlimit && (Math.abs(xsize) > xlimit)) {
           x2 = (xsize > 0) ? (x1 + xlimit) : (x1 - xlimit);
         }
@@ -668,7 +702,7 @@
         if (xmin / xscale && (Math.abs(xsize) < xmin / xscale)) {
           x2 = (xsize > 0) ? (x1 + xmin / xscale) : (x1 - xmin / xscale);
         }
-
+        
         if (x1 < 0) {
           x2 -= x1;
           x1 -= x1;
@@ -1547,7 +1581,7 @@
       tellSelect: tellSelect,
       tellScaled: tellScaled,
       setClass: setClass,
-
+      
       disable: disableCrop,
       enable: enableCrop,
       cancel: cancelCrop,
@@ -1569,7 +1603,9 @@
         // careful: internal values are returned
         return options;
       },
-
+      
+      resize: resize,
+      
       ui: {
         holder: $div,
         selection: $sel
