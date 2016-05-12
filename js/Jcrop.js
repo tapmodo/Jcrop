@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.2 - build: 20150831
+/*! Jcrop.js v2.0.2 - build: 20160512
  *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -1066,7 +1066,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
       load: function(){
         var t = this;
         var el = t.element;
-
+        el.crossOrigin = "Anonymous";
         el.src = t.src;
 
         if (t.isLoaded()) t.fireCallback();

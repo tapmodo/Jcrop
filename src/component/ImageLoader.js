@@ -42,7 +42,7 @@
       load: function(){
         var t = this;
         var el = t.element;
-
+        el.crossOrigin = "Anonymous";
         el.src = t.src;
 
         if (t.isLoaded()) t.fireCallback();
