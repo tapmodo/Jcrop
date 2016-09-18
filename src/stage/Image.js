@@ -15,10 +15,16 @@ $.extend(ImageStage,{
 
       obj.element.width(w).height(h);
       obj.imgsrc = el;
+      options.imgsrc = el;
 
       if (typeof callback == 'function')
         callback.call(this,obj,options);
     });
+  }
+});
+$.extend(ImageStage.prototype,{
+  init: function(core){
+    this.core = core;
   }
 });
 Jcrop.registerStageType('Image',ImageStage);
