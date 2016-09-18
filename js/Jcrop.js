@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.4 - build: 20151117
+/*! Jcrop.js v2.0.4 - build: 20160918
  *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -182,10 +182,16 @@ $.extend(ImageStage,{
 
       obj.element.width(w).height(h);
       obj.imgsrc = el;
+      options.imgsrc = el;
 
       if (typeof callback == 'function')
         callback.call(this,obj,options);
     });
+  }
+});
+$.extend(ImageStage.prototype,{
+  init: function(core){
+    this.core = core;
   }
 });
 Jcrop.registerStageType('Image',ImageStage);
@@ -226,9 +232,6 @@ $.extend(CanvasStage,{
 });
 
 $.extend(CanvasStage.prototype,{
-  init: function(core){
-    this.core = core;
-  },
   // setOffset: function(x,y) {{{
   setOffset: function(x,y) {
     this.offset = [x,y];
