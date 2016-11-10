@@ -165,7 +165,7 @@
     function createDragger(ord) //{{{
     {
       return function (e) {
-        if (options.disabled) {
+        if (options.disabled || e.which == 3) {
           return false;
         }
         if ((ord === 'move') && !options.allowMove) {
@@ -230,7 +230,7 @@
       if (options.disabled) {
         return;
       }
-      if (!options.allowSelect) {
+      if (!options.allowSelect || e.which == 3) {
         return;
       }
       btndown = true;
