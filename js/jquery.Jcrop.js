@@ -1317,7 +1317,8 @@
       var x1 = a[0] / xscale,
           y1 = a[1] / yscale,
           x2 = a[2] / xscale,
-          y2 = a[3] / yscale;
+          y2 = a[3] / yscale,
+          x, y;
 
       if (animating) {
         return;
