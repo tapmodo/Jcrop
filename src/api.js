@@ -255,6 +255,9 @@
       };
     },
     // }}}
+    getCoordinates: function () {
+			return this.unscale( this.ui.selection.get() );
+		},
     // unscale: function(b){{{
     unscale: function(b){
       var xs = this.opt.xscale,
