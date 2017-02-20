@@ -255,6 +255,13 @@
       };
     },
     // }}}
+    getCoordinates: function () {
+	return this.unscale( this.ui.selection.get() );
+    },
+    rotate: function ( degrees ) {
+	this.ui.stage.setAngle( degrees ).redraw();
+	return this;
+    },
     // unscale: function(b){{{
     unscale: function(b){
       var xs = this.opt.xscale,
