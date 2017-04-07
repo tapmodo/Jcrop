@@ -1,2 +1,3 @@
 demos/test*
 node_modules
+.idea
