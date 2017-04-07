@@ -7,6 +7,7 @@
       // If this value is set, the preview will only track that Selection
       selection: null,
 
+      container: null, // defaults to jCrop container
       fading: true,
       fadeDelay: 1000,
       fadeDuration: 1000,
@@ -24,6 +25,7 @@
       init: function(core,options){
         var t = this;
         this.core = core;
+        Thumbnailer.defaults.container = this.core.container;
         $.extend(this,Thumbnailer.defaults,options);
         t.initEvents();
         t.refresh();
@@ -56,7 +58,7 @@
         this.element = $('<div />').addClass('jcrop-thumb')
           .width(this.width).height(this.height)
           .append(this.preview)
-          .appendTo(this.core.container);
+          .appendTo(this.container);
       },
       resize: function(w,h){
         this.width = w;
