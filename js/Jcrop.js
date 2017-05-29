@@ -159,6 +159,9 @@ $.extend(AbstractStage,{
     },
     getElement: function(){
       return this.element;
+    },
+    init: function(core){
+        this.core = core;
     }
   }
 });
@@ -226,9 +229,6 @@ $.extend(CanvasStage,{
 });
 
 $.extend(CanvasStage.prototype,{
-  init: function(core){
-    this.core = core;
-  },
   // setOffset: function(x,y) {{{
   setOffset: function(x,y) {
     this.offset = [x,y];
