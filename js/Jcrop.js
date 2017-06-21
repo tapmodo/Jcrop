@@ -2183,7 +2183,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
     // getSelection: function(raw){{{
     getSelection: function(raw){
       var b = this.ui.selection.get();
-      return b;
+      return this.unscale(b);;
     },
     // }}}
     // newSelection: function(){{{
