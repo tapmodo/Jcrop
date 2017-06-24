@@ -555,10 +555,12 @@
 
           if (xx < 0) {
             xx = 0;
+            x1 = w;
             h = Math.abs((xx - x1) / aspect);
             yy = rh < 0 ? y1 - h : h + y1;
           } else if (xx > boundx) {
             xx = boundx;
+            x1 = boundx - w;
             h = Math.abs((xx - x1) / aspect);
             yy = rh < 0 ? y1 - h : h + y1;
           }
@@ -568,10 +570,12 @@
           yy = rh < 0 ? y1 - h : y1 + h;
           if (yy < 0) {
             yy = 0;
+            y1 = h;
             w = Math.abs((yy - y1) * aspect);
             xx = rw < 0 ? x1 - w : w + x1;
           } else if (yy > boundy) {
             yy = boundy;
+            y1 = boundy - h;
             w = Math.abs(yy - y1) * aspect;
             xx = rw < 0 ? x1 - w : w + x1;
           }
