@@ -159,6 +159,9 @@ $.extend(AbstractStage,{
     },
     getElement: function(){
       return this.element;
+    },
+    init: function(core){
+      this.core = core;
     }
   }
 });
