@@ -1,5 +1,6 @@
   // Jcrop jQuery plugin function
   $.fn.Jcrop = function(options,callback){
+    options = options || {};
 
     var first = this.eq(0).data('Jcrop');
     var args = Array.prototype.slice.call(arguments);

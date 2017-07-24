@@ -1,4 +1,4 @@
-/*! Jcrop.js v2.0.2 - build: 20150831
+/*! Jcrop.js v2.0.4 - build: 20151117
  *  @copyright 2008-2015 Tapmodo Interactive LLC
  *  @license Free software under MIT License
  *  @website http://jcrop.org/
@@ -1298,7 +1298,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
         t.filter = t.core.getDefaultFilters();
 
         t.element = $('<div />').addClass(o.css_selection).data({ selection: t });
-        t.frame = $('<button />').addClass(o.css_button).data('ord','move');
+        t.frame = $('<button />').addClass(o.css_button).data('ord','move').attr('type','button');
         t.element.append(t.frame).appendTo(t.core.container);
 
         // IE background/draggable hack
@@ -2405,6 +2405,7 @@ Jcrop.registerStageType('Canvas',CanvasStage);
 
   // Jcrop jQuery plugin function
   $.fn.Jcrop = function(options,callback){
+    options = options || {};
 
     var first = this.eq(0).data('Jcrop');
     var args = Array.prototype.slice.call(arguments);

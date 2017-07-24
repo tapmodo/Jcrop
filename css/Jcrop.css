@@ -1,4 +1,4 @@
-/*! Jcrop.css v2.0.2 - build: 20150831
+/*! Jcrop.css v2.0.4 - build: 20151117
  *  Copyright 2008-2015 Tapmodo Interactive LLC
  *  Free software under MIT License
  **/
@@ -15,8 +15,8 @@
 .jcrop-active {
   direction: ltr;
   text-align: left;
-  box-sizing: border-box;
   /* IE10 touch compatibility */
+
   -ms-touch-action: none;
 }
 .jcrop-dragging {
@@ -101,6 +101,7 @@
 /* Selection Handles */
 .jcrop-handle {
   z-index: 4;
+  box-sizing: border-box;
   background-color: rgba(49, 28, 28, 0.58);
   border: 1px #eeeeee solid;
   width: 9px;
@@ -169,6 +170,7 @@
 /* Larger Selection Handles for Touch */
 .jcrop-touch .jcrop-handle {
   z-index: 4;
+  box-sizing: border-box;
   background-color: rgba(49, 28, 28, 0.58);
   border: 1px #eeeeee solid;
   width: 18px;
