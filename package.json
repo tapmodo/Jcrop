@@ -1,0 +1,30 @@
+{
+  "name": "jcrop",
+  "version": "0.9.12",
+  "description": "Jcrop Image Cropping Plugin ===========================",
+  "main": [
+    "js/jquery.Jcrop.js",
+    "css/jquery.Jcrop.css"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tapmodo/Jcrop"
+  },
+  "author": "Tapmodo <khallman@tapmodo.com>",
+  "keywords": [ "img", "image", "form", "crop", "cropping", "cropper" ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kh3dr0n/Jcrop/issues"
+  },
+  "homepage": "https://github.com/tapmodo/Jcrop",
+  "ignore": [
+    "**/.*",
+    "build",
+    "demos",
+    "node_modules",
+    "bower_components"
+  ]
+}
