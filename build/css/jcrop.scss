@@ -1,0 +1,46 @@
+$handleSize: 10px;
+$handleBorder: 1px rgba(127,127,127,0.8) solid;
+$handleOffset: 7px;
+$handleBackground: rgba(255,255,255,0.8);
+
+@import 'handles-mixin';
+
+.cropper .handle {
+  @include jcrop-handles(
+    $handleSize,
+    $handleOffset,
+    $handleBorder,
+    $handleBackground
+  );
+}
+
+.cropper {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px white dashed;
+  opacity: 0.25;
+  background: transparent;
+  transition: opacity 1s;
+  padding:0;
+  margin:0;
+  cursor: move;
+}
+
+.cropper:hover {
+  transition: opacity 0.8s;
+  opacity: 0.65;
+}
+.cropper:focus {
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+.shade {
+  background: rgba(0,0,0,0.5);
+  position: absolute;
+  &.l { top: 0px; left: 0px; height: 100%; }
+  &.r { top: 0px; right: 0px; height: 100%; }
+  &.t { top: 0px; }
+  &.b { bottom: 0px; }
+}
+

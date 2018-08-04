@@ -1,0 +1,139 @@
+body {
+  margin: 0px;
+  padding: 0px;
+  background-color: #ededed;
+}
+
+.cropapp {
+  position: absolute;
+  width: 90%;
+  height: 80%;
+  left: 5%;
+  background: lightgray;
+}
+
+.cropbox {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.bg-image {
+  background: url(/image.jpg) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.cropper .handle {
+  position: absolute;
+  border: 1px rgba(127, 127, 127, 0.8) solid;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.cropper .handle.nw {
+  top: -3px;
+  left: -3px;
+  cursor: nwse-resize;
+}
+
+.cropper .handle.w {
+  top: 50%;
+  transform: translateY(-50%);
+  left: -3px;
+  cursor: ew-resize;
+}
+
+.cropper .handle.sw {
+  bottom: -3px;
+  left: -3px;
+  cursor: nesw-resize;
+}
+
+.cropper .handle.ne {
+  top: -3px;
+  right: -3px;
+  cursor: nesw-resize;
+}
+
+.cropper .handle.e {
+  top: 50%;
+  transform: translateY(-50%);
+  right: -3px;
+  cursor: ew-resize;
+}
+
+.cropper .handle.se {
+  bottom: -3px;
+  right: -3px;
+  cursor: nwse-resize;
+}
+
+.cropper .handle.n {
+  left: 50%;
+  transform: translateX(-50%);
+  top: -3px;
+  cursor: ns-resize;
+}
+
+.cropper .handle.s {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -3px;
+  cursor: ns-resize;
+}
+
+.cropper {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px white dashed;
+  opacity: 0.25;
+  background: transparent;
+  transition: opacity 1s;
+  padding: 0;
+  margin: 0;
+  cursor: move;
+}
+
+.cropper:hover {
+  transition: opacity 0.8s;
+  opacity: 0.65;
+}
+
+.cropper:focus {
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+.shade {
+  background: rgba(0, 0, 0, 0.5);
+  position: absolute;
+}
+
+.shade.l {
+  top: 0px;
+  left: 0px;
+  height: 100%;
+}
+
+.shade.r {
+  top: 0px;
+  right: 0px;
+  height: 100%;
+}
+
+.shade.t {
+  top: 0px;
+}
+
+.shade.b {
+  bottom: 0px;
+}
+
+/*# sourceMappingURL=style.css.map */

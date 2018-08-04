@@ -1,0 +1,55 @@
+@mixin jcrop-handles($size:10px,$offset:7px,$border:1px black solid,$bg:white) {
+  position: absolute;
+  border: $border;
+  width: $size;
+  height: $size;
+  box-sizing: border-box;
+  background: $bg;
+
+  &.nw {
+    top: -$size + $offset;
+    left: -$size + $offset;
+    cursor: nwse-resize;
+  }
+  &.w {
+    top: 50%;
+    transform: translateY(-50%);
+    left: -$size + $offset;
+    cursor: ew-resize;
+  }
+  &.sw {
+    bottom: -$size + $offset;
+    left: -$size + $offset;
+    cursor: nesw-resize;
+  }
+  &.ne {
+    top: -$size + $offset;
+    right: -$size + $offset;
+    cursor: nesw-resize;
+  }
+  &.e {
+    top: 50%;
+    transform: translateY(-50%);
+    right: -$size + $offset;
+    cursor: ew-resize;
+  }
+  &.se {
+    bottom: -$size + $offset;
+    right: -$size + $offset;
+    cursor: nwse-resize;
+  }
+  &.n {
+    left: 50%;
+    transform: translateX(-50%);
+    top: -$size + $offset;
+    cursor: ns-resize;
+  }
+  &.s {
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -$size + $offset;
+    cursor: ns-resize;
+  }
+}
+
+

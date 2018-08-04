@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Jcrop Example</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+
+    <div style="float:right; margin-right:5%; margin-top:0.7em;">
+      <select id="animtype">
+        <option>swing</option>
+        <option>inQuad</option>
+        <option>outQuad</option>
+        <option>inOutQuad</option>
+        <option>inCubic</option>
+        <option>outCubic</option>
+        <option>inOutCubic</option>
+        <option>inQuart</option>
+        <option>outQuart</option>
+        <option>inOutQuart</option>
+        <option>inQuint</option>
+        <option>outQuint</option>
+        <option>inOutQuint</option>
+        <option>inSine</option>
+        <option>outSine</option>
+        <option>inOutSine</option>
+        <option>inExpo</option>
+        <option>outExpo</option>
+        <option selected>inOutExpo</option>
+        <option>inCirc</option>
+        <option>outCirc</option>
+        <option>inOutCirc</option>
+        <option>inElastic</option>
+        <option>outElastic</option>
+        <option>inOutElastic</option>
+        <option>inBack</option>
+        <option>outBack</option>
+        <option>inOutBack</option>
+        <option>inBounce</option>
+        <option>outBounce</option>
+        <option>inOutBounce</option>
+      </select>
+      <button onclick="anim()">Animate</button>
+    </div>
+
+    <h1 style="margin-left:5%;">
+      Jcrop <span style="color:lightgray;">- draw some crops!</span>
+    </h1>
+
+    <div id="cropapp" class="cropapp"></div>
+    <script src="../dist/js/jcrop.bundle.js"></script>
+    <script>
+      const jcp = Jcrop.attach('cropapp');
+
+      function rcoord() {
+        const w = jcp.el.offsetWidth;
+        const h = jcp.el.offsetHeight;
+        return [Math.round(Math.random()*w), Math.round(Math.random()*h)];
+      }
+
+      function rrect() {
+        return Jcrop.Rect.fromCoordSet(rcoord(),rcoord());
+      }
+
+      function anim(){
+        if (!jcp.active) return false;
+        const animtype = document.getElementById('animtype').value;
+        jcp.active.animate(rrect(),25,animtype);
+        jcp.active.el.focus();
+      }
+    </script>
+  </body>
+</html>
