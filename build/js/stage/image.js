@@ -1,10 +1,24 @@
-import { wrap, replace } from '../util/dom';
-import Stage from './basic';
+import { wrap, replace, div } from '../util/dom';
+import Stage from './dom';
 
-class ImageStage {
+class ImageStage extends Stage {
   constructor(el,options) {
-    debugger;
+    const wrapper = div('cropstage imagestage');
+    el.parentNode.insertBefore(wrapper, el);
+    wrapper.appendChild(el);
+    super(wrapper,options);
+    this.srcEl = el;
+    el.onload = this.resizeToImage.bind(this);
+    this.resizeToImage();
     console.log('image stage!');
+  }
+
+  resizeToImage() {
+    const w = this.srcEl.width;
+    const h = this.srcEl.height;
+    this.el.style.width = w+'px';
+    this.el.style.height = h+'px';
+    this.refresh();
   }
 }
 

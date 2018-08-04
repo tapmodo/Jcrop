@@ -115,8 +115,9 @@ class Cropper extends DomObj {
 }
 
 Cropper.create = function(options={}){
-  const el = document.createElement('button');
+  const el = document.createElement('div');
   const opts = extend({},Defaults,options);
+  el.setAttribute('tabindex','0');
   el.className = opts.cropperClass || 'cropper';
   return new Cropper(el,opts);
 };

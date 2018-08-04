@@ -8,6 +8,7 @@
     "dev": "npx webpack --mode development",
     "watch": "npx webpack --watch --mode development",
     "prod": "npx webpack --mode production",
+    "css": "npx node-sass --output-style=extended build/css/jcrop.scss dist/jcrop.css && npx node-sass --output-style=compressed --source-map dist/jcrop.min.css.map build/css/jcrop.scss dist/jcrop.min.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {

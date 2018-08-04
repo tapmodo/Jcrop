@@ -2,13 +2,7 @@ import extend from '../util/extend';
 import Defaults from '../defaults';
 import Cropper from '../cropper';
 import Shade from '../shade';
-import Handle from '../handle';
 import Dragger from '../dragger';
-import Rect from '../rect';
-import Sticker from '../sticker';
-import DomObj from '../domobj';
-import Easing from '../easing';
-import ImageStage from './image';
 
 class Stage {
   constructor(el,options) {
@@ -30,8 +24,11 @@ class Stage {
   canCreate() {
     const n = this.crops.size;
     const o = this.options;
-    if (n >= o.maxCroppers) return false;
-    if (!o.multi && (n >= o.minCroppers)) return false;
+    if ((o.maxCroppers!==null) && (n >= o.maxCroppers)) return false;
+    if (!o.multi && (n >= o.minCroppers)) {
+      console.info('huh');
+      return false;
+    }
     return true;
   }
 
@@ -50,8 +47,8 @@ class Stage {
         if (!this.canCreate()) return false;
         crop = Cropper.create();
         pos = crop.pos;
-        pos.x = e.pageX - this.el.offsetLeft;
-        pos.y = e.pageY - this.el.offsetTop;
+        pos.x = e.pageX - this.el.offsetParent.offsetLeft - this.el.offsetLeft;
+        pos.y = e.pageY - this.el.offsetParent.offsetTop - this.el.offsetTop;
         w = this.el.offsetWidth;
         h = this.el.offsetHeight;
         crop.render(pos);
@@ -98,7 +95,7 @@ class Stage {
       if (this.active === crop) crop.addClass('active');
         else crop.removeClass('active');
     });
-    this.options.shading && this.shades.adjust(this.active.pos);
+    this.refresh();
   }
 
   activate(cropper) {
@@ -130,25 +127,11 @@ class Stage {
     this.crops.delete(cropper);
     this.activate();
   }
+
+  refresh() {
+    this.options.shading && this.active && this.shades.adjust(this.active.pos);
+  }
 }
-
-Stage.attach = function(el,options={}) {
-  options = extend({},Defaults,options);
-
-  if (typeof el == 'string') el = document.getElementById(el);
-  if (el.tagName == 'IMG') return new ImageStage(el,options);
-  console.log('hi hi');
-
-  return new Stage(el,options);
-}
-
-Stage.defaults = Defaults;
-Stage.Dragger = Dragger;
-Stage.Cropper = Cropper;
-Stage.Rect = Rect;
-Stage.Handle = Handle;
-Stage.Sticker = Sticker;
-Stage.Easing = Easing;
 
 export default Stage;
 

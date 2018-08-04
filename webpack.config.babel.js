@@ -31,8 +31,9 @@ module.exports = {
     ]
   },
   output: {
-    path: path.join(__dirname, 'dist/js'),
-    filename: '[name].bundle.js'
+    path: path.join(__dirname, 'dist'),
+    filename: '[name].bundle.js',
+    library: 'Jcrop'
   },
   resolve: {
     alias: { }
