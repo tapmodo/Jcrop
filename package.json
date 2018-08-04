@@ -4,7 +4,7 @@
   "description": "",
   "main": "webpack.config.babel.js",
   "scripts": {
-    "start": "npx http-server -p3000",
+    "start": "npx http-server",
     "dev": "npx webpack --mode development",
     "watch": "npx webpack --watch --mode development",
     "prod": "npx webpack --mode production",
