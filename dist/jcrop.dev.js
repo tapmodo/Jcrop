@@ -1,0 +1,1649 @@
+var Jcrop =
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./build/js/jcrop.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./build/js/animate.js":
+/*!*****************************!*\
+  !*** ./build/js/animate.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _easing = __webpack_require__(/*! ./easing */ "./build/js/easing.js");
+
+var _easing2 = _interopRequireDefault(_easing);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function Animate(el, from, to, cb) {
+  var frames = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 30;
+  var easingFunc = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 'swing';
+
+  var p = ['x', 'y', 'w', 'h'];
+  var delta = {};
+  var cur = from.normalize();
+  easingFunc = typeof easingFunc == 'string' ? _easing2.default[easingFunc] : easingFunc;
+
+  var cur_frame = 0;
+
+  p.forEach(function (key) {
+    return delta[key] = (to[key] - from[key]) / frames;
+  });
+
+  function step() {
+
+    if (cur_frame < frames) {
+
+      p.forEach(function (key) {
+        return cur[key] = Math.round(easingFunc(cur_frame, from[key], to[key] - from[key], frames));
+      });
+
+      cb(cur);
+      cur_frame++;
+      requestAnimationFrame(step);
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+exports.default = Animate;
+
+/***/ }),
+
+/***/ "./build/js/cropper.js":
+/*!*****************************!*\
+  !*** ./build/js/cropper.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _handle = __webpack_require__(/*! ./handle */ "./build/js/handle.js");
+
+var _handle2 = _interopRequireDefault(_handle);
+
+var _defaults = __webpack_require__(/*! ./defaults */ "./build/js/defaults.js");
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+var _dragger = __webpack_require__(/*! ./dragger */ "./build/js/dragger.js");
+
+var _dragger2 = _interopRequireDefault(_dragger);
+
+var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _sticker = __webpack_require__(/*! ./sticker */ "./build/js/sticker.js");
+
+var _sticker2 = _interopRequireDefault(_sticker);
+
+var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+
+var _domobj2 = _interopRequireDefault(_domobj);
+
+var _keyboard = __webpack_require__(/*! ./keyboard */ "./build/js/keyboard.js");
+
+var _keyboard2 = _interopRequireDefault(_keyboard);
+
+var _animate = __webpack_require__(/*! ./animate */ "./build/js/animate.js");
+
+var _animate2 = _interopRequireDefault(_animate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Cropper = function (_DomObj) {
+  _inherits(Cropper, _DomObj);
+
+  function Cropper(el) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Cropper);
+
+    var _this = _possibleConstructorReturn(this, (Cropper.__proto__ || Object.getPrototypeOf(Cropper)).call(this, el));
+
+    _this.options = (0, _extend2.default)({}, Cropper.defaults, options);
+    _this.pos = _rect2.default.from(_this.el);
+    return _this;
+  }
+
+  _createClass(Cropper, [{
+    key: 'init',
+    value: function init() {
+      this.createHandles();
+      this.createMover();
+      this.attachFocus();
+      new _keyboard2.default(this);
+      return this;
+    }
+  }, {
+    key: 'attachToStage',
+    value: function attachToStage(stage) {
+      this.stage = stage;
+      this.emit('crop.attach');
+    }
+  }, {
+    key: 'attachFocus',
+    value: function attachFocus() {
+      var _this2 = this;
+
+      this.el.addEventListener('focus', function (e) {
+        _this2.emit('crop.activate');
+        _this2.emit('crop.update');
+      }, false);
+    }
+  }, {
+    key: 'animate',
+    value: function animate(rect) {
+      var _this3 = this;
+
+      var frames = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 30;
+      var efunc = arguments[2];
+
+      (0, _animate2.default)(this.el, this.pos, rect, function (r) {
+        return _this3.render(r.normalize());
+      }, frames, efunc);
+    }
+  }, {
+    key: 'createMover',
+    value: function createMover() {
+      var _this4 = this;
+
+      var pe = this.el.parentElement;
+      var w, h;
+      this.pos = _rect2.default.from(this.el);
+      var stick;
+      (0, _dragger2.default)(this.el, function () {
+        var _ref = [pe.offsetWidth, pe.offsetHeight];
+        w = _ref[0];
+        h = _ref[1];
+
+        stick = _rect2.default.from(_this4.el);
+        _this4.el.focus();
+        _this4.emit('crop.activate');
+        return true;
+      }, function (x, y) {
+        _this4.pos.x = stick.x + x;
+        _this4.pos.y = stick.y + y;
+        _this4.render(_this4.pos.rebound(w, h));
+      }, function () {});
+    }
+  }, {
+    key: 'nudge',
+    value: function nudge() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      var pe = this.el.parentElement;
+      var _ref2 = [pe.offsetWidth, pe.offsetHeight],
+          w = _ref2[0],
+          h = _ref2[1];
+
+      if (x) this.pos.x += x;
+      if (y) this.pos.y += y;
+      this.render(this.pos.rebound(w, h));
+    }
+  }, {
+    key: 'createHandles',
+    value: function createHandles() {
+      var _this5 = this;
+
+      this.options.handles.forEach(function (c) {
+        var handle = _handle2.default.create('handle ' + c);
+        var pe = _this5.el.parentElement;
+        var _ref3 = [pe.offsetWidth, pe.offsetHeight],
+            w = _ref3[0],
+            h = _ref3[1];
+
+        handle.appendTo(_this5.el);
+
+        var stick;
+        (0, _dragger2.default)(handle.el, function () {
+          stick = _sticker2.default.create(_rect2.default.from(_this5.el), w, h, c);
+          _this5.el.focus();
+          _this5.emit('crop.active');
+          return true;
+        }, function (x, y) {
+          return _this5.render(stick.move(x, y));
+        }, function () {});
+      });
+      return this;
+    }
+  }, {
+    key: 'isActive',
+    value: function isActive() {
+      return this.stage && this.stage.active === this;
+    }
+  }, {
+    key: 'render',
+    value: function render(r) {
+      r = r || this.pos;
+      this.el.style.top = r.y + 'px';
+      this.el.style.left = r.x + 'px';
+      this.el.style.width = r.w + 'px';
+      this.el.style.height = r.h + 'px';
+      this.pos = r;
+      this.emit('crop.update');
+      return this;
+    }
+  }, {
+    key: 'doneDragging',
+    value: function doneDragging() {
+      this.pos = _rect2.default.from(this.el);
+    }
+  }]);
+
+  return Cropper;
+}(_domobj2.default);
+
+Cropper.create = function () {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var el = document.createElement('div');
+  var opts = (0, _extend2.default)({}, _defaults2.default, options);
+  el.setAttribute('tabindex', '0');
+  el.className = opts.cropperClass || 'cropper';
+  return new Cropper(el, opts);
+};
+
+exports.default = Cropper;
+
+/***/ }),
+
+/***/ "./build/js/defaults.js":
+/*!******************************!*\
+  !*** ./build/js/defaults.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = {
+  multi: true,
+  maxCroppers: null,
+  minCroppers: 1,
+  cropperClass: 'cropper',
+  canDrag: true,
+  canResize: true,
+  canSelect: true,
+  canRemove: true,
+  multiple: false,
+  autoFront: true,
+  active: true,
+  handles: ['n', 's', 'e', 'w', 'sw', 'nw', 'ne', 'se'],
+  shading: true,
+  shadeClass: 'shade',
+  shadeColor: 'black',
+  shadeOpacity: 0.5,
+  x: 0,
+  y: 0,
+  w: 100,
+  h: 100
+};
+
+/***/ }),
+
+/***/ "./build/js/domobj.js":
+/*!****************************!*\
+  !*** ./build/js/domobj.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var DomObj = function () {
+  function DomObj(el) {
+    _classCallCheck(this, DomObj);
+
+    if (typeof el == 'string') el = document.getElementById(el);
+    this.el = el;
+  }
+
+  _createClass(DomObj, [{
+    key: 'appendTo',
+    value: function appendTo(el) {
+      if (typeof el == 'string') el = document.getElementById(el);
+      el.appendChild(this.el);
+      return this;
+    }
+  }, {
+    key: 'emit',
+    value: function emit(evname) {
+      var ev = document.createEvent('Event');
+      ev.initEvent(evname, true, true);
+      ev.cropTarget = this;
+      this.el.dispatchEvent(ev);
+    }
+  }, {
+    key: 'removeClass',
+    value: function removeClass(cl) {
+      this.el.className = this.el.className.split(' ').filter(function (i) {
+        return cl != i;
+      }).join(' ');
+      return this;
+    }
+  }, {
+    key: 'hasClass',
+    value: function hasClass(cl) {
+      return this.el.className.split(' ').filter(function (i) {
+        return cl == i;
+      }).length;
+    }
+  }, {
+    key: 'addClass',
+    value: function addClass(cl) {
+      if (!this.hasClass(cl)) this.el.className += ' ' + cl;
+    }
+  }]);
+
+  return DomObj;
+}();
+
+exports.default = DomObj;
+
+/***/ }),
+
+/***/ "./build/js/dragger.js":
+/*!*****************************!*\
+  !*** ./build/js/dragger.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/*
+  Dragger function - sets up dragging callbacks on an element
+*/
+
+var Dragger = function Dragger(el, startcb, movecb, donecb) {
+  var ox, oy;
+  if (typeof el == 'string') el = document.getElementById(el);
+
+  el.addEventListener('mousedown', start);
+  el.addEventListener('touchstart', start);
+
+  function start(e) {
+    ox = e.pageX;
+    oy = e.pageY;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!startcb(ox, oy, e)) return;
+
+    if (e.type == 'mousedown') {
+      window.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', done);
+    } else if (e.type == 'touchstart') {
+      document.addEventListener('touchmove', move);
+      document.addEventListener('touchend', done);
+    }
+  }
+
+  function move(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    movecb(e.pageX - ox, e.pageY - oy);
+  }
+
+  function done(e) {
+    if (e.pageX && e.pageY) movecb(e.pageX - ox, e.pageY - oy);
+
+    document.removeEventListener('mouseup', done);
+    window.removeEventListener('mousemove', move);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', done);
+
+    donecb();
+  }
+
+  function remove() {
+    el.removeEventListener('mousedown', start);
+    el.removeEventListener('touchstart', start);
+  }
+
+  return { remove: remove };
+};
+
+exports.default = Dragger;
+
+/***/ }),
+
+/***/ "./build/js/easing.js":
+/*!****************************!*\
+  !*** ./build/js/easing.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/* ============================================================
+ * Easing functions adapted from jQuery easing library
+ * Open source under the BSD License.
+ *
+ * Copyright © 2008 George McGinley Smith
+ * All rights reserved.
+ * ======================================================== */
+
+var m = module.exports = {
+  // t: current time, b: begInnIng value, c: change In value, d: duration
+  def: 'outQuad',
+  swing: function swing(t, b, c, d) {
+    return m[m.def](t, b, c, d);
+  },
+  inQuad: function inQuad(t, b, c, d) {
+    return c * (t /= d) * t + b;
+  },
+  outQuad: function outQuad(t, b, c, d) {
+    return -c * (t /= d) * (t - 2) + b;
+  },
+  inOutQuad: function inOutQuad(t, b, c, d) {
+    if ((t /= d / 2) < 1) return c / 2 * t * t + b;
+    return -c / 2 * (--t * (t - 2) - 1) + b;
+  },
+  inCubic: function inCubic(t, b, c, d) {
+    return c * (t /= d) * t * t + b;
+  },
+  outCubic: function outCubic(t, b, c, d) {
+    return c * ((t = t / d - 1) * t * t + 1) + b;
+  },
+  inOutCubic: function inOutCubic(t, b, c, d) {
+    if ((t /= d / 2) < 1) return c / 2 * t * t * t + b;
+    return c / 2 * ((t -= 2) * t * t + 2) + b;
+  },
+  inQuart: function inQuart(t, b, c, d) {
+    return c * (t /= d) * t * t * t + b;
+  },
+  outQuart: function outQuart(t, b, c, d) {
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+  },
+  inOutQuart: function inOutQuart(t, b, c, d) {
+    if ((t /= d / 2) < 1) return c / 2 * t * t * t * t + b;
+    return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+  },
+  inQuint: function inQuint(t, b, c, d) {
+    return c * (t /= d) * t * t * t * t + b;
+  },
+  outQuint: function outQuint(t, b, c, d) {
+    return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+  },
+  inOutQuint: function inOutQuint(t, b, c, d) {
+    if ((t /= d / 2) < 1) return c / 2 * t * t * t * t * t + b;
+    return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+  },
+  inSine: function inSine(t, b, c, d) {
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+  },
+  outSine: function outSine(t, b, c, d) {
+    return c * Math.sin(t / d * (Math.PI / 2)) + b;
+  },
+  inOutSine: function inOutSine(t, b, c, d) {
+    return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+  },
+  inExpo: function inExpo(t, b, c, d) {
+    return t == 0 ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+  },
+  outExpo: function outExpo(t, b, c, d) {
+    return t == d ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+  },
+  inOutExpo: function inOutExpo(t, b, c, d) {
+    if (t == 0) return b;
+    if (t == d) return b + c;
+    if ((t /= d / 2) < 1) return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+    return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+  },
+  inCirc: function inCirc(t, b, c, d) {
+    return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+  },
+  outCirc: function outCirc(t, b, c, d) {
+    return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+  },
+  inOutCirc: function inOutCirc(t, b, c, d) {
+    if ((t /= d / 2) < 1) return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+  },
+  inElastic: function inElastic(t, b, c, d) {
+    var s = 1.70158;var p = 0;var a = c;
+    if (t == 0) return b;if ((t /= d) == 1) return b + c;if (!p) p = d * .3;
+    if (a < Math.abs(c)) {
+      a = c;var s = p / 4;
+    } else var s = p / (2 * Math.PI) * Math.asin(c / a);
+    return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+  },
+  outElastic: function outElastic(t, b, c, d) {
+    var s = 1.70158;var p = 0;var a = c;
+    if (t == 0) return b;if ((t /= d) == 1) return b + c;if (!p) p = d * .3;
+    if (a < Math.abs(c)) {
+      a = c;var s = p / 4;
+    } else var s = p / (2 * Math.PI) * Math.asin(c / a);
+    return a * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b;
+  },
+  inOutElastic: function inOutElastic(t, b, c, d) {
+    var s = 1.70158;var p = 0;var a = c;
+    if (t == 0) return b;if ((t /= d / 2) == 2) return b + c;if (!p) p = d * (.3 * 1.5);
+    if (a < Math.abs(c)) {
+      a = c;var s = p / 4;
+    } else var s = p / (2 * Math.PI) * Math.asin(c / a);
+    if (t < 1) return -.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+    return a * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * .5 + c + b;
+  },
+  inBack: function inBack(t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    return c * (t /= d) * t * ((s + 1) * t - s) + b;
+  },
+  outBack: function outBack(t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+  },
+  inOutBack: function inOutBack(t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    if ((t /= d / 2) < 1) return c / 2 * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
+    return c / 2 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
+  },
+  inBounce: function inBounce(t, b, c, d) {
+    return c - m.outBounce(d - t, 0, c, d) + b;
+  },
+  outBounce: function outBounce(t, b, c, d) {
+    if ((t /= d) < 1 / 2.75) {
+      return c * (7.5625 * t * t) + b;
+    } else if (t < 2 / 2.75) {
+      return c * (7.5625 * (t -= 1.5 / 2.75) * t + .75) + b;
+    } else if (t < 2.5 / 2.75) {
+      return c * (7.5625 * (t -= 2.25 / 2.75) * t + .9375) + b;
+    } else {
+      return c * (7.5625 * (t -= 2.625 / 2.75) * t + .984375) + b;
+    }
+  },
+  inOutBounce: function inOutBounce(t, b, c, d) {
+    if (t < d / 2) return m.inBounce(t * 2, 0, c, d) * .5 + b;
+    return m.outBounce(t * 2 - d, 0, c, d) * .5 + c * .5 + b;
+  }
+};
+
+/*
+ * TERMS OF USE - EASING EQUATIONS
+ * Open source under the BSD License. 
+ * 
+ * Copyright © 2001 Robert Penner All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without modification, 
+ * are permitted provided that the following conditions are met:
+ * 
+ * Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ * 
+ * Neither the name of the author nor the names of contributors may be
+ * used to endorse or promote products derived from this software
+ * without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ */
+
+/***/ }),
+
+/***/ "./build/js/handle.js":
+/*!****************************!*\
+  !*** ./build/js/handle.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+
+var _domobj2 = _interopRequireDefault(_domobj);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Handle = function (_DomObj) {
+  _inherits(Handle, _DomObj);
+
+  function Handle() {
+    _classCallCheck(this, Handle);
+
+    return _possibleConstructorReturn(this, (Handle.__proto__ || Object.getPrototypeOf(Handle)).apply(this, arguments));
+  }
+
+  return Handle;
+}(_domobj2.default);
+
+Handle.create = function (clname) {
+  var el = document.createElement('div');
+  el.className = clname;
+  return new Handle(el);
+};
+
+exports.default = Handle;
+
+/***/ }),
+
+/***/ "./build/js/jcrop.js":
+/*!***************************!*\
+  !*** ./build/js/jcrop.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Cropper = exports.Dragger = exports.defaults = exports.Stage = undefined;
+exports.attach = attach;
+
+var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _defaults = __webpack_require__(/*! ./defaults */ "./build/js/defaults.js");
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+var _dom = __webpack_require__(/*! ./stage/dom */ "./build/js/stage/dom.js");
+
+var _dom2 = _interopRequireDefault(_dom);
+
+var _image = __webpack_require__(/*! ./stage/image */ "./build/js/stage/image.js");
+
+var _image2 = _interopRequireDefault(_image);
+
+var _cropper = __webpack_require__(/*! ./cropper */ "./build/js/cropper.js");
+
+var _cropper2 = _interopRequireDefault(_cropper);
+
+var _shade = __webpack_require__(/*! ./shade */ "./build/js/shade.js");
+
+var _shade2 = _interopRequireDefault(_shade);
+
+var _handle = __webpack_require__(/*! ./handle */ "./build/js/handle.js");
+
+var _handle2 = _interopRequireDefault(_handle);
+
+var _dragger = __webpack_require__(/*! ./dragger */ "./build/js/dragger.js");
+
+var _dragger2 = _interopRequireDefault(_dragger);
+
+var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _sticker = __webpack_require__(/*! ./sticker */ "./build/js/sticker.js");
+
+var _sticker2 = _interopRequireDefault(_sticker);
+
+var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+
+var _domobj2 = _interopRequireDefault(_domobj);
+
+var _easing = __webpack_require__(/*! ./easing */ "./build/js/easing.js");
+
+var _easing2 = _interopRequireDefault(_easing);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function attach(el) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  options = (0, _extend2.default)({}, _defaults2.default, options);
+
+  if (typeof el == 'string') el = document.getElementById(el);
+  if (el.tagName == 'IMG') return new _image2.default(el, options);
+
+  return new _dom2.default(el, options);
+}
+
+exports.Stage = _dom2.default;
+exports.defaults = _defaults2.default;
+exports.Dragger = _dragger2.default;
+exports.Cropper = _cropper2.default;
+exports.Rect = _rect2.default;
+exports.Handle = _handle2.default;
+exports.Sticker = _sticker2.default;
+exports.Easing = _easing2.default;
+
+/***/ }),
+
+/***/ "./build/js/keyboard.js":
+/*!******************************!*\
+  !*** ./build/js/keyboard.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Keyboard = function () {
+  function Keyboard(cropper) {
+    _classCallCheck(this, Keyboard);
+
+    this.cropper = cropper;
+    this.attach();
+  }
+
+  _createClass(Keyboard, [{
+    key: 'attach',
+    value: function attach() {
+      var c = this.cropper;
+      c.el.addEventListener('keyup', function (e) {
+        var d = e.shiftKey ? 10 : 1;
+        switch (e.key) {
+          case 'ArrowRight':
+            c.nudge(d);break;
+          case 'ArrowLeft':
+            c.nudge(-d);break;
+          case 'ArrowUp':
+            c.nudge(0, -d);break;
+          case 'ArrowDown':
+            c.nudge(0, d);break;
+          case 'Delete':case 'Backspace':
+            c.emit('crop.remove');break;
+          default:
+            console.log(e);break;
+        }
+      });
+    }
+  }]);
+
+  return Keyboard;
+}();
+
+exports.default = Keyboard;
+
+/***/ }),
+
+/***/ "./build/js/rect.js":
+/*!**************************!*\
+  !*** ./build/js/rect.js ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/* Rect class -- describes a rectangle with two points, usually
+   top left and bottom right. It allows the second set of coordinates
+   to be described as either w/h or x2/y2 and allows getting and
+   setting of those values such that the object values will always be
+   consistent with the latest input. It should be noted that it does not
+   attempt to keep these points normalized. That is, you should expect
+   to see the actual w/h properties to sometimes be negative values.
+   To normalize the values, use the normalize method, which will return
+   a new Rect object with normalized values.
+*/
+var Rect = function () {
+  function Rect() {
+    _classCallCheck(this, Rect);
+
+    this.x = 0;
+    this.y = 0;
+    this.w = 0;
+    this.h = 0;
+  }
+
+  _createClass(Rect, [{
+    key: "normalize",
+    value: function normalize() {
+      var _ref = [Math.min(this.x, this.x2), Math.min(this.y, this.y2), Math.max(this.x, this.x2), Math.max(this.y, this.y2)],
+          x1 = _ref[0],
+          y1 = _ref[1],
+          x2 = _ref[2],
+          y2 = _ref[3];
+
+      return Rect.create(x1, y1, x2 - x1, y2 - y1);
+    }
+  }, {
+    key: "rebound",
+    value: function rebound(w, h) {
+      var rect = this.normalize();
+      if (rect.x < 0) rect.x = 0;
+      if (rect.y < 0) rect.y = 0;
+      if (rect.x2 > w) rect.x = w - rect.w;
+      if (rect.y2 > h) rect.y = h - rect.h;
+      return rect;
+    }
+  }, {
+    key: "x1",
+    set: function set(v) {
+      this.w = this.x2 - v;
+      this.x = v;
+    }
+  }, {
+    key: "y1",
+    set: function set(v) {
+      this.h = this.y2 - v;
+      this.y = v;
+    }
+  }, {
+    key: "x2",
+    get: function get() {
+      return this.x + this.w;
+    },
+    set: function set(x) {
+      this.w = x - this.x;
+    }
+  }, {
+    key: "y2",
+    get: function get() {
+      return this.y + this.h;
+    },
+    set: function set(y) {
+      this.h = y - this.y;
+    }
+  }]);
+
+  return Rect;
+}();
+
+Rect.fromCoordSet = function (p1, p2) {
+  var _ref2 = [Math.min(p1[0], p2[0]), Math.min(p1[1], p2[1]), Math.max(p1[0], p2[0]), Math.max(p1[1], p2[1])],
+      x1 = _ref2[0],
+      y1 = _ref2[1],
+      x2 = _ref2[2],
+      y2 = _ref2[3];
+
+  return Rect.create(x1, y1, x2 - x1, y2 - y1);
+};
+
+Rect.create = function () {
+  var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+  var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  var w = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  var h = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+  var c = new Rect();
+  c.x = x;
+  c.y = y;
+  c.w = w;
+  c.h = h;
+  return c;
+};
+
+Rect.from = function (el) {
+  var c = new Rect();
+  c.x = el.offsetLeft;
+  c.y = el.offsetTop;
+  c.w = el.offsetWidth;
+  c.h = el.offsetHeight;
+  return c;
+};
+
+exports.default = Rect;
+
+/***/ }),
+
+/***/ "./build/js/shade.js":
+/*!***************************!*\
+  !*** ./build/js/shade.js ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+
+var _domobj2 = _interopRequireDefault(_domobj);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Manager = function () {
+  function Manager(el) {
+    _classCallCheck(this, Manager);
+
+    if (typeof el == 'string') el = document.getElementById(el);
+    this.el = el;
+    this.shades = {};
+  }
+
+  _createClass(Manager, [{
+    key: 'init',
+    value: function init() {
+      var _this = this;
+
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      this.active = options.shading !== undefined ? options.shading : true;
+
+      ['t', 'l', 'r', 'b'].forEach(function (key) {
+        return _this.shades[key] = Shade.create(options, key);
+      });
+
+      this.enable();
+    }
+  }, {
+    key: 'adjust',
+    value: function adjust(rect) {
+      var f = _rect2.default.from(this.el);
+      var s = this.shades;
+      s.t.h = rect.y;
+      s.r.w = Math.ceil(f.w - rect.x2);
+      s.b.h = f.h - rect.y2;
+      s.t.w = s.b.w = Math.floor(rect.w);
+      s.l.w = s.t.x = s.b.x = Math.floor(rect.x);
+    }
+  }, {
+    key: 'enable',
+    value: function enable() {
+      var _this2 = this;
+
+      var s = this.shades;
+      ['t', 'l', 'r', 'b'].forEach(function (key) {
+        return s[key].insert(_this2.el);
+      });
+    }
+  }, {
+    key: 'disable',
+    value: function disable() {
+      var s = this.shades;
+      ['t', 'l', 'r', 'b'].forEach(function (key) {
+        return s[key].remove();
+      });
+    }
+  }]);
+
+  return Manager;
+}();
+
+Manager.attach = function (cropper) {
+  var el = cropper.el;
+  var m = new Manager(el);
+  m.init(cropper.options);
+  cropper.shades = m;
+  return m;
+};
+
+var Shade = function (_DomObj) {
+  _inherits(Shade, _DomObj);
+
+  function Shade() {
+    _classCallCheck(this, Shade);
+
+    return _possibleConstructorReturn(this, (Shade.__proto__ || Object.getPrototypeOf(Shade)).apply(this, arguments));
+  }
+
+  _createClass(Shade, [{
+    key: 'insert',
+    value: function insert(el) {
+      el.appendChild(this.el);
+    }
+  }, {
+    key: 'remove',
+    value: function remove() {
+      this.el.parentElement.removeChild(this.el);
+    }
+  }, {
+    key: 'w',
+    set: function set(w) {
+      this.el.style.width = w + 'px';
+    }
+  }, {
+    key: 'h',
+    set: function set(h) {
+      this.el.style.height = h + 'px';
+    }
+  }, {
+    key: 'x',
+    set: function set(l) {
+      this.el.style.left = l + 'px';
+    }
+  }]);
+
+  return Shade;
+}(_domobj2.default);
+
+Shade.create = function (o, key) {
+  var el = document.createElement('div');
+  var clname = o.shadeClass || 'shade';
+  if (o.shadeColor) el.style.backgroundColor = o.shadeColor;
+  if (o.shadeOpacity) el.style.opacity = o.shadeOpacity;
+  el.className = clname + ' ' + key;
+  return new Shade(el);
+};
+
+Shade.Manager = Manager;
+
+exports.default = Shade;
+
+/***/ }),
+
+/***/ "./build/js/stage/dom.js":
+/*!*******************************!*\
+  !*** ./build/js/stage/dom.js ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extend = __webpack_require__(/*! ../util/extend */ "./build/js/util/extend.js");
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _defaults = __webpack_require__(/*! ../defaults */ "./build/js/defaults.js");
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+var _cropper = __webpack_require__(/*! ../cropper */ "./build/js/cropper.js");
+
+var _cropper2 = _interopRequireDefault(_cropper);
+
+var _shade = __webpack_require__(/*! ../shade */ "./build/js/shade.js");
+
+var _shade2 = _interopRequireDefault(_shade);
+
+var _dragger = __webpack_require__(/*! ../dragger */ "./build/js/dragger.js");
+
+var _dragger2 = _interopRequireDefault(_dragger);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Stage = function () {
+  function Stage(el, options) {
+    _classCallCheck(this, Stage);
+
+    if (typeof el == 'string') el = document.getElementById(el);
+    this.options = (0, _extend2.default)({}, _defaults2.default, options);
+    this.el = el;
+    this.crops = new Set();
+    this.active = null;
+    this.init();
+  }
+
+  _createClass(Stage, [{
+    key: 'init',
+    value: function init() {
+      this.initListeners();
+      this.initStageDrag();
+      _shade2.default.Manager.attach(this);
+      console.info('Jcrop initialized stage');
+    }
+  }, {
+    key: 'canCreate',
+    value: function canCreate() {
+      var n = this.crops.size;
+      var o = this.options;
+      if (o.maxCroppers !== null && n >= o.maxCroppers) return false;
+      if (!o.multi && n >= o.minCroppers) {
+        console.info('huh');
+        return false;
+      }
+      return true;
+    }
+  }, {
+    key: 'canRemove',
+    value: function canRemove() {
+      var n = this.crops.size;
+      var o = this.options;
+      if (this.active && !this.active.options.canRemove) return false;
+      if (!o.canRemove || n <= o.minCroppers) return false;
+      return true;
+    }
+  }, {
+    key: 'initStageDrag',
+    value: function initStageDrag() {
+      var _this = this;
+
+      var crop, pos, w, h;
+      (0, _dragger2.default)(this.el, function (x, y, e) {
+        if (!_this.canCreate()) return false;
+        crop = _cropper2.default.create();
+        pos = crop.pos;
+        pos.x = e.pageX - _this.el.offsetParent.offsetLeft - _this.el.offsetLeft;
+        pos.y = e.pageY - _this.el.offsetParent.offsetTop - _this.el.offsetTop;
+        w = _this.el.offsetWidth;
+        h = _this.el.offsetHeight;
+        crop.render(pos);
+        _this.addCropper(crop);
+        crop.el.focus();
+        return true;
+      }, function (x, y) {
+        pos.x2 = pos.x + x;
+        pos.y2 = pos.y + y;
+        if (pos.x2 < 0) pos.x2 = 0;
+        if (pos.y2 < 0) pos.y2 = 0;
+        if (pos.x2 > w) pos.x2 = w;
+        if (pos.y2 > h) pos.y2 = h;
+        crop.render(pos.normalize());
+      }, function () {});
+    }
+  }, {
+    key: 'initListeners',
+    value: function initListeners() {
+      var _this2 = this;
+
+      this.el.addEventListener('crop.activate', function (e) {
+        _this2.activate(e.cropTarget);
+      }, false);
+      this.el.addEventListener('crop.update', function (e) {
+        var targ = e.cropTarget;
+        if (targ === _this2.active && targ.options.shading) _this2.shades.adjust(targ.pos);
+      }, false);
+      this.el.addEventListener('crop.attach', function (e) {
+        console.info('Cropper attached');
+      });
+      this.el.addEventListener('crop.remove', function (e) {
+        _this2.removeCropper(e.cropTarget);
+      });
+    }
+  }, {
+    key: 'reorderCroppers',
+    value: function reorderCroppers() {
+      var _this3 = this;
+
+      var z = 1000;
+      this.crops.forEach(function (crop) {
+        crop.el.style.zIndex = z++;
+        if (_this3.active === crop) crop.addClass('active');else crop.removeClass('active');
+      });
+      this.refresh();
+    }
+  }, {
+    key: 'activate',
+    value: function activate(cropper) {
+      cropper = cropper || Array.from(this.crops).pop();
+      if (cropper) {
+        this.shades.enable();
+        this.active = cropper;
+        this.crops.delete(cropper);
+        this.crops.add(cropper);
+        this.reorderCroppers();
+        this.active.el.focus();
+      } else {
+        this.shades.disable();
+      }
+      return this;
+    }
+  }, {
+    key: 'addCropper',
+    value: function addCropper(cropper) {
+      cropper.attachToStage(this);
+      cropper.appendTo(this.el);
+      cropper.init();
+      this.activate(cropper);
+      return this;
+    }
+  }, {
+    key: 'removeCropper',
+    value: function removeCropper(cropper) {
+      if (!this.canRemove()) return false;
+      cropper.el.remove();
+      this.crops.delete(cropper);
+      this.activate();
+    }
+  }, {
+    key: 'refresh',
+    value: function refresh() {
+      this.options.shading && this.active && this.shades.adjust(this.active.pos);
+    }
+  }]);
+
+  return Stage;
+}();
+
+exports.default = Stage;
+
+/***/ }),
+
+/***/ "./build/js/stage/image.js":
+/*!*********************************!*\
+  !*** ./build/js/stage/image.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _dom = __webpack_require__(/*! ../util/dom */ "./build/js/util/dom.js");
+
+var _dom2 = __webpack_require__(/*! ./dom */ "./build/js/stage/dom.js");
+
+var _dom3 = _interopRequireDefault(_dom2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ImageStage = function (_Stage) {
+  _inherits(ImageStage, _Stage);
+
+  function ImageStage(el, options) {
+    _classCallCheck(this, ImageStage);
+
+    var wrapper = (0, _dom.div)('cropstage imagestage');
+    el.parentNode.insertBefore(wrapper, el);
+    wrapper.appendChild(el);
+
+    var _this = _possibleConstructorReturn(this, (ImageStage.__proto__ || Object.getPrototypeOf(ImageStage)).call(this, wrapper, options));
+
+    _this.srcEl = el;
+    el.onload = _this.resizeToImage.bind(_this);
+    _this.resizeToImage();
+    console.log('image stage!');
+    return _this;
+  }
+
+  _createClass(ImageStage, [{
+    key: 'resizeToImage',
+    value: function resizeToImage() {
+      var w = this.srcEl.width;
+      var h = this.srcEl.height;
+      this.el.style.width = w + 'px';
+      this.el.style.height = h + 'px';
+      this.refresh();
+    }
+  }]);
+
+  return ImageStage;
+}(_dom3.default);
+
+exports.default = ImageStage;
+
+/***/ }),
+
+/***/ "./build/js/sticker.js":
+/*!*****************************!*\
+  !*** ./build/js/sticker.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /* This class creates a draggable frame by locking the
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        corner opposite to the one being dragged */
+
+var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
+
+var _rect2 = _interopRequireDefault(_rect);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Sticker = function () {
+  function Sticker(rect, w, h, ord) {
+    _classCallCheck(this, Sticker);
+
+    this.sw = w;
+    this.sh = h;
+    this.rect = rect;
+    this.locked = this.getCornerPoint(this.getOppositeCorner(ord));
+    this.stuck = this.getCornerPoint(ord);
+  }
+
+  _createClass(Sticker, [{
+    key: 'move',
+    value: function move(x, y) {
+      return _rect2.default.fromCoordSet(this.locked, this.translateStuckPoint(x, y));
+    }
+  }, {
+    key: 'translateStuckPoint',
+    value: function translateStuckPoint(ox, oy) {
+      var _stuck = _slicedToArray(this.stuck, 3),
+          xx = _stuck[0],
+          yy = _stuck[1],
+          sp = _stuck[2];
+
+      var x = xx === null ? sp : xx + ox;
+      var y = yy === null ? sp : yy + oy;
+      if (x > this.sw) x = this.sw;
+      if (y > this.sh) y = this.sh;
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      return [x, y];
+    }
+  }, {
+    key: 'getCornerPoint',
+    value: function getCornerPoint(h) {
+      var p = this.rect;
+      switch (h) {
+        case 'n':
+          return [null, p.y, p.x];
+        case 's':
+          return [null, p.y2, p.x2];
+        case 'e':
+          return [p.x2, null, p.y2];
+        case 'w':
+          return [p.x, null, p.y];
+        case 'se':
+          return [p.x2, p.y2];
+        case 'sw':
+          return [p.x, p.y2];
+        case 'ne':
+          return [p.x2, p.y];
+        case 'nw':
+          return [p.x, p.y];
+      }
+    }
+  }, {
+    key: 'getOppositeCorner',
+    value: function getOppositeCorner(h) {
+      switch (h) {
+        case 'n':
+          return 'se';
+        case 's':
+          return 'nw';
+        case 'e':
+          return 'nw';
+        case 'w':
+          return 'se';
+        case 'se':
+          return 'nw';
+        case 'sw':
+          return 'ne';
+        case 'ne':
+          return 'sw';
+        case 'nw':
+          return 'se';
+      }
+    }
+  }]);
+
+  return Sticker;
+}();
+
+Sticker.create = function (rect, w, h, ord) {
+  return new Sticker(rect, w, h, ord);
+};
+
+exports.default = Sticker;
+
+/***/ }),
+
+/***/ "./build/js/util/dom.js":
+/*!******************************!*\
+  !*** ./build/js/util/dom.js ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+var wrap = exports.wrap = function wrap(target) {
+  var wrapper = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
+
+  [].concat(_toConsumableArray(target.childNodes)).forEach(function (child) {
+    return wrapper.appendChild(child);
+  });
+  target.appendChild(wrapper);
+  return wrapper;
+};
+
+var div = exports.div = function div(clname) {
+  var el = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
+
+  el.className = clname;
+  return el;
+};
+
+var replace = exports.replace = function replace(orig, target) {
+  orig.parentElement.replaceChild(target, orig);
+  return target;
+};
+
+/***/ }),
+
+/***/ "./build/js/util/extend.js":
+/*!*********************************!*\
+  !*** ./build/js/util/extend.js ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = extend;
+function extend() {
+  var extended = {};
+
+  for (var key in arguments) {
+    var argument = arguments[key];
+    for (var prop in argument) {
+      if (Object.prototype.hasOwnProperty.call(argument, prop)) {
+        extended[prop] = argument[prop];
+      }
+    }
+  }
+
+  return extended;
+};
+
+/***/ })
+
+/******/ });
+//# sourceMappingURL=jcrop.dev.js.map
