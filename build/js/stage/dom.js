@@ -65,9 +65,7 @@ class Stage {
         if (pos.y2 > h) pos.y2 = h;
         crop.render(pos.normalize());
       },
-      () => {
-        console.log('done');
-      }
+      () => { }
     );
   }
 

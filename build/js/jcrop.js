@@ -16,7 +16,6 @@ export function attach(el,options={}) {
 
   if (typeof el == 'string') el = document.getElementById(el);
   if (el.tagName == 'IMG') return new ImageStage(el,options);
-  console.log('hi hi');
 
   return new Stage(el,options);
 }
