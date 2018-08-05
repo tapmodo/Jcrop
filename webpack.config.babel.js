@@ -32,13 +32,14 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: '[name].bundle.js',
+    filename: '[name].js',
     library: 'Jcrop'
   },
   resolve: {
     alias: { }
   },
   optimization: {
+    /*
     splitChunks: {
       cacheGroups: {
         commons: {
@@ -48,6 +49,7 @@ module.exports = {
         }
       }
     }
+    */
   },
   // this makes sure 'jQuery' is available to any jQuery plugin you might want
   // to load (including Foundation files) regardless of how they are written
