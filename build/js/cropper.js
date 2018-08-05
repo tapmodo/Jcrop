@@ -74,13 +74,14 @@ class Cropper extends DomObj {
   createHandles() {
     this.options.handles.forEach(c => {
       const handle = Handle.create('handle '+c);
-      const pe = this.el.parentElement;
-      const [w,h] = [ pe.offsetWidth, pe.offsetHeight ];
       handle.appendTo(this.el);
 
       var stick;
       Dragger(handle.el,
         () => {
+          const pe = this.el.parentElement;
+          const w = pe.offsetWidth;
+          const h = pe.offsetHeight;
           stick = Sticker.create(Rect.from(this.el), w, h, c);
           this.el.focus();
           this.emit('crop.active');
