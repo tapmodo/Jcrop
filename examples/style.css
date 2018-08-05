@@ -20,3 +20,4 @@ body {
   height: 100%;
 }
 
+img#target { max-width: 780px; }
