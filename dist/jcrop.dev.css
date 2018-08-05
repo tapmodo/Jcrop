@@ -81,7 +81,8 @@
     bottom: 0px; }
 
 .cropstage {
-  position: relative; }
+  position: relative;
+  width: 100%; }
 
 .imagestage img {
   position: absolute; }
