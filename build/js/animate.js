@@ -1,29 +1,47 @@
 import Easing from './easing';
 
-function Animate(el,from,to,cb,frames=30,easingFunc='swing') {
+// Animate function uses requestAnimationFrame to sequence events
+// Easing functions adapted from jQuery-ui and Robert Penner's equations
+// el - element to animate
+// from and to - "rect" objects representing initial and target coordinates
+// cb - callback receives a "rect" object for each update/frame
+// frames - number of frames to animate
+// efunc - name of easing function to use
+// returns a Promise that resolves when the animation is complete
+
+function Animate(el,from,to,cb,frames=30,efunc='swing') {
+  // Set the keys to update, in this case it is our Rect's properties
+  // Normalize the initial state as a Rect named "cur"
   const p = ['x','y','w','h'];
   const cur = from.normalize();
-  console.log(easingFunc);
-  easingFunc = (typeof easingFunc == 'string')? Easing[easingFunc] : easingFunc;
+
+  // Lookup the easing function if it is a string
+  efunc = (typeof efunc == 'string')? Easing[efunc] : efunc;
 
   var cur_frame = 0;
 
+  // Return a promise that will resolve when the animation is complete
   return new Promise((resolve,reject) => {
-    const step = () => {
+    function step(){
 
       if (cur_frame < frames) {
 
+        // Update each key for this frame
         p.forEach(key => 
           cur[key] = Math.round(
-            easingFunc(cur_frame, from[key], to[key] - from[key], frames)
+            efunc(cur_frame, from[key], to[key] - from[key], frames)
           )
         );
 
+        // Send it to the callback function
+        // update the current frame counter
+        // and request the next animation frame
         cb(cur);
         cur_frame++;
         requestAnimationFrame(step);
       }
 
+      // We've reached the end of the animation frames
       else resolve();
     }
 
