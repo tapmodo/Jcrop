@@ -922,10 +922,12 @@ var Keyboard = function () {
             c.nudge(0, -d);break;
           case 'ArrowDown':
             c.nudge(0, d);break;
-          case 'Delete':case 'Backspace':
-            c.emit('crop.remove');break;
-          default:
-            console.log(e);break;
+
+          case 'Delete':
+          case 'Backspace':
+            e.preventDefault();
+            c.emit('crop.remove');
+            break;
         }
       });
     }
