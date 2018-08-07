@@ -10,13 +10,15 @@ const Dragger = function(el,startcb,movecb,donecb){
   el.addEventListener('touchstart',start);
 
   function start(e) {
-    ox = e.pageX;
-    oy = e.pageY;
+    const obj = (e.type == 'touchstart')? e.touches[0]: e;
+
+    ox = obj.pageX;
+    oy = obj.pageY;
 
     e.preventDefault();
     e.stopPropagation();
 
-    if (!startcb(ox,oy,e)) return;
+    if (!startcb(ox,oy,obj)) return;
 
     if (e.type == 'mousedown') {
       window.addEventListener('mousemove',move);
@@ -29,15 +31,16 @@ const Dragger = function(el,startcb,movecb,donecb){
   }
 
   function move(e) {
-    e.preventDefault();
+    const obj = (e.type == 'touchmove')? e.changedTouches[0]: e;
     e.stopPropagation();
-
-    movecb(e.pageX - ox,e.pageY - oy);
+    movecb(obj.pageX - ox,obj.pageY - oy);
   }
 
   function done(e) {
-    if (e.pageX && e.pageY)
-      movecb(e.pageX - ox,e.pageY - oy);
+    const obj = (e.type == 'touchend')? e.changedTouches[0]: e;
+
+    if (obj.pageX && obj.pageY)
+      movecb(obj.pageX - ox,obj.pageY - oy);
 
     document.removeEventListener('mouseup',done);
     window.removeEventListener('mousemove',move);
