@@ -107,36 +107,54 @@ var _easing2 = _interopRequireDefault(_easing);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Animate function uses requestAnimationFrame to sequence events
+// Easing functions adapted from jQuery-ui and Robert Penner's equations
+// el - element to animate
+// from and to - "rect" objects representing initial and target coordinates
+// cb - callback receives a "rect" object for each update/frame
+// frames - number of frames to animate
+// efunc - name of easing function to use
+// returns a Promise that resolves when the animation is complete
+
 function Animate(el, from, to, cb) {
   var frames = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 30;
-  var easingFunc = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 'swing';
+  var efunc = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 'swing';
 
+  // Set the keys to update, in this case it is our Rect's properties
+  // Normalize the initial state as a Rect named "cur"
   var p = ['x', 'y', 'w', 'h'];
-  var delta = {};
   var cur = from.normalize();
-  easingFunc = typeof easingFunc == 'string' ? _easing2.default[easingFunc] : easingFunc;
+
+  // Lookup the easing function if it is a string
+  efunc = typeof efunc == 'string' ? _easing2.default[efunc] : efunc;
 
   var cur_frame = 0;
 
-  p.forEach(function (key) {
-    return delta[key] = (to[key] - from[key]) / frames;
-  });
+  // Return a promise that will resolve when the animation is complete
+  return new Promise(function (resolve, reject) {
+    function step() {
 
-  function step() {
+      if (cur_frame < frames) {
 
-    if (cur_frame < frames) {
+        // Update each key for this frame
+        p.forEach(function (key) {
+          return cur[key] = Math.round(efunc(cur_frame, from[key], to[key] - from[key], frames));
+        });
 
-      p.forEach(function (key) {
-        return cur[key] = Math.round(easingFunc(cur_frame, from[key], to[key] - from[key], frames));
-      });
+        // Send it to the callback function
+        // update the current frame counter
+        // and request the next animation frame
+        cb(cur);
+        cur_frame++;
+        requestAnimationFrame(step);
+      }
 
-      cb(cur);
-      cur_frame++;
-      requestAnimationFrame(step);
+      // We've reached the end of the animation frames
+      else resolve();
     }
-  }
 
-  requestAnimationFrame(step);
+    requestAnimationFrame(step);
+  });
 }
 
 exports.default = Animate;
@@ -245,20 +263,18 @@ var Cropper = function (_DomObj) {
     }
   }, {
     key: 'animate',
-    value: function animate(rect) {
-      var _this3 = this;
-
-      var frames = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 30;
-      var efunc = arguments[2];
-
-      (0, _animate2.default)(this.el, this.pos, rect, function (r) {
-        return _this3.render(r.normalize());
+    value: function animate(rect, frames, efunc) {
+      var t = this;
+      efunc = efunc || t.options.animateEasingFunction || 'swing';
+      frames = frames || t.options.animateFrames || 30;
+      return (0, _animate2.default)(t.el, t.pos, rect, function (r) {
+        return t.render(r.normalize());
       }, frames, efunc);
     }
   }, {
     key: 'createMover',
     value: function createMover() {
-      var _this4 = this;
+      var _this3 = this;
 
       var pe = this.el.parentElement;
       var w, h;
@@ -269,14 +285,14 @@ var Cropper = function (_DomObj) {
         w = _ref[0];
         h = _ref[1];
 
-        stick = _rect2.default.from(_this4.el);
-        _this4.el.focus();
-        _this4.emit('crop.activate');
+        stick = _rect2.default.from(_this3.el);
+        _this3.el.focus();
+        _this3.emit('crop.activate');
         return true;
       }, function (x, y) {
-        _this4.pos.x = stick.x + x;
-        _this4.pos.y = stick.y + y;
-        _this4.render(_this4.pos.rebound(w, h));
+        _this3.pos.x = stick.x + x;
+        _this3.pos.y = stick.y + y;
+        _this3.render(_this3.pos.rebound(w, h));
       }, function () {});
     }
   }, {
@@ -297,25 +313,23 @@ var Cropper = function (_DomObj) {
   }, {
     key: 'createHandles',
     value: function createHandles() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.options.handles.forEach(function (c) {
         var handle = _handle2.default.create('handle ' + c);
-        var pe = _this5.el.parentElement;
-        var _ref3 = [pe.offsetWidth, pe.offsetHeight],
-            w = _ref3[0],
-            h = _ref3[1];
-
-        handle.appendTo(_this5.el);
+        handle.appendTo(_this4.el);
 
         var stick;
         (0, _dragger2.default)(handle.el, function () {
-          stick = _sticker2.default.create(_rect2.default.from(_this5.el), w, h, c);
-          _this5.el.focus();
-          _this5.emit('crop.active');
+          var pe = _this4.el.parentElement;
+          var w = pe.offsetWidth;
+          var h = pe.offsetHeight;
+          stick = _sticker2.default.create(_rect2.default.from(_this4.el), w, h, c);
+          _this4.el.focus();
+          _this4.emit('crop.active');
           return true;
         }, function (x, y) {
-          return _this5.render(stick.move(x, y));
+          return _this4.render(stick.move(x, y));
         }, function () {});
       });
       return this;
@@ -375,6 +389,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = {
+  animateEasingFunction: 'swing',
+  animateFrames: 30,
   multi: true,
   maxCroppers: null,
   minCroppers: 1,
