@@ -1,4 +1,6 @@
 export default {
+  animateEasingFunction: 'swing',
+  animateFrames: 30,
   multi: true,
   maxCroppers: null,
   minCroppers: 1,
