@@ -7,7 +7,7 @@
     "build": "npx webpack --mode production build/js/jcrop.js --output dist/jcrop.js && npx webpack --mode development build/js/jcrop.js --output dist/jcrop.dev.js && npm run css",
     "start": "npx http-server",
     "dev": "npx webpack --mode development",
-    "watch": "npx webpack --watch --mode development",
+    "watch": "npx webpack --watch --mode development build/js/jcrop.js --output dist/jcrop.js",
     "prod": "npx webpack --mode production",
     "css": "npx node-sass --output-style=extended build/css/jcrop.scss dist/jcrop.dev.css && npx node-sass --output-style=compressed --source-map dist/jcrop.css.map build/css/jcrop.scss dist/jcrop.css",
     "test": "echo \"Error: no test specified\" && exit 1"
