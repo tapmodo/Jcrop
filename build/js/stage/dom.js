@@ -73,11 +73,6 @@ class Stage {
     this.el.addEventListener('crop.activate',(e) => {
       this.activate(e.cropTarget);
     },false);
-    this.el.addEventListener('crop.update',(e) => {
-      const targ = e.cropTarget;
-      if ((targ === this.active) && targ.options.shading)
-        this.shades.adjust(targ.pos);
-    },false);
     this.el.addEventListener('crop.attach',function(e){
       console.info('Cropper attached');
     });

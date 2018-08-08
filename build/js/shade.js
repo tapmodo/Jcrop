@@ -15,6 +15,11 @@ class Manager {
       key => this.shades[key] = Shade.create(options,key)
     );
 
+    this.el.addEventListener('crop.update',(e) => {
+      if (e.cropTarget.isActive() && e.cropTarget.options.shading)
+        this.adjust(e.cropTarget.pos);
+    },false);
+
     this.enable();
   }
   
