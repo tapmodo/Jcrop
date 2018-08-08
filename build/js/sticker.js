@@ -17,6 +17,26 @@ class Sticker {
     return Rect.fromCoordSet(this.locked, this.translateStuckPoint(x,y));
   }
 
+  // Determine "quadrant" of handle drag relative to locked point
+  // returns string tl = top left, br = bottom right, etc
+  getDragQuadrant(x,y) {
+    const relx = this.locked[0] - x;
+    const rely = this.locked[1] - y;
+    if ((relx < 0) && (rely < 0)) return 'br';
+    else if ((relx >= 0) && (rely >= 0)) return 'tl';
+    else if ((relx < 0) && (rely >= 0)) return 'tr';
+    else return 'bl';
+  }
+
+  // get the maximum aspect ratio rectangle for the current drag
+  getMaxRect(x,y,aspect) {
+    return Rect.getMax(
+      Math.abs(this.locked[0] - x),
+      Math.abs(this.locked[1] - y),
+      aspect
+    );
+  }
+
   translateStuckPoint(ox,oy) {
     const [xx,yy,sp] = this.stuck;
     var x = (xx === null)? sp: xx + ox;
