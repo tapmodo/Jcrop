@@ -104,10 +104,10 @@ class Cropper extends DomObj {
 
   render(r) {
     r = r || this.pos;
-    this.el.style.top = r.y + 'px';
-    this.el.style.left = r.x + 'px';
-    this.el.style.width = r.w + 'px';
-    this.el.style.height = r.h + 'px';
+    this.el.style.top = Math.round(r.y) + 'px';
+    this.el.style.left = Math.round(r.x) + 'px';
+    this.el.style.width = Math.round(r.w) + 'px';
+    this.el.style.height = Math.round(r.h) + 'px';
     this.pos = r;
     this.emit('crop.update');
     return this;
