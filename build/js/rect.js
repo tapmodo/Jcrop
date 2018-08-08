@@ -93,12 +93,12 @@ Rect.from = function(el){
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
   return c;
-}
+};
 
-Rect.getMax(w,h,aspect) {
-  if ((w/h) > asepct) return [ h*aspect, h ];
+Rect.getMax = function(w,h,aspect) {
+  if ((w/h) > aspect) return [ h*aspect, h ];
     else return [ w, w/aspect ];
-}
+};
 
 export default Rect;
 
