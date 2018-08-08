@@ -246,11 +246,6 @@ var Cropper = function (_DomObj) {
       return this;
     }
   }, {
-    key: 'isActive',
-    value: function isActive() {
-      return this.stage.active && this.stage.active === this;
-    }
-  }, {
     key: 'attachToStage',
     value: function attachToStage(stage) {
       this.stage = stage;
@@ -349,10 +344,10 @@ var Cropper = function (_DomObj) {
     key: 'render',
     value: function render(r) {
       r = r || this.pos;
-      this.el.style.top = r.y + 'px';
-      this.el.style.left = r.x + 'px';
-      this.el.style.width = r.w + 'px';
-      this.el.style.height = r.h + 'px';
+      this.el.style.top = Math.round(r.y) + 'px';
+      this.el.style.left = Math.round(r.x) + 'px';
+      this.el.style.width = Math.round(r.w) + 'px';
+      this.el.style.height = Math.round(r.h) + 'px';
       this.pos = r;
       this.emit('crop.update');
       return this;
@@ -1430,6 +1425,18 @@ var Stage = function () {
       cropper.init();
       this.activate(cropper);
       return this;
+    }
+  }, {
+    key: 'newCropper',
+    value: function newCropper(rect) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      options = (0, _extend2.default)({}, options, this.options);
+      var crop = _cropper2.default.create();
+      crop.render(rect);
+      this.addCropper(crop);
+      crop.el.focus();
+      return crop;
     }
   }, {
     key: 'removeCropper',
