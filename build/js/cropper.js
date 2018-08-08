@@ -24,10 +24,6 @@ class Cropper extends DomObj {
     return this;
   }
 
-  isActive() {
-    return this.stage.active && (this.stage.active === this);
-  }
-
   attachToStage(stage) {
     this.stage = stage;
     this.emit('crop.attach');
