@@ -246,6 +246,11 @@ var Cropper = function (_DomObj) {
       return this;
     }
   }, {
+    key: 'isActive',
+    value: function isActive() {
+      return this.stage.active && this.stage.active === this;
+    }
+  }, {
     key: 'attachToStage',
     value: function attachToStage(stage) {
       this.stage = stage;
@@ -325,6 +330,7 @@ var Cropper = function (_DomObj) {
           var w = pe.offsetWidth;
           var h = pe.offsetHeight;
           stick = _sticker2.default.create(_rect2.default.from(_this4.el), w, h, c);
+          if (_this4.aspect) stick.aspect = _this4.aspect;
           _this4.el.focus();
           _this4.emit('crop.active');
           return true;
@@ -510,13 +516,15 @@ var Dragger = function Dragger(el, startcb, movecb, donecb) {
   el.addEventListener('touchstart', start);
 
   function start(e) {
-    ox = e.pageX;
-    oy = e.pageY;
+    var obj = e.type == 'touchstart' ? e.touches[0] : e;
+
+    ox = obj.pageX;
+    oy = obj.pageY;
 
     e.preventDefault();
     e.stopPropagation();
 
-    if (!startcb(ox, oy, e)) return;
+    if (!startcb(ox, oy, obj)) return;
 
     if (e.type == 'mousedown') {
       window.addEventListener('mousemove', move);
@@ -528,14 +536,15 @@ var Dragger = function Dragger(el, startcb, movecb, donecb) {
   }
 
   function move(e) {
-    e.preventDefault();
+    var obj = e.type == 'touchmove' ? e.changedTouches[0] : e;
     e.stopPropagation();
-
-    movecb(e.pageX - ox, e.pageY - oy);
+    movecb(obj.pageX - ox, obj.pageY - oy);
   }
 
   function done(e) {
-    if (e.pageX && e.pageY) movecb(e.pageX - ox, e.pageY - oy);
+    var obj = e.type == 'touchend' ? e.changedTouches[0] : e;
+
+    if (obj.pageX && obj.pageY) movecb(obj.pageX - ox, obj.pageY - oy);
 
     document.removeEventListener('mouseup', done);
     window.removeEventListener('mousemove', move);
@@ -979,7 +988,7 @@ var Rect = function () {
   }
 
   _createClass(Rect, [{
-    key: "normalize",
+    key: 'normalize',
     value: function normalize() {
       var _ref = [Math.min(this.x, this.x2), Math.min(this.y, this.y2), Math.max(this.x, this.x2), Math.max(this.y, this.y2)],
           x1 = _ref[0],
@@ -990,7 +999,7 @@ var Rect = function () {
       return Rect.create(x1, y1, x2 - x1, y2 - y1);
     }
   }, {
-    key: "rebound",
+    key: 'rebound',
     value: function rebound(w, h) {
       var rect = this.normalize();
       if (rect.x < 0) rect.x = 0;
@@ -1000,19 +1009,19 @@ var Rect = function () {
       return rect;
     }
   }, {
-    key: "x1",
+    key: 'x1',
     set: function set(v) {
       this.w = this.x2 - v;
       this.x = v;
     }
   }, {
-    key: "y1",
+    key: 'y1',
     set: function set(v) {
       this.h = this.y2 - v;
       this.y = v;
     }
   }, {
-    key: "x2",
+    key: 'x2',
     get: function get() {
       return this.x + this.w;
     },
@@ -1020,12 +1029,17 @@ var Rect = function () {
       this.w = x - this.x;
     }
   }, {
-    key: "y2",
+    key: 'y2',
     get: function get() {
       return this.y + this.h;
     },
     set: function set(y) {
       this.h = y - this.y;
+    }
+  }, {
+    key: 'aspect',
+    get: function get() {
+      return this.w / this.h;
     }
   }]);
 
@@ -1062,6 +1076,37 @@ Rect.from = function (el) {
   c.y = el.offsetTop;
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
+  return c;
+};
+
+Rect.getMax = function (w, h, aspect) {
+  if (w / h > aspect) return [h * aspect, h];else return [w, w / aspect];
+};
+
+Rect.fromPoint = function (point, w, h) {
+  var quad = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 'br';
+
+  var c = new Rect();
+  c.x = point[0];
+  c.y = point[1];
+  switch (quad) {
+    case 'br':
+      c.x2 = c.x + w;
+      c.y2 = c.y + h;
+      break;
+    case 'bl':
+      c.x2 = c.x - w;
+      c.y2 = c.y + h;
+      break;
+    case 'tl':
+      c.x2 = c.x - w;
+      c.y2 = c.y - h;
+      break;
+    case 'tr':
+      c.x2 = c.x + w;
+      c.y2 = c.y - h;
+      break;
+  }
   return c;
 };
 
@@ -1122,6 +1167,10 @@ var Manager = function () {
       ['t', 'l', 'r', 'b'].forEach(function (key) {
         return _this.shades[key] = Shade.create(options, key);
       });
+
+      this.el.addEventListener('crop.update', function (e) {
+        if (e.cropTarget.isActive() && e.cropTarget.options.shading) _this.adjust(e.cropTarget.pos);
+      }, false);
 
       this.enable();
     }
@@ -1338,10 +1387,6 @@ var Stage = function () {
       this.el.addEventListener('crop.activate', function (e) {
         _this2.activate(e.cropTarget);
       }, false);
-      this.el.addEventListener('crop.update', function (e) {
-        var targ = e.cropTarget;
-        if (targ === _this2.active && targ.options.shading) _this2.shades.adjust(targ.pos);
-      }, false);
       this.el.addEventListener('crop.attach', function (e) {
         console.info('Cropper attached');
       });
@@ -1518,6 +1563,29 @@ var Sticker = function () {
     value: function move(x, y) {
       return _rect2.default.fromCoordSet(this.locked, this.translateStuckPoint(x, y));
     }
+
+    // Determine "quadrant" of handle drag relative to locked point
+    // returns string tl = top left, br = bottom right, etc
+
+  }, {
+    key: 'getDragQuadrant',
+    value: function getDragQuadrant(x, y) {
+      var relx = this.locked[0] - x;
+      var rely = this.locked[1] - y;
+      if (relx < 0 && rely < 0) return 'br';else if (relx >= 0 && rely >= 0) return 'tl';else if (relx < 0 && rely >= 0) return 'tr';else return 'bl';
+    }
+
+    // get the maximum aspect ratio rectangle for the current drag
+
+  }, {
+    key: 'getMaxRect',
+    value: function getMaxRect(x, y, aspect) {
+      return _rect2.default.getMax(Math.abs(this.locked[0] - x), Math.abs(this.locked[1] - y), aspect);
+    }
+
+    // given the offset of the drag versus the stuck point,
+    // determine the real dragging coordinates
+
   }, {
     key: 'translateStuckPoint',
     value: function translateStuckPoint(ox, oy) {
@@ -1528,10 +1596,23 @@ var Sticker = function () {
 
       var x = xx === null ? sp : xx + ox;
       var y = yy === null ? sp : yy + oy;
+
       if (x > this.sw) x = this.sw;
       if (y > this.sh) y = this.sh;
       if (x < 0) x = 0;
       if (y < 0) y = 0;
+
+      if (this.aspect) {
+        var _getMaxRect = this.getMaxRect(x, y, this.aspect),
+            _getMaxRect2 = _slicedToArray(_getMaxRect, 2),
+            w = _getMaxRect2[0],
+            h = _getMaxRect2[1];
+
+        var quad = this.getDragQuadrant(x, y);
+        var res = _rect2.default.fromPoint(this.locked, w, h, quad);
+        return [res.x2, res.y2];
+      }
+
       return [x, y];
     }
   }, {
