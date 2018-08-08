@@ -114,6 +114,15 @@ class Stage {
     return this;
   }
 
+  newCropper(rect,options={}) {
+    options = extend({},options,this.options);
+    const crop = Cropper.create();
+    crop.render(rect);
+    this.addCropper(crop);
+    crop.el.focus();
+    return crop;
+  }
+
   removeCropper(cropper) {
     if (!this.canRemove()) return false;
     cropper.el.remove();
