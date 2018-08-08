@@ -37,6 +37,8 @@ class Sticker {
     );
   }
 
+  // given the offset of the drag versus the stuck point,
+  // determine the real dragging coordinates
   translateStuckPoint(ox,oy) {
     const [xx,yy,sp] = this.stuck;
     var x = (xx === null)? sp: xx + ox;
