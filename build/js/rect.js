@@ -95,5 +95,10 @@ Rect.from = function(el){
   return c;
 }
 
+Rect.getMax(w,h,aspect) {
+  if ((w/h) > asepct) return [ h*aspect, h ];
+    else return [ w, w/aspect ];
+}
+
 export default Rect;
 
