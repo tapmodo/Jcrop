@@ -100,5 +100,30 @@ Rect.getMax = function(w,h,aspect) {
     else return [ w, w/aspect ];
 };
 
+Rect.fromPoint = function(point,w,h,quad='br'){
+  const c = new Rect;
+  c.x = point[0];
+  c.y = point[1];
+  switch(quad){
+    case 'br':
+      c.x2 = c.x + w;
+      c.y2 = c.y + h;
+      break;
+    case 'bl':
+      c.x2 = c.x - w;
+      c.y2 = c.y + h;
+      break;
+    case 'tl':
+      c.x2 = c.x - w;
+      c.y2 = c.y - h;
+      break;
+    case 'tr':
+      c.x2 = c.x + w;
+      c.y2 = c.y - h;
+      break;
+  }
+  return c;
+};
+
 export default Rect;
 
