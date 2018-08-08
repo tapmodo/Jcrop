@@ -90,6 +90,7 @@ class Cropper extends DomObj {
           const w = pe.offsetWidth;
           const h = pe.offsetHeight;
           stick = Sticker.create(Rect.from(this.el), w, h, c);
+          if (this.aspect) stick.aspect = this.aspect;
           this.el.focus();
           this.emit('crop.active');
           return true;
