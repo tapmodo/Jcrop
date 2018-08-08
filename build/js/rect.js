@@ -39,6 +39,10 @@ class Rect {
     return this.y + this.h;
   }
 
+  get aspect() {
+    return this.w/this.h;
+  }
+
   set y2(y) {
     this.h = y - this.y;
   }
