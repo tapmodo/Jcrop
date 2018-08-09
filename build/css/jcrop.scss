@@ -54,6 +54,9 @@ $handleBackground: rgba(255,255,255,0.8);
 
 .imagestage img {
   position: absolute;
+  width: 100%;
+  height: auto;
+  z-index: -1;
 }
 
 .jcrop-hide-inactive .cropper .handle {

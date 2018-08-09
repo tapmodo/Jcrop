@@ -85,7 +85,10 @@
   width: 100%; }
 
 .imagestage img {
-  position: absolute; }
+  position: absolute;
+  width: 100%;
+  height: auto;
+  z-index: -1; }
 
 .jcrop-hide-inactive .cropper .handle {
   display: none; }
