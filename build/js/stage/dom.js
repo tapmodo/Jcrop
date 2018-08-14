@@ -1,14 +1,13 @@
 import extend from '../util/extend';
-import Defaults from '../defaults';
 import Cropper from '../cropper';
 import Shade from '../shade';
 import Dragger from '../dragger';
+import ConfObj from '../confobj';
 
-class Stage {
+class Stage extends ConfObj {
+
   constructor(el,options) {
-    if (typeof el == 'string') el = document.getElementById(el);
-    this.options = extend({},Defaults,options);
-    this.el = el;
+    super(el,options);
     this.crops = new Set;
     this.active = null;
     this.init();
@@ -18,17 +17,13 @@ class Stage {
     this.initListeners();
     this.initStageDrag();
     Shade.Manager.attach(this);
-    console.info('Jcrop initialized stage');
   }
 
   canCreate() {
     const n = this.crops.size;
     const o = this.options;
     if ((o.maxCroppers!==null) && (n >= o.maxCroppers)) return false;
-    if (!o.multi && (n >= o.minCroppers)) {
-      console.info('huh');
-      return false;
-    }
+    if (!o.multi && (n >= o.minCroppers)) return false;
     return true;
   }
 
@@ -45,7 +40,7 @@ class Stage {
     Dragger(this.el,
       (x,y,e) => {
         if (!this.canCreate()) return false;
-        crop = Cropper.create();
+        crop = Cropper.create(this.options);
         pos = crop.pos;
         pos.x = e.pageX - this.el.offsetParent.offsetLeft - this.el.offsetLeft;
         pos.y = e.pageY - this.el.offsetParent.offsetTop - this.el.offsetTop;
@@ -132,6 +127,14 @@ class Stage {
 
   refresh() {
     this.options.shading && this.active && this.shades.adjust(this.active.pos);
+  }
+
+  setOptions(options={}){
+    super.setOptions(options);
+
+    if (this.crops)
+      Array.from(this.crops)
+        .forEach(i => i.setOptions(options));
   }
 }
 

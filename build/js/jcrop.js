@@ -21,4 +21,3 @@ export function attach(el,options={}) {
 }
 
 export { Stage, defaults, Dragger, Cropper, Rect, Handle, Sticker, Easing };
-

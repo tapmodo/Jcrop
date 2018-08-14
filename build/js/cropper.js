@@ -4,16 +4,16 @@ import Defaults from './defaults';
 import Dragger from './dragger';
 import Rect from './rect';
 import Sticker from './sticker';
-import DomObj from './domobj';
+import ConfObj from './confobj';
 import Keyboard from './keyboard';
 import Animate from './animate';
 
-class Cropper extends DomObj {
+class Cropper extends ConfObj {
 
   constructor(el,options={}) {
-    super(el);
-    this.options = extend({},Cropper.defaults,options);
+    super(el,options);
     this.pos = Rect.from(this.el);
+    this.init();
   }
 
   init() {
@@ -44,13 +44,13 @@ class Cropper extends DomObj {
   }
 
   createMover() {
-    const pe = this.el.parentElement;
     var w,h;
     this.pos = Rect.from(this.el);
     var stick;
     Dragger(
       this.el,
       () => {
+        const pe = this.el.parentElement;
         [w,h] = [ pe.offsetWidth, pe.offsetHeight ];
         stick = Rect.from(this.el);
         this.el.focus();

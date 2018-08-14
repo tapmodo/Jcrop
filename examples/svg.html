@@ -36,7 +36,7 @@
 
       var img = document.getElementById('img');
 
-      const crop = jcp.newCropper(Jcrop.Rect.fromCoordSet([100,100],[300,300]));
+      const crop = jcp.newCropper(Jcrop.Rect.fromCoords([100,100],[300,300]));
       crop.el.appendChild(img);
       crop.aspect = 1;
       crop.options.canRemove = false;

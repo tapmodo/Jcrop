@@ -10,7 +10,6 @@ class ImageStage extends Stage {
     this.srcEl = el;
     el.onload = this.resizeToImage.bind(this);
     this.resizeToImage();
-    console.log('image stage!');
   }
 
   resizeToImage() {

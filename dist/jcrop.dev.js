@@ -161,6 +161,72 @@ exports.default = Animate;
 
 /***/ }),
 
+/***/ "./build/js/confobj.js":
+/*!*****************************!*\
+  !*** ./build/js/confobj.js ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+
+var _domobj2 = _interopRequireDefault(_domobj);
+
+var _defaults = __webpack_require__(/*! ./defaults */ "./build/js/defaults.js");
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ConfObj = function (_DomObj) {
+  _inherits(ConfObj, _DomObj);
+
+  function ConfObj(el) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, ConfObj);
+
+    var _this = _possibleConstructorReturn(this, (ConfObj.__proto__ || Object.getPrototypeOf(ConfObj)).call(this, el));
+
+    _this.options = {};
+    _this.setOptions((0, _extend2.default)({}, _defaults2.default, options));
+    return _this;
+  }
+
+  _createClass(ConfObj, [{
+    key: 'setOptions',
+    value: function setOptions(options) {
+      this.options = (0, _extend2.default)({}, this.options, options);
+      return this;
+    }
+  }]);
+
+  return ConfObj;
+}(_domobj2.default);
+
+exports.default = ConfObj;
+
+/***/ }),
+
 /***/ "./build/js/cropper.js":
 /*!*****************************!*\
   !*** ./build/js/cropper.js ***!
@@ -201,9 +267,9 @@ var _sticker = __webpack_require__(/*! ./sticker */ "./build/js/sticker.js");
 
 var _sticker2 = _interopRequireDefault(_sticker);
 
-var _domobj = __webpack_require__(/*! ./domobj */ "./build/js/domobj.js");
+var _confobj = __webpack_require__(/*! ./confobj */ "./build/js/confobj.js");
 
-var _domobj2 = _interopRequireDefault(_domobj);
+var _confobj2 = _interopRequireDefault(_confobj);
 
 var _keyboard = __webpack_require__(/*! ./keyboard */ "./build/js/keyboard.js");
 
@@ -221,18 +287,18 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var Cropper = function (_DomObj) {
-  _inherits(Cropper, _DomObj);
+var Cropper = function (_ConfObj) {
+  _inherits(Cropper, _ConfObj);
 
   function Cropper(el) {
     var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
     _classCallCheck(this, Cropper);
 
-    var _this = _possibleConstructorReturn(this, (Cropper.__proto__ || Object.getPrototypeOf(Cropper)).call(this, el));
+    var _this = _possibleConstructorReturn(this, (Cropper.__proto__ || Object.getPrototypeOf(Cropper)).call(this, el, options));
 
-    _this.options = (0, _extend2.default)({}, Cropper.defaults, options);
     _this.pos = _rect2.default.from(_this.el);
+    _this.init();
     return _this;
   }
 
@@ -276,11 +342,11 @@ var Cropper = function (_DomObj) {
     value: function createMover() {
       var _this3 = this;
 
-      var pe = this.el.parentElement;
       var w, h;
       this.pos = _rect2.default.from(this.el);
       var stick;
       (0, _dragger2.default)(this.el, function () {
+        var pe = _this3.el.parentElement;
         var _ref = [pe.offsetWidth, pe.offsetHeight];
         w = _ref[0];
         h = _ref[1];
@@ -360,7 +426,7 @@ var Cropper = function (_DomObj) {
   }]);
 
   return Cropper;
-}(_domobj2.default);
+}(_confobj2.default);
 
 Cropper.create = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -1041,7 +1107,7 @@ var Rect = function () {
   return Rect;
 }();
 
-Rect.fromCoordSet = function (p1, p2) {
+Rect.fromCoords = function (p1, p2) {
   var _ref2 = [Math.min(p1[0], p2[0]), Math.min(p1[1], p2[1]), Math.max(p1[0], p2[0]), Math.max(p1[1], p2[1])],
       x1 = _ref2[0],
       y1 = _ref2[1],
@@ -1281,13 +1347,11 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
 var _extend = __webpack_require__(/*! ../util/extend */ "./build/js/util/extend.js");
 
 var _extend2 = _interopRequireDefault(_extend);
-
-var _defaults = __webpack_require__(/*! ../defaults */ "./build/js/defaults.js");
-
-var _defaults2 = _interopRequireDefault(_defaults);
 
 var _cropper = __webpack_require__(/*! ../cropper */ "./build/js/cropper.js");
 
@@ -1301,20 +1365,30 @@ var _dragger = __webpack_require__(/*! ../dragger */ "./build/js/dragger.js");
 
 var _dragger2 = _interopRequireDefault(_dragger);
 
+var _confobj = __webpack_require__(/*! ../confobj */ "./build/js/confobj.js");
+
+var _confobj2 = _interopRequireDefault(_confobj);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Stage = function () {
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Stage = function (_ConfObj) {
+  _inherits(Stage, _ConfObj);
+
   function Stage(el, options) {
     _classCallCheck(this, Stage);
 
-    if (typeof el == 'string') el = document.getElementById(el);
-    this.options = (0, _extend2.default)({}, _defaults2.default, options);
-    this.el = el;
-    this.crops = new Set();
-    this.active = null;
-    this.init();
+    var _this = _possibleConstructorReturn(this, (Stage.__proto__ || Object.getPrototypeOf(Stage)).call(this, el, options));
+
+    _this.crops = new Set();
+    _this.active = null;
+    _this.init();
+    return _this;
   }
 
   _createClass(Stage, [{
@@ -1323,7 +1397,6 @@ var Stage = function () {
       this.initListeners();
       this.initStageDrag();
       _shade2.default.Manager.attach(this);
-      console.info('Jcrop initialized stage');
     }
   }, {
     key: 'canCreate',
@@ -1331,10 +1404,7 @@ var Stage = function () {
       var n = this.crops.size;
       var o = this.options;
       if (o.maxCroppers !== null && n >= o.maxCroppers) return false;
-      if (!o.multi && n >= o.minCroppers) {
-        console.info('huh');
-        return false;
-      }
+      if (!o.multi && n >= o.minCroppers) return false;
       return true;
     }
   }, {
@@ -1349,19 +1419,19 @@ var Stage = function () {
   }, {
     key: 'initStageDrag',
     value: function initStageDrag() {
-      var _this = this;
+      var _this2 = this;
 
       var crop, pos, w, h;
       (0, _dragger2.default)(this.el, function (x, y, e) {
-        if (!_this.canCreate()) return false;
-        crop = _cropper2.default.create();
+        if (!_this2.canCreate()) return false;
+        crop = _cropper2.default.create(_this2.options);
         pos = crop.pos;
-        pos.x = e.pageX - _this.el.offsetParent.offsetLeft - _this.el.offsetLeft;
-        pos.y = e.pageY - _this.el.offsetParent.offsetTop - _this.el.offsetTop;
-        w = _this.el.offsetWidth;
-        h = _this.el.offsetHeight;
+        pos.x = e.pageX - _this2.el.offsetParent.offsetLeft - _this2.el.offsetLeft;
+        pos.y = e.pageY - _this2.el.offsetParent.offsetTop - _this2.el.offsetTop;
+        w = _this2.el.offsetWidth;
+        h = _this2.el.offsetHeight;
         crop.render(pos);
-        _this.addCropper(crop);
+        _this2.addCropper(crop);
         crop.el.focus();
         return true;
       }, function (x, y) {
@@ -1377,27 +1447,27 @@ var Stage = function () {
   }, {
     key: 'initListeners',
     value: function initListeners() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.el.addEventListener('crop.activate', function (e) {
-        _this2.activate(e.cropTarget);
+        _this3.activate(e.cropTarget);
       }, false);
       this.el.addEventListener('crop.attach', function (e) {
         console.info('Cropper attached');
       });
       this.el.addEventListener('crop.remove', function (e) {
-        _this2.removeCropper(e.cropTarget);
+        _this3.removeCropper(e.cropTarget);
       });
     }
   }, {
     key: 'reorderCroppers',
     value: function reorderCroppers() {
-      var _this3 = this;
+      var _this4 = this;
 
       var z = 1000;
       this.crops.forEach(function (crop) {
         crop.el.style.zIndex = z++;
-        if (_this3.active === crop) crop.addClass('active');else crop.removeClass('active');
+        if (_this4.active === crop) crop.addClass('active');else crop.removeClass('active');
       });
       this.refresh();
     }
@@ -1451,10 +1521,21 @@ var Stage = function () {
     value: function refresh() {
       this.options.shading && this.active && this.shades.adjust(this.active.pos);
     }
+  }, {
+    key: 'setOptions',
+    value: function setOptions() {
+      var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      _get(Stage.prototype.__proto__ || Object.getPrototypeOf(Stage.prototype), 'setOptions', this).call(this, options);
+
+      if (this.crops) Array.from(this.crops).forEach(function (i) {
+        return i.setOptions(options);
+      });
+    }
   }]);
 
   return Stage;
-}();
+}(_confobj2.default);
 
 exports.default = Stage;
 
@@ -1505,7 +1586,6 @@ var ImageStage = function (_Stage) {
     _this.srcEl = el;
     el.onload = _this.resizeToImage.bind(_this);
     _this.resizeToImage();
-    console.log('image stage!');
     return _this;
   }
 
@@ -1568,7 +1648,7 @@ var Sticker = function () {
   _createClass(Sticker, [{
     key: 'move',
     value: function move(x, y) {
-      return _rect2.default.fromCoordSet(this.locked, this.translateStuckPoint(x, y));
+      return _rect2.default.fromCoords(this.locked, this.translateStuckPoint(x, y));
     }
 
     // Determine "quadrant" of handle drag relative to locked point

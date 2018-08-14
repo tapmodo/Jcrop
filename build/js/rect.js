@@ -67,7 +67,7 @@ class Rect {
   }
 }
 
-Rect.fromCoordSet = function(p1,p2){
+Rect.fromCoords = function(p1,p2){
   const [x1,y1,x2,y2] = [
     Math.min(p1[0],p2[0]),
     Math.min(p1[1],p2[1]),
