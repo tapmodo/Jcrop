@@ -95,6 +95,13 @@ Rect.from = function(el){
   return c;
 };
 
+Rect.sizeOf = function(el){
+  const c = Rect.from(el);
+  c.x = 0;
+  c.y = 0;
+  return c;
+};
+
 Rect.getMax = function(w,h,aspect) {
   if ((w/h) > aspect) return [ h*aspect, h ];
     else return [ w, w/aspect ];
