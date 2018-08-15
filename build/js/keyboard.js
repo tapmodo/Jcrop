@@ -21,7 +21,6 @@ class Keyboard {
 
         default: return;
       }
-      e.stopPropagation();
       e.preventDefault();
     });
   }
