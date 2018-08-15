@@ -54,11 +54,14 @@ class Manager {
 
 }
 
-Manager.attach = function(instance){
-  const el = instance.el;
+Manager.attach = function(i){
+  const el = i.el;
   const m = new Manager(el);
-  m.init(instance.options);
-  instance.shades = m;
+  m.init(i.options);
+  i.shades = m;
+  i._optconf['shading'] = v => i.updateShades();
+  i._optconf['shadeColor'] = v => m.setStyle(v);
+  i._optconf['shadeOpacity'] = v => m.setStyle(null,v);
   return m;
 };
 
