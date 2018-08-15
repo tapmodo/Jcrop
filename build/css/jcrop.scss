@@ -6,12 +6,17 @@ $handleBackground: rgba(255,255,255,0.8);
 @import 'handles-mixin';
 
 .cropper .handle {
+  display: none;
   @include jcrop-handles(
     $handleSize,
     $handleOffset,
     $handleBorder,
     $handleBackground
   );
+}
+
+.cropper.active .handle {
+  display: block;
 }
 
 .cropper {
@@ -59,10 +64,7 @@ $handleBackground: rgba(255,255,255,0.8);
   z-index: -1;
 }
 
-.jcrop-hide-inactive .cropper .handle {
-  display: none;
-}
-
-.jcrop-hide-inactive .cropper.active .handle {
+.jcrop-ux-inactive-handles .cropper .handle {
   display: block;
 }
+
