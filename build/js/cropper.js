@@ -24,6 +24,17 @@ class Cropper extends ConfObj {
     return this;
   }
 
+  initOptions(){
+    this._optconf['aspectRatio'] = ar => {
+      const p = this.pos;
+      this.aspect = ar || null;
+      if (this.aspect && p) {
+        var [w,h] = Rect.getMax(p.w,p.h,ar);
+        this.render(Rect.fromPoint([p.x,p.y],w,h));
+      }
+    };
+  }
+
   attachToStage(stage) {
     this.stage = stage;
     this.emit('crop.attach');
