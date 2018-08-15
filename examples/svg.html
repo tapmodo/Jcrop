@@ -32,14 +32,17 @@
 
     <script src="../dist/jcrop.js"></script>
     <script>
-      const jcp = Jcrop.attach('target');
+      const jcp = Jcrop.attach('target',{multi:false});
 
-      var img = document.getElementById('img');
+      const rect = Jcrop.Rect.fromCoords([100,100],[300,300]);
 
-      const crop = jcp.newCropper(Jcrop.Rect.fromCoords([100,100],[300,300]));
+      const crop = jcp.newCropper(rect,{
+        aspectRatio: rect.aspect,
+        canRemove: false
+      });
+
+      const img = document.getElementById('img');
       crop.el.appendChild(img);
-      crop.aspect = 1;
-      crop.options.canRemove = false;
 
       function setImage(tag){
         console.log('set image ',tag);
