@@ -32,6 +32,11 @@ class DomObj {
     if (!this.hasClass(cl)) this.el.className += ' ' + cl;
   }
 
+  listen(evname,handler) {
+    this.el.addEventListener(evname,handler);
+    return this;
+  }
+
 }
 
 export default DomObj;

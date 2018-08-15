@@ -65,15 +65,9 @@ class Stage extends ConfObj {
   }
 
   initListeners() {
-    this.el.addEventListener('crop.activate',(e) => {
-      this.activate(e.cropTarget);
-    },false);
-    this.el.addEventListener('crop.attach',function(e){
-      console.info('Cropper attached');
-    });
-    this.el.addEventListener('crop.remove',(e) => {
-      this.removeCropper(e.cropTarget);
-    });
+    this.listen('crop.activate',e => this.activate(e.cropTarget),false);
+    this.listen('crop.attach',e => console.info('Cropper attached'));
+    this.listen('crop.remove',e => this.removeCropper(e.cropTarget));
   }
 
   reorderCroppers() {
