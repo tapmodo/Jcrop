@@ -6,7 +6,7 @@ class Keyboard {
 
   attach() {
     const c = this.cropper;
-    c.el.addEventListener('keyup',(e) => {
+    c.el.addEventListener('keydown',(e) => {
       const d = e.shiftKey ? 10: 1;
       switch(e.key) {
         case 'ArrowRight': c.nudge(d); break;
@@ -16,10 +16,13 @@ class Keyboard {
 
         case 'Delete':
         case 'Backspace':
-          e.preventDefault();
           c.emit('crop.remove');
           break;
+
+        default: return;
       }
+      e.stopPropagation();
+      e.preventDefault();
     });
   }
 }

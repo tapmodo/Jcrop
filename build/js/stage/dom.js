@@ -3,6 +3,7 @@ import Cropper from '../cropper';
 import Shade from '../shade';
 import Dragger from '../dragger';
 import ConfObj from '../confobj';
+import Sticker from '../sticker';
 
 class Stage extends ConfObj {
 
@@ -55,7 +56,7 @@ class Stage extends ConfObj {
   }
 
   initStageDrag() {
-    var crop, pos, w, h;
+    var crop, pos, w, h, stick;
     Dragger(this.el,
       (x,y,e) => {
         if (!this.canCreate()) return false;
@@ -65,19 +66,15 @@ class Stage extends ConfObj {
         pos.y = e.pageY - this.el.offsetParent.offsetTop - this.el.offsetTop;
         w = this.el.offsetWidth;
         h = this.el.offsetHeight;
-        crop.render(pos);
         this.addCropper(crop);
-        crop.el.focus();
+        stick = Sticker.create(pos,w,h,'se');
+        if (this.options.aspectRatio) stick.aspect = this.options.aspectRatio;
+        crop.render(pos);
+        this.focus();
         return true;
       },
       (x,y) => {
-        pos.x2 = pos.x + x;
-        pos.y2 = pos.y + y;
-        if (pos.x2 < 0) pos.x2 = 0;
-        if (pos.y2 < 0) pos.y2 = 0;
-        if (pos.x2 > w) pos.x2 = w;
-        if (pos.y2 > h) pos.y2 = h;
-        crop.render(pos.normalize());
+        crop.render(stick.move(x,y))
       },
       () => { }
     );
