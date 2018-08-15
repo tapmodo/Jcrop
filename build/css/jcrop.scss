@@ -45,6 +45,7 @@ $handleBackground: rgba(255,255,255,0.8);
 
 .shade {
   background: rgba(0,0,0,0.5);
+  transition: opacity 0.5s, background-color 0.5s;
   position: absolute;
   &.l { top: 0px; left: 0px; height: 100%; }
   &.r { top: 0px; right: 0px; height: 100%; }
