@@ -19,6 +19,13 @@ class Stage extends ConfObj {
     Shade.Manager.attach(this);
   }
 
+  initOptions(){
+    this._optconf['multi'] = v => { if (!v) this.limitWidgets() };
+    this._optconf['shading'] = v => this.updateShades();
+    this._optconf['shadeColor'] = v => this.shades.setStyle(v);
+    this._optconf['shadeOpacity'] = v => this.shades.setStyle(null,v);
+  }
+
   limitWidgets(n=1) {
     if (!this.crops || (n<1)) return false;
     const crops = Array.from(this.crops);
@@ -75,9 +82,9 @@ class Stage extends ConfObj {
   }
 
   initListeners() {
-    this.listen('crop.activate',e => this.activate(e.cropTarget),false);
-    this.listen('crop.attach',e => console.info('Cropper attached'));
-    this.listen('crop.remove',e => this.removeCropper(e.cropTarget));
+    this.listen('crop.activate',c => this.activate(c),false);
+    this.listen('crop.attach',c => console.info('Cropper attached'));
+    this.listen('crop.remove',c => this.removeCropper(c));
   }
 
   reorderCroppers() {
@@ -93,7 +100,6 @@ class Stage extends ConfObj {
   activate(cropper) {
     cropper = cropper || Array.from(this.crops).pop();
     if (cropper) {
-      this.shades.enable();
       this.active = cropper;
       this.crops.delete(cropper);
       this.crops.add(cropper);
@@ -115,7 +121,7 @@ class Stage extends ConfObj {
 
   newCropper(rect,options={}) {
     options = extend({},options,this.options);
-    const crop = Cropper.create();
+    const crop = Cropper.create(options);
     crop.render(rect);
     this.addCropper(crop);
     crop.el.focus();
@@ -130,7 +136,20 @@ class Stage extends ConfObj {
   }
 
   refresh() {
-    this.options.shading && this.active && this.shades.adjust(this.active.pos);
+    this.options.shading && this.active &&
+      this.shades.adjust(this.active.pos);
+  }
+
+  updateShades() {
+    if (!this.shades) return;
+
+    if (this.options.shading) this.shades.enable();
+      else this.shades.disable();
+
+    this.options.shading && this.active &&
+      this.shades.adjust(this.active.pos);
+
+    return this;
   }
 
   setOptions(options={}){
