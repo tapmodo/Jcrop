@@ -33,7 +33,7 @@ class DomObj {
   }
 
   listen(evname,handler) {
-    this.el.addEventListener(evname,handler);
+    this.el.addEventListener(evname,e => handler(e.cropTarget,e));
     return this;
   }
 
