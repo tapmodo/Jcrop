@@ -22,8 +22,8 @@ class Stage extends ConfObj {
   initOptions(){
     this._optconf['multi'] = v => { if (!v) this.limitWidgets() };
     this._optconf['shading'] = v => this.updateShades();
-    this._optconf['shadeColor'] = v => this.shades.setStyle(v);
-    this._optconf['shadeOpacity'] = v => this.shades.setStyle(null,v);
+    this._optconf['shadeColor'] = v => this.shades && this.shades.setStyle(v);
+    this._optconf['shadeOpacity'] = v => this.shades && this.shades.setStyle(null,v);
   }
 
   limitWidgets(n=1) {
