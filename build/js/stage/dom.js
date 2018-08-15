@@ -19,6 +19,16 @@ class Stage extends ConfObj {
     Shade.Manager.attach(this);
   }
 
+  limitWidgets(n=1) {
+    if (!this.crops || (n<1)) return false;
+    const crops = Array.from(this.crops);
+
+    while(crops.length > n)
+      this.removeCropper(crops.shift());
+
+    return this;
+  }
+
   canCreate() {
     const n = this.crops.size;
     const o = this.options;
