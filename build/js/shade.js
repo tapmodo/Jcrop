@@ -11,7 +11,7 @@ class Manager {
   init(options={}) {
     this.active = (options.shading!==undefined)? options.shading: true;
 
-    ['t','l','r','b'].forEach(
+    this.keys().forEach(
       key => this.shades[key] = Shade.create(options,key)
     );
 
@@ -33,41 +33,60 @@ class Manager {
     s.l.w = s.t.x = s.b.x = Math.floor(rect.x);
   }
 
+  keys(){
+    return [ 't', 'l', 'r', 'b' ];
+  }
+
   enable(){
     const s = this.shades;
-    ['t','l','r','b'].forEach(key => s[key].insert(this.el));
+    this.keys().forEach(key => s[key].insert(this.el));
   }
 
   disable(){
     const s = this.shades;
-    ['t','l','r','b'].forEach(key => s[key].remove());
+    this.keys().forEach(key => s[key].remove());
   }
+
+  setStyle(color,opacity){
+    const s = this.shades;
+    this.keys().forEach(key => s[key].color(color).opacity(opacity));
+  }
+
 }
 
-Manager.attach = function(cropper){
-  const el = cropper.el;
+Manager.attach = function(instance){
+  const el = instance.el;
   const m = new Manager(el);
-  m.init(cropper.options);
-  cropper.shades = m;
+  m.init(instance.options);
+  instance.shades = m;
   return m;
 };
 
 class Shade extends DomObj {
   insert(el){ el.appendChild(this.el); }
-  remove(){ this.el.parentElement.removeChild(this.el); }
+  remove(){ this.el.remove(); }
 
   set w(w) { this.el.style.width = w + 'px'; }
   set h(h) { this.el.style.height = h + 'px'; }
   set x(l) { this.el.style.left = l + 'px'; }
+
+  color(c) {
+    if (c) this.el.style.backgroundColor = c;
+    return this;
+  }
+
+  opacity(o) {
+    if (o) this.el.style.opacity = o;
+    return this;
+  }
 }
 
 Shade.create = function(o,key) {
   const el = document.createElement('div');
   const clname = o.shadeClass || 'shade';
-  if (o.shadeColor) el.style.backgroundColor = o.shadeColor;
-  if (o.shadeOpacity) el.style.opacity = o.shadeOpacity;
   el.className = `${clname} ${key}`;
-  return new Shade(el);
+  const obj = new Shade(el);
+  return obj.color(o.shadeColor).opacity(o.shadeOpacity);
 };
 
 Shade.Manager = Manager;
