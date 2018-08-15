@@ -1,4 +1,5 @@
 .cropper .handle {
+  display: none;
   position: absolute;
   border: 1px rgba(127, 127, 127, 0.8) solid;
   width: 10px;
@@ -42,6 +43,9 @@
     bottom: -3px;
     cursor: ns-resize; }
 
+.cropper.active .handle {
+  display: block; }
+
 .cropper {
   position: absolute;
   box-sizing: border-box;
@@ -66,6 +70,7 @@
 
 .shade {
   background: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.5s, background-color 0.5s;
   position: absolute; }
   .shade.l {
     top: 0px;
@@ -90,8 +95,5 @@
   height: auto;
   z-index: -1; }
 
-.jcrop-hide-inactive .cropper .handle {
-  display: none; }
-
-.jcrop-hide-inactive .cropper.active .handle {
+.jcrop-ux-inactive-handles .cropper .handle {
   display: block; }

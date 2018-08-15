@@ -1185,6 +1185,13 @@ Rect.from = function (el) {
   return c;
 };
 
+Rect.sizeOf = function (el) {
+  var c = Rect.from(el);
+  c.x = 0;
+  c.y = 0;
+  return c;
+};
+
 Rect.getMax = function (w, h, aspect) {
   if (w / h > aspect) return [h * aspect, h];else return [w, w / aspect];
 };
@@ -1327,11 +1334,20 @@ var Manager = function () {
   return Manager;
 }();
 
-Manager.attach = function (instance) {
-  var el = instance.el;
+Manager.attach = function (i) {
+  var el = i.el;
   var m = new Manager(el);
-  m.init(instance.options);
-  instance.shades = m;
+  m.init(i.options);
+  i.shades = m;
+  i._optconf['shading'] = function (v) {
+    return i.updateShades();
+  };
+  i._optconf['shadeColor'] = function (v) {
+    return m.setStyle(v);
+  };
+  i._optconf['shadeOpacity'] = function (v) {
+    return m.setStyle(null, v);
+  };
   return m;
 };
 
@@ -1475,15 +1491,12 @@ var Stage = function (_ConfObj) {
       this._optconf['multi'] = function (v) {
         if (!v) _this2.limitWidgets();
       };
-      this._optconf['shading'] = function (v) {
-        return _this2.updateShades();
-      };
-      this._optconf['shadeColor'] = function (v) {
-        return _this2.shades && _this2.shades.setStyle(v);
-      };
-      this._optconf['shadeOpacity'] = function (v) {
-        return _this2.shades && _this2.shades.setStyle(null, v);
-      };
+    }
+  }, {
+    key: 'focus',
+    value: function focus() {
+      this.el.focus();
+      return this;
     }
   }, {
     key: 'limitWidgets',
