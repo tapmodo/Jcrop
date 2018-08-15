@@ -1479,10 +1479,10 @@ var Stage = function (_ConfObj) {
         return _this2.updateShades();
       };
       this._optconf['shadeColor'] = function (v) {
-        return _this2.shades.setStyle(v);
+        return _this2.shades && _this2.shades.setStyle(v);
       };
       this._optconf['shadeOpacity'] = function (v) {
-        return _this2.shades.setStyle(null, v);
+        return _this2.shades && _this2.shades.setStyle(null, v);
       };
     }
   }, {
