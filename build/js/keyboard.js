@@ -1,11 +1,11 @@
 class Keyboard {
-  constructor(cropper) {
-    this.cropper = cropper;
+  constructor(widget) {
+    this.widget = widget;
     this.attach();
   }
 
   attach() {
-    const c = this.cropper;
+    const c = this.widget;
     c.el.addEventListener('keydown',(e) => {
       const d = e.shiftKey ? 10: 1;
       switch(e.key) {
