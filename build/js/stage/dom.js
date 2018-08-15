@@ -1,5 +1,5 @@
 import extend from '../util/extend';
-import Cropper from '../cropper';
+import Widget from '../widget';
 import Shade from '../shade';
 import Dragger from '../dragger';
 import ConfObj from '../confobj';
@@ -25,7 +25,8 @@ class Stage extends ConfObj {
   }
 
   focus() {
-    this.el.focus();
+    if (this.active) this.active.el.focus();
+    else this.el.focus();
     return this;
   }
 
@@ -34,7 +35,7 @@ class Stage extends ConfObj {
     const crops = Array.from(this.crops);
 
     while(crops.length > n)
-      this.removeCropper(crops.shift());
+      this.removeWidget(crops.shift());
 
     return this;
   }
@@ -42,8 +43,8 @@ class Stage extends ConfObj {
   canCreate() {
     const n = this.crops.size;
     const o = this.options;
-    if ((o.maxCroppers!==null) && (n >= o.maxCroppers)) return false;
-    if (!o.multi && (n >= o.minCroppers)) return false;
+    if ((o.multiMax!==null) && (n >= o.multiMax)) return false;
+    if (!o.multi && (n >= o.multiMin)) return false;
     return true;
   }
 
@@ -51,7 +52,7 @@ class Stage extends ConfObj {
     const n = this.crops.size;
     const o = this.options;
     if (this.active && !this.active.options.canRemove) return false;
-    if (!o.canRemove || (n <= o.minCroppers)) return false;
+    if (!o.canRemove || (n <= o.multiMin)) return false;
     return true;
   }
 
@@ -60,13 +61,13 @@ class Stage extends ConfObj {
     Dragger(this.el,
       (x,y,e) => {
         if (!this.canCreate()) return false;
-        crop = Cropper.create(this.options);
+        crop = Widget.create(this.options);
         pos = crop.pos;
         pos.x = e.pageX - this.el.offsetParent.offsetLeft - this.el.offsetLeft;
         pos.y = e.pageY - this.el.offsetParent.offsetTop - this.el.offsetTop;
         w = this.el.offsetWidth;
         h = this.el.offsetHeight;
-        this.addCropper(crop);
+        this.addWidget(crop);
         stick = Sticker.create(pos,w,h,'se');
         if (this.options.aspectRatio) stick.aspect = this.options.aspectRatio;
         crop.render(pos);
@@ -83,10 +84,10 @@ class Stage extends ConfObj {
   initListeners() {
     this.listen('crop.activate',c => this.activate(c),false);
     this.listen('crop.attach',c => console.info('Cropper attached'));
-    this.listen('crop.remove',c => this.removeCropper(c));
+    this.listen('crop.remove',c => this.removeWidget(c));
   }
 
-  reorderCroppers() {
+  reorderWidgets() {
     var z = 1000;
     this.crops.forEach(crop => {
       crop.el.style.zIndex = z++;
@@ -96,13 +97,13 @@ class Stage extends ConfObj {
     this.refresh();
   }
 
-  activate(cropper) {
-    cropper = cropper || Array.from(this.crops).pop();
-    if (cropper) {
-      this.active = cropper;
-      this.crops.delete(cropper);
-      this.crops.add(cropper);
-      this.reorderCroppers();
+  activate(widget) {
+    widget = widget || Array.from(this.crops).pop();
+    if (widget) {
+      this.active = widget;
+      this.crops.delete(widget);
+      this.crops.add(widget);
+      this.reorderWidgets();
       this.active.el.focus();
     } else {
       this.shades.disable();
@@ -110,27 +111,27 @@ class Stage extends ConfObj {
     return this;
   }
 
-  addCropper(cropper) {
-    cropper.attachToStage(this);
-    cropper.appendTo(this.el);
-    cropper.init();
-    this.activate(cropper);
+  addWidget(widget) {
+    widget.attachToStage(this);
+    widget.appendTo(this.el);
+    widget.init();
+    this.activate(widget);
     return this;
   }
 
-  newCropper(rect,options={}) {
+  newWidget(rect,options={}) {
     options = extend({},options,this.options);
-    const crop = Cropper.create(options);
+    const crop = Widget.create(options);
     crop.render(rect);
-    this.addCropper(crop);
+    this.addWidget(crop);
     crop.el.focus();
     return crop;
   }
 
-  removeCropper(cropper) {
+  removeWidget(widget) {
     if (!this.canRemove()) return false;
-    cropper.el.remove();
-    this.crops.delete(cropper);
+    widget.el.remove();
+    this.crops.delete(widget);
     this.activate();
   }
 

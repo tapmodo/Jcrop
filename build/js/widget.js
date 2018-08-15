@@ -8,7 +8,7 @@ import ConfObj from './confobj';
 import Keyboard from './keyboard';
 import Animate from './animate';
 
-class Cropper extends ConfObj {
+class Widget extends ConfObj {
 
   constructor(el,options={}) {
     super(el,options);
@@ -130,12 +130,12 @@ class Cropper extends ConfObj {
 
 }
 
-Cropper.create = function(options={}){
+Widget.create = function(options={}){
   const el = document.createElement('div');
   const opts = extend({},Defaults,options);
   el.setAttribute('tabindex','0');
   el.className = opts.cropperClass || 'cropper';
-  return new Cropper(el,opts);
+  return new Widget(el,opts);
 };
 
-export default Cropper;
+export default Widget;

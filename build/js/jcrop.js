@@ -2,7 +2,7 @@ import extend from './util/extend';
 import defaults from './defaults';
 import Stage from './stage/dom';
 import ImageStage from './stage/image';
-import Cropper from './cropper';
+import Widget from './widget';
 import Shade from './shade';
 import Handle from './handle';
 import Dragger from './dragger';
@@ -20,4 +20,4 @@ export function attach(el,options={}) {
   return new Stage(el,options);
 }
 
-export { Stage, defaults, Dragger, Cropper, Rect, Handle, Sticker, Easing };
+export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing };

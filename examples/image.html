@@ -80,8 +80,8 @@
 
     <script src="../dist/jcrop.js"></script>
     <script>
-      const jcp = Jcrop.attach('target');
-      jcp.newCropper(Jcrop.Rect.sizeOf(jcp.el));
+      const jcp = Jcrop.attach('target',{multi:true});
+      jcp.newWidget(Jcrop.Rect.sizeOf(jcp.el));
       jcp.focus();
 
       function setImage(tag){

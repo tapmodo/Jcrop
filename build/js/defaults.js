@@ -1,9 +1,9 @@
 export default {
   animateEasingFunction: 'swing',
   animateFrames: 30,
-  multi: true,
-  maxCroppers: null,
-  minCroppers: 1,
+  multi: false,
+  multiMax: null,
+  multiMin: 1,
   cropperClass: 'cropper',
   canDrag: true,
   canResize: true,

@@ -36,7 +36,7 @@
 
       const rect = Jcrop.Rect.fromCoords([100,100],[300,300]);
 
-      const crop = jcp.newCropper(rect,{
+      const crop = jcp.newWidget(rect,{
         aspectRatio: rect.aspect,
         canRemove: false
       });
@@ -54,7 +54,7 @@
         if (!jcp.active) return false;
         const animtype = document.getElementById('animtype').value;
         jcp.active.animate(rrect(),null,animtype);
-        jcp.active.el.focus();
+        jcp.focus();
       }
     </script>
   </body>
