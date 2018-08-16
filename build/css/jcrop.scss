@@ -54,12 +54,12 @@ $handleBackground: rgba(255,255,255,0.8);
   &.b { bottom: 0px; }
 }
 
-.cropstage {
+.jcrop-stage {
   position: relative;
   width: 100%;
 }
 
-.imagestage img {
+.jcrop-image-stage img {
   position: absolute;
   width: 100%;
   height: auto;

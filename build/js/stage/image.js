@@ -3,7 +3,7 @@ import Stage from './dom';
 
 class ImageStage extends Stage {
   constructor(el,options) {
-    const wrapper = div('cropstage imagestage');
+    const wrapper = div('jcrop-stage jcrop-image-stage');
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
     super(wrapper,options);
