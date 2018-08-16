@@ -65,6 +65,19 @@ class Rect {
     if (rect.y2>h) rect.y = h-rect.h;
     return rect;
   }
+
+  scale(x,y) {
+    y = y || x;
+    return Rect.create(this.x,this.y,this.w*x,this.h*y);
+  }
+  
+  center(w,h) {
+    return Rect.create(
+      (w - this.w)/2,
+      (h - this.h)/2,
+      this.w, this.h
+    );
+  }
 }
 
 Rect.fromCoords = function(p1,p2){
