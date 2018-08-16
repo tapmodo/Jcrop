@@ -12,9 +12,7 @@
       Jcrop Example <span style="color:lightgray;">- draw some crops!</span>
     </h1>
 
-    <div class="jcrop-hide-inactive">
-      <img id="target" src="https://d3o1694hluedf9.cloudfront.net/market-750.jpg">
-    </div>
+    <img id="target" src="https://d3o1694hluedf9.cloudfront.net/market-750.jpg">
 
     <div style="margin-top:0.5em;">
       <select id="animtype">
@@ -72,17 +70,15 @@
 
     </div>
 
-    <div id="ext">
-    <img src="./js.svg" id="img">
-    </div>
-
-
-
     <script src="../dist/jcrop.js"></script>
     <script>
-      const jcp = Jcrop.attach('target',{multi:true});
-      jcp.newWidget(Jcrop.Rect.sizeOf(jcp.el));
-      jcp.focus();
+      var jcp;
+      Jcrop.load('target').then(img => {
+        jcp = Jcrop.attach(img,{multi:true});
+        const rect = Jcrop.Rect.sizeOf(jcp.el);
+        jcp.newWidget(rect.scale(.7,.5).center(rect.w,rect.h));
+        jcp.focus();
+      });
 
       function setImage(tag){
         document.getElementById('target').src =
