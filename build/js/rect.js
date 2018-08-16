@@ -109,9 +109,9 @@ Rect.from = function(el){
 };
 
 Rect.sizeOf = function(el){
-  const c = Rect.from(el);
-  c.x = 0;
-  c.y = 0;
+  const c = new Rect;
+  c.w = el.offsetWidth;
+  c.h = el.offsetHeight;
   return c;
 };
 
