@@ -13,9 +13,7 @@
       <span style="color:lightgray;">- Aspect Ratio + SVG</span>
     </h1>
 
-    <div class="jcrop-hide-inactive">
-      <img id="target" src="https://d3o1694hluedf9.cloudfront.net/market-750.jpg">
-    </div>
+    <img id="target" src="https://d3o1694hluedf9.cloudfront.net/market-750.jpg">
 
     <div style="margin-top:0.5em;">
       <button onclick="setImage('market-750.jpg')">Market</button>
@@ -45,7 +43,6 @@
       crop.el.appendChild(img);
 
       function setImage(tag){
-        console.log('set image ',tag);
         document.getElementById('target').src =
           'https://d3o1694hluedf9.cloudfront.net/'+tag;
       }
