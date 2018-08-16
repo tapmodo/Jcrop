@@ -244,241 +244,6 @@ exports.default = ConfObj;
 
 /***/ }),
 
-/***/ "./build/js/cropper.js":
-/*!*****************************!*\
-  !*** ./build/js/cropper.js ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
-
-var _extend2 = _interopRequireDefault(_extend);
-
-var _handle = __webpack_require__(/*! ./handle */ "./build/js/handle.js");
-
-var _handle2 = _interopRequireDefault(_handle);
-
-var _defaults = __webpack_require__(/*! ./defaults */ "./build/js/defaults.js");
-
-var _defaults2 = _interopRequireDefault(_defaults);
-
-var _dragger = __webpack_require__(/*! ./dragger */ "./build/js/dragger.js");
-
-var _dragger2 = _interopRequireDefault(_dragger);
-
-var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
-
-var _rect2 = _interopRequireDefault(_rect);
-
-var _sticker = __webpack_require__(/*! ./sticker */ "./build/js/sticker.js");
-
-var _sticker2 = _interopRequireDefault(_sticker);
-
-var _confobj = __webpack_require__(/*! ./confobj */ "./build/js/confobj.js");
-
-var _confobj2 = _interopRequireDefault(_confobj);
-
-var _keyboard = __webpack_require__(/*! ./keyboard */ "./build/js/keyboard.js");
-
-var _keyboard2 = _interopRequireDefault(_keyboard);
-
-var _animate = __webpack_require__(/*! ./animate */ "./build/js/animate.js");
-
-var _animate2 = _interopRequireDefault(_animate);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Cropper = function (_ConfObj) {
-  _inherits(Cropper, _ConfObj);
-
-  function Cropper(el) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    _classCallCheck(this, Cropper);
-
-    var _this = _possibleConstructorReturn(this, (Cropper.__proto__ || Object.getPrototypeOf(Cropper)).call(this, el, options));
-
-    _this.pos = _rect2.default.from(_this.el);
-    _this.init();
-    return _this;
-  }
-
-  _createClass(Cropper, [{
-    key: 'init',
-    value: function init() {
-      this.createHandles();
-      this.createMover();
-      this.attachFocus();
-      new _keyboard2.default(this);
-      return this;
-    }
-  }, {
-    key: 'initOptions',
-    value: function initOptions() {
-      var _this2 = this;
-
-      this._optconf['aspectRatio'] = function (ar) {
-        var p = _this2.pos;
-        _this2.aspect = ar || null;
-        if (_this2.aspect && p) {
-          var _Rect$getMax = _rect2.default.getMax(p.w, p.h, ar),
-              _Rect$getMax2 = _slicedToArray(_Rect$getMax, 2),
-              w = _Rect$getMax2[0],
-              h = _Rect$getMax2[1];
-
-          _this2.render(_rect2.default.fromPoint([p.x, p.y], w, h));
-        }
-      };
-    }
-  }, {
-    key: 'attachToStage',
-    value: function attachToStage(stage) {
-      this.stage = stage;
-      this.emit('crop.attach');
-    }
-  }, {
-    key: 'attachFocus',
-    value: function attachFocus() {
-      var _this3 = this;
-
-      this.el.addEventListener('focus', function (e) {
-        _this3.emit('crop.activate');
-        _this3.emit('crop.update');
-      }, false);
-    }
-  }, {
-    key: 'animate',
-    value: function animate(rect, frames, efunc) {
-      var t = this;
-      efunc = efunc || t.options.animateEasingFunction || 'swing';
-      frames = frames || t.options.animateFrames || 30;
-      return (0, _animate2.default)(t.el, t.pos, rect, function (r) {
-        return t.render(r.normalize());
-      }, frames, efunc);
-    }
-  }, {
-    key: 'createMover',
-    value: function createMover() {
-      var _this4 = this;
-
-      var w, h;
-      this.pos = _rect2.default.from(this.el);
-      var stick;
-      (0, _dragger2.default)(this.el, function () {
-        var pe = _this4.el.parentElement;
-        var _ref = [pe.offsetWidth, pe.offsetHeight];
-        w = _ref[0];
-        h = _ref[1];
-
-        stick = _rect2.default.from(_this4.el);
-        _this4.el.focus();
-        _this4.emit('crop.activate');
-        return true;
-      }, function (x, y) {
-        _this4.pos.x = stick.x + x;
-        _this4.pos.y = stick.y + y;
-        _this4.render(_this4.pos.rebound(w, h));
-      }, function () {});
-    }
-  }, {
-    key: 'nudge',
-    value: function nudge() {
-      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-
-      var pe = this.el.parentElement;
-      var _ref2 = [pe.offsetWidth, pe.offsetHeight],
-          w = _ref2[0],
-          h = _ref2[1];
-
-      if (x) this.pos.x += x;
-      if (y) this.pos.y += y;
-      this.render(this.pos.rebound(w, h));
-    }
-  }, {
-    key: 'createHandles',
-    value: function createHandles() {
-      var _this5 = this;
-
-      this.options.handles.forEach(function (c) {
-        var handle = _handle2.default.create('handle ' + c);
-        handle.appendTo(_this5.el);
-
-        var stick;
-        (0, _dragger2.default)(handle.el, function () {
-          var pe = _this5.el.parentElement;
-          var w = pe.offsetWidth;
-          var h = pe.offsetHeight;
-          stick = _sticker2.default.create(_rect2.default.from(_this5.el), w, h, c);
-          if (_this5.aspect) stick.aspect = _this5.aspect;
-          _this5.el.focus();
-          _this5.emit('crop.active');
-          return true;
-        }, function (x, y) {
-          return _this5.render(stick.move(x, y));
-        }, function () {});
-      });
-      return this;
-    }
-  }, {
-    key: 'isActive',
-    value: function isActive() {
-      return this.stage && this.stage.active === this;
-    }
-  }, {
-    key: 'render',
-    value: function render(r) {
-      r = r || this.pos;
-      this.el.style.top = Math.round(r.y) + 'px';
-      this.el.style.left = Math.round(r.x) + 'px';
-      this.el.style.width = Math.round(r.w) + 'px';
-      this.el.style.height = Math.round(r.h) + 'px';
-      this.pos = r;
-      this.emit('crop.update');
-      return this;
-    }
-  }, {
-    key: 'doneDragging',
-    value: function doneDragging() {
-      this.pos = _rect2.default.from(this.el);
-    }
-  }]);
-
-  return Cropper;
-}(_confobj2.default);
-
-Cropper.create = function () {
-  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  var el = document.createElement('div');
-  var opts = (0, _extend2.default)({}, _defaults2.default, options);
-  el.setAttribute('tabindex', '0');
-  el.className = opts.cropperClass || 'cropper';
-  return new Cropper(el, opts);
-};
-
-exports.default = Cropper;
-
-/***/ }),
-
 /***/ "./build/js/defaults.js":
 /*!******************************!*\
   !*** ./build/js/defaults.js ***!
@@ -495,9 +260,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
   animateEasingFunction: 'swing',
   animateFrames: 30,
-  multi: true,
-  maxCroppers: null,
-  minCroppers: 1,
+  multi: false,
+  multiMax: null,
+  multiMin: 1,
   cropperClass: 'cropper',
   canDrag: true,
   canResize: true,
@@ -921,7 +686,7 @@ exports.default = Handle;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Cropper = exports.Dragger = exports.defaults = exports.Stage = undefined;
+exports.load = exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Widget = exports.Dragger = exports.defaults = exports.Stage = undefined;
 exports.attach = attach;
 
 var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
@@ -940,9 +705,9 @@ var _image = __webpack_require__(/*! ./stage/image */ "./build/js/stage/image.js
 
 var _image2 = _interopRequireDefault(_image);
 
-var _cropper = __webpack_require__(/*! ./cropper */ "./build/js/cropper.js");
+var _widget = __webpack_require__(/*! ./widget */ "./build/js/widget.js");
 
-var _cropper2 = _interopRequireDefault(_cropper);
+var _widget2 = _interopRequireDefault(_widget);
 
 var _shade = __webpack_require__(/*! ./shade */ "./build/js/shade.js");
 
@@ -972,6 +737,10 @@ var _easing = __webpack_require__(/*! ./easing */ "./build/js/easing.js");
 
 var _easing2 = _interopRequireDefault(_easing);
 
+var _loader = __webpack_require__(/*! ./loader */ "./build/js/loader.js");
+
+var _loader2 = _interopRequireDefault(_loader);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function attach(el) {
@@ -988,11 +757,12 @@ function attach(el) {
 exports.Stage = _dom2.default;
 exports.defaults = _defaults2.default;
 exports.Dragger = _dragger2.default;
-exports.Cropper = _cropper2.default;
+exports.Widget = _widget2.default;
 exports.Rect = _rect2.default;
 exports.Handle = _handle2.default;
 exports.Sticker = _sticker2.default;
 exports.Easing = _easing2.default;
+exports.load = _loader2.default;
 
 /***/ }),
 
@@ -1015,18 +785,18 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Keyboard = function () {
-  function Keyboard(cropper) {
+  function Keyboard(widget) {
     _classCallCheck(this, Keyboard);
 
-    this.cropper = cropper;
+    this.widget = widget;
     this.attach();
   }
 
   _createClass(Keyboard, [{
     key: 'attach',
     value: function attach() {
-      var c = this.cropper;
-      c.el.addEventListener('keyup', function (e) {
+      var c = this.widget;
+      c.el.addEventListener('keydown', function (e) {
         var d = e.shiftKey ? 10 : 1;
         switch (e.key) {
           case 'ArrowRight':
@@ -1040,10 +810,13 @@ var Keyboard = function () {
 
           case 'Delete':
           case 'Backspace':
-            e.preventDefault();
             c.emit('crop.remove');
             break;
+
+          default:
+            return;
         }
+        e.preventDefault();
       });
     }
   }]);
@@ -1052,6 +825,50 @@ var Keyboard = function () {
 }();
 
 exports.default = Keyboard;
+
+/***/ }),
+
+/***/ "./build/js/loader.js":
+/*!****************************!*\
+  !*** ./build/js/loader.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+// IMAGE LOADING/LOADED FUNCTIONS
+// returns a promise that resolves when image is loaded
+// if it's already loaded, the promise will resolve immediately
+function Loader(img) {
+  if (typeof img == 'string') img = document.getElementById(img);
+
+  return new Promise(function (resolve, reject) {
+    if (Loader.check(img)) return resolve(img);
+
+    function handler(e) {
+      img.removeEventListener('load', handler);
+      img.removeEventListener('error', handler);
+      e.type == 'load' ? resolve(img) : reject(img);
+    }
+
+    img.addEventListener('load', handler);
+    img.addEventListener('error', handler);
+  });
+}
+
+// static method to check if image is completely loaded
+Loader.check = function (img) {
+  if (!img.complete) return false;
+  if (img.naturalWidth === 0) return false;
+  return true;
+};
+
+exports.default = Loader;
 
 /***/ }),
 
@@ -1113,6 +930,17 @@ var Rect = function () {
       if (rect.x2 > w) rect.x = w - rect.w;
       if (rect.y2 > h) rect.y = h - rect.h;
       return rect;
+    }
+  }, {
+    key: 'scale',
+    value: function scale(x, y) {
+      y = y || x;
+      return Rect.create(this.x, this.y, this.w * x, this.h * y);
+    }
+  }, {
+    key: 'center',
+    value: function center(w, h) {
+      return Rect.create((w - this.w) / 2, (h - this.h) / 2, this.w, this.h);
     }
   }, {
     key: 'x1',
@@ -1186,9 +1014,9 @@ Rect.from = function (el) {
 };
 
 Rect.sizeOf = function (el) {
-  var c = Rect.from(el);
-  c.x = 0;
-  c.y = 0;
+  var c = new Rect();
+  c.w = el.offsetWidth;
+  c.h = el.offsetHeight;
   return c;
 };
 
@@ -1438,9 +1266,9 @@ var _extend = __webpack_require__(/*! ../util/extend */ "./build/js/util/extend.
 
 var _extend2 = _interopRequireDefault(_extend);
 
-var _cropper = __webpack_require__(/*! ../cropper */ "./build/js/cropper.js");
+var _widget = __webpack_require__(/*! ../widget */ "./build/js/widget.js");
 
-var _cropper2 = _interopRequireDefault(_cropper);
+var _widget2 = _interopRequireDefault(_widget);
 
 var _shade = __webpack_require__(/*! ../shade */ "./build/js/shade.js");
 
@@ -1453,6 +1281,10 @@ var _dragger2 = _interopRequireDefault(_dragger);
 var _confobj = __webpack_require__(/*! ../confobj */ "./build/js/confobj.js");
 
 var _confobj2 = _interopRequireDefault(_confobj);
+
+var _sticker = __webpack_require__(/*! ../sticker */ "./build/js/sticker.js");
+
+var _sticker2 = _interopRequireDefault(_sticker);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1495,7 +1327,7 @@ var Stage = function (_ConfObj) {
   }, {
     key: 'focus',
     value: function focus() {
-      this.el.focus();
+      if (this.active) this.active.el.focus();else this.el.focus();
       return this;
     }
   }, {
@@ -1507,7 +1339,7 @@ var Stage = function (_ConfObj) {
       var crops = Array.from(this.crops);
 
       while (crops.length > n) {
-        this.removeCropper(crops.shift());
+        this.removeWidget(crops.shift());
       }return this;
     }
   }, {
@@ -1515,8 +1347,8 @@ var Stage = function (_ConfObj) {
     value: function canCreate() {
       var n = this.crops.size;
       var o = this.options;
-      if (o.maxCroppers !== null && n >= o.maxCroppers) return false;
-      if (!o.multi && n >= o.minCroppers) return false;
+      if (o.multiMax !== null && n >= o.multiMax) return false;
+      if (!o.multi && n >= o.multiMin) return false;
       return true;
     }
   }, {
@@ -1525,7 +1357,7 @@ var Stage = function (_ConfObj) {
       var n = this.crops.size;
       var o = this.options;
       if (this.active && !this.active.options.canRemove) return false;
-      if (!o.canRemove || n <= o.minCroppers) return false;
+      if (!o.canRemove || n <= o.multiMin) return false;
       return true;
     }
   }, {
@@ -1533,27 +1365,23 @@ var Stage = function (_ConfObj) {
     value: function initStageDrag() {
       var _this3 = this;
 
-      var crop, pos, w, h;
+      var crop, pos, w, h, stick;
       (0, _dragger2.default)(this.el, function (x, y, e) {
         if (!_this3.canCreate()) return false;
-        crop = _cropper2.default.create(_this3.options);
+        crop = _widget2.default.create(_this3.options);
         pos = crop.pos;
         pos.x = e.pageX - _this3.el.offsetParent.offsetLeft - _this3.el.offsetLeft;
         pos.y = e.pageY - _this3.el.offsetParent.offsetTop - _this3.el.offsetTop;
         w = _this3.el.offsetWidth;
         h = _this3.el.offsetHeight;
+        _this3.addWidget(crop);
+        stick = _sticker2.default.create(pos, w, h, 'se');
+        if (_this3.options.aspectRatio) stick.aspect = _this3.options.aspectRatio;
         crop.render(pos);
-        _this3.addCropper(crop);
-        crop.el.focus();
+        _this3.focus();
         return true;
       }, function (x, y) {
-        pos.x2 = pos.x + x;
-        pos.y2 = pos.y + y;
-        if (pos.x2 < 0) pos.x2 = 0;
-        if (pos.y2 < 0) pos.y2 = 0;
-        if (pos.x2 > w) pos.x2 = w;
-        if (pos.y2 > h) pos.y2 = h;
-        crop.render(pos.normalize());
+        crop.render(stick.move(x, y));
       }, function () {});
     }
   }, {
@@ -1568,12 +1396,12 @@ var Stage = function (_ConfObj) {
         return console.info('Cropper attached');
       });
       this.listen('crop.remove', function (c) {
-        return _this4.removeCropper(c);
+        return _this4.removeWidget(c);
       });
     }
   }, {
-    key: 'reorderCroppers',
-    value: function reorderCroppers() {
+    key: 'reorderWidgets',
+    value: function reorderWidgets() {
       var _this5 = this;
 
       var z = 1000;
@@ -1585,13 +1413,13 @@ var Stage = function (_ConfObj) {
     }
   }, {
     key: 'activate',
-    value: function activate(cropper) {
-      cropper = cropper || Array.from(this.crops).pop();
-      if (cropper) {
-        this.active = cropper;
-        this.crops.delete(cropper);
-        this.crops.add(cropper);
-        this.reorderCroppers();
+    value: function activate(widget) {
+      widget = widget || Array.from(this.crops).pop();
+      if (widget) {
+        this.active = widget;
+        this.crops.delete(widget);
+        this.crops.add(widget);
+        this.reorderWidgets();
         this.active.el.focus();
       } else {
         this.shades.disable();
@@ -1599,32 +1427,32 @@ var Stage = function (_ConfObj) {
       return this;
     }
   }, {
-    key: 'addCropper',
-    value: function addCropper(cropper) {
-      cropper.attachToStage(this);
-      cropper.appendTo(this.el);
-      cropper.init();
-      this.activate(cropper);
+    key: 'addWidget',
+    value: function addWidget(widget) {
+      widget.attachToStage(this);
+      widget.appendTo(this.el);
+      widget.init();
+      this.activate(widget);
       return this;
     }
   }, {
-    key: 'newCropper',
-    value: function newCropper(rect) {
+    key: 'newWidget',
+    value: function newWidget(rect) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
       options = (0, _extend2.default)({}, options, this.options);
-      var crop = _cropper2.default.create(options);
+      var crop = _widget2.default.create(options);
       crop.render(rect);
-      this.addCropper(crop);
+      this.addWidget(crop);
       crop.el.focus();
       return crop;
     }
   }, {
-    key: 'removeCropper',
-    value: function removeCropper(cropper) {
+    key: 'removeWidget',
+    value: function removeWidget(widget) {
       if (!this.canRemove()) return false;
-      cropper.el.remove();
-      this.crops.delete(cropper);
+      widget.el.remove();
+      this.crops.delete(widget);
       this.activate();
     }
   }, {
@@ -1699,7 +1527,7 @@ var ImageStage = function (_Stage) {
   function ImageStage(el, options) {
     _classCallCheck(this, ImageStage);
 
-    var wrapper = (0, _dom.div)('cropstage imagestage');
+    var wrapper = (0, _dom.div)('jcrop-stage jcrop-image-stage');
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
 
@@ -1950,6 +1778,241 @@ function extend() {
 
   return extended;
 };
+
+/***/ }),
+
+/***/ "./build/js/widget.js":
+/*!****************************!*\
+  !*** ./build/js/widget.js ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
+
+var _extend2 = _interopRequireDefault(_extend);
+
+var _handle = __webpack_require__(/*! ./handle */ "./build/js/handle.js");
+
+var _handle2 = _interopRequireDefault(_handle);
+
+var _defaults = __webpack_require__(/*! ./defaults */ "./build/js/defaults.js");
+
+var _defaults2 = _interopRequireDefault(_defaults);
+
+var _dragger = __webpack_require__(/*! ./dragger */ "./build/js/dragger.js");
+
+var _dragger2 = _interopRequireDefault(_dragger);
+
+var _rect = __webpack_require__(/*! ./rect */ "./build/js/rect.js");
+
+var _rect2 = _interopRequireDefault(_rect);
+
+var _sticker = __webpack_require__(/*! ./sticker */ "./build/js/sticker.js");
+
+var _sticker2 = _interopRequireDefault(_sticker);
+
+var _confobj = __webpack_require__(/*! ./confobj */ "./build/js/confobj.js");
+
+var _confobj2 = _interopRequireDefault(_confobj);
+
+var _keyboard = __webpack_require__(/*! ./keyboard */ "./build/js/keyboard.js");
+
+var _keyboard2 = _interopRequireDefault(_keyboard);
+
+var _animate = __webpack_require__(/*! ./animate */ "./build/js/animate.js");
+
+var _animate2 = _interopRequireDefault(_animate);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Widget = function (_ConfObj) {
+  _inherits(Widget, _ConfObj);
+
+  function Widget(el) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Widget);
+
+    var _this = _possibleConstructorReturn(this, (Widget.__proto__ || Object.getPrototypeOf(Widget)).call(this, el, options));
+
+    _this.pos = _rect2.default.from(_this.el);
+    _this.init();
+    return _this;
+  }
+
+  _createClass(Widget, [{
+    key: 'init',
+    value: function init() {
+      this.createHandles();
+      this.createMover();
+      this.attachFocus();
+      new _keyboard2.default(this);
+      return this;
+    }
+  }, {
+    key: 'initOptions',
+    value: function initOptions() {
+      var _this2 = this;
+
+      this._optconf['aspectRatio'] = function (ar) {
+        var p = _this2.pos;
+        _this2.aspect = ar || null;
+        if (_this2.aspect && p) {
+          var _Rect$getMax = _rect2.default.getMax(p.w, p.h, ar),
+              _Rect$getMax2 = _slicedToArray(_Rect$getMax, 2),
+              w = _Rect$getMax2[0],
+              h = _Rect$getMax2[1];
+
+          _this2.render(_rect2.default.fromPoint([p.x, p.y], w, h));
+        }
+      };
+    }
+  }, {
+    key: 'attachToStage',
+    value: function attachToStage(stage) {
+      this.stage = stage;
+      this.emit('crop.attach');
+    }
+  }, {
+    key: 'attachFocus',
+    value: function attachFocus() {
+      var _this3 = this;
+
+      this.el.addEventListener('focus', function (e) {
+        _this3.emit('crop.activate');
+        _this3.emit('crop.update');
+      }, false);
+    }
+  }, {
+    key: 'animate',
+    value: function animate(rect, frames, efunc) {
+      var t = this;
+      efunc = efunc || t.options.animateEasingFunction || 'swing';
+      frames = frames || t.options.animateFrames || 30;
+      return (0, _animate2.default)(t.el, t.pos, rect, function (r) {
+        return t.render(r.normalize());
+      }, frames, efunc);
+    }
+  }, {
+    key: 'createMover',
+    value: function createMover() {
+      var _this4 = this;
+
+      var w, h;
+      this.pos = _rect2.default.from(this.el);
+      var stick;
+      (0, _dragger2.default)(this.el, function () {
+        var pe = _this4.el.parentElement;
+        var _ref = [pe.offsetWidth, pe.offsetHeight];
+        w = _ref[0];
+        h = _ref[1];
+
+        stick = _rect2.default.from(_this4.el);
+        _this4.el.focus();
+        _this4.emit('crop.activate');
+        return true;
+      }, function (x, y) {
+        _this4.pos.x = stick.x + x;
+        _this4.pos.y = stick.y + y;
+        _this4.render(_this4.pos.rebound(w, h));
+      }, function () {});
+    }
+  }, {
+    key: 'nudge',
+    value: function nudge() {
+      var x = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      var y = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+      var pe = this.el.parentElement;
+      var _ref2 = [pe.offsetWidth, pe.offsetHeight],
+          w = _ref2[0],
+          h = _ref2[1];
+
+      if (x) this.pos.x += x;
+      if (y) this.pos.y += y;
+      this.render(this.pos.rebound(w, h));
+    }
+  }, {
+    key: 'createHandles',
+    value: function createHandles() {
+      var _this5 = this;
+
+      this.options.handles.forEach(function (c) {
+        var handle = _handle2.default.create('handle ' + c);
+        handle.appendTo(_this5.el);
+
+        var stick;
+        (0, _dragger2.default)(handle.el, function () {
+          var pe = _this5.el.parentElement;
+          var w = pe.offsetWidth;
+          var h = pe.offsetHeight;
+          stick = _sticker2.default.create(_rect2.default.from(_this5.el), w, h, c);
+          if (_this5.aspect) stick.aspect = _this5.aspect;
+          _this5.el.focus();
+          _this5.emit('crop.active');
+          return true;
+        }, function (x, y) {
+          return _this5.render(stick.move(x, y));
+        }, function () {});
+      });
+      return this;
+    }
+  }, {
+    key: 'isActive',
+    value: function isActive() {
+      return this.stage && this.stage.active === this;
+    }
+  }, {
+    key: 'render',
+    value: function render(r) {
+      r = r || this.pos;
+      this.el.style.top = Math.round(r.y) + 'px';
+      this.el.style.left = Math.round(r.x) + 'px';
+      this.el.style.width = Math.round(r.w) + 'px';
+      this.el.style.height = Math.round(r.h) + 'px';
+      this.pos = r;
+      this.emit('crop.update');
+      return this;
+    }
+  }, {
+    key: 'doneDragging',
+    value: function doneDragging() {
+      this.pos = _rect2.default.from(this.el);
+    }
+  }]);
+
+  return Widget;
+}(_confobj2.default);
+
+Widget.create = function () {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  var el = document.createElement('div');
+  var opts = (0, _extend2.default)({}, _defaults2.default, options);
+  el.setAttribute('tabindex', '0');
+  el.className = opts.cropperClass || 'cropper';
+  return new Widget(el, opts);
+};
+
+exports.default = Widget;
 
 /***/ })
 

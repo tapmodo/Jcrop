@@ -56,17 +56,15 @@
   padding: 0;
   margin: 0;
   cursor: move; }
-
-.cropper:hover {
-  transition: opacity 0.8s;
-  opacity: 0.65; }
-
-.cropper:focus {
-  transition: opacity 0.5s;
-  opacity: 1;
-  outline-style: auto;
-  outline-width: 3px;
-  outline-color: rgba(0, 0, 0, 0.3); }
+  .cropper:hover {
+    transition: opacity 0.8s;
+    opacity: 0.65; }
+  .cropper:focus {
+    transition: opacity 0.5s;
+    opacity: 1;
+    outline-style: auto;
+    outline-width: 3px;
+    outline-color: rgba(0, 0, 0, 0.3); }
 
 .shade {
   background: rgba(0, 0, 0, 0.5);
@@ -85,11 +83,11 @@
   .shade.b {
     bottom: 0px; }
 
-.cropstage {
+.jcrop-stage {
   position: relative;
   width: 100%; }
 
-.imagestage img {
+.jcrop-image-stage img {
   position: absolute;
   width: 100%;
   height: auto;
