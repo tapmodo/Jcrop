@@ -263,7 +263,7 @@ exports.default = {
   multi: false,
   multiMax: null,
   multiMin: 1,
-  cropperClass: 'cropper',
+  cropperClass: 'jcrop-widget',
   canDrag: true,
   canResize: true,
   canSelect: true,
@@ -273,9 +273,10 @@ exports.default = {
   active: true,
   handles: ['n', 's', 'e', 'w', 'sw', 'nw', 'ne', 'se'],
   shading: true,
-  shadeClass: 'shade',
+  shadeClass: 'jcrop-shade',
   shadeColor: 'black',
   shadeOpacity: 0.5,
+  widgetConstructor: null,
   x: 0,
   y: 0,
   w: 100,
@@ -1232,7 +1233,7 @@ var Shade = function (_DomObj) {
 
 Shade.create = function (o, key) {
   var el = document.createElement('div');
-  var clname = o.shadeClass || 'shade';
+  var clname = o.shadeClass || 'jcrop-shade';
   el.className = clname + ' ' + key;
   var obj = new Shade(el);
   return obj.color(o.shadeColor).opacity(o.shadeOpacity);
@@ -1368,7 +1369,7 @@ var Stage = function (_ConfObj) {
       var crop, pos, w, h, stick;
       (0, _dragger2.default)(this.el, function (x, y, e) {
         if (!_this3.canCreate()) return false;
-        crop = _widget2.default.create(_this3.options);
+        crop = (_this3.options.widgetConstructor || _widget2.default).create(_this3.options);
         pos = crop.pos;
         pos.x = e.pageX - _this3.el.offsetParent.offsetLeft - _this3.el.offsetLeft;
         pos.y = e.pageY - _this3.el.offsetParent.offsetTop - _this3.el.offsetTop;
@@ -1431,7 +1432,6 @@ var Stage = function (_ConfObj) {
     value: function addWidget(widget) {
       widget.attachToStage(this);
       widget.appendTo(this.el);
-      widget.init();
       this.activate(widget);
       return this;
     }
@@ -1440,8 +1440,8 @@ var Stage = function (_ConfObj) {
     value: function newWidget(rect) {
       var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      options = (0, _extend2.default)({}, options, this.options);
-      var crop = _widget2.default.create(options);
+      options = (0, _extend2.default)({}, this.options, options);
+      var crop = (this.options.widgetConstructor || _widget2.default).create(options);
       crop.render(rect);
       this.addWidget(crop);
       crop.el.focus();
@@ -1956,7 +1956,7 @@ var Widget = function (_ConfObj) {
       var _this5 = this;
 
       this.options.handles.forEach(function (c) {
-        var handle = _handle2.default.create('handle ' + c);
+        var handle = _handle2.default.create('jcrop-handle ' + c);
         handle.appendTo(_this5.el);
 
         var stick;
@@ -2008,8 +2008,8 @@ Widget.create = function () {
   var el = document.createElement('div');
   var opts = (0, _extend2.default)({}, _defaults2.default, options);
   el.setAttribute('tabindex', '0');
-  el.className = opts.cropperClass || 'cropper';
-  return new Widget(el, opts);
+  el.className = opts.cropperClass || 'jcrop-widget';
+  return new (options.widgetConstructor || Widget)(el, opts);
 };
 
 exports.default = Widget;

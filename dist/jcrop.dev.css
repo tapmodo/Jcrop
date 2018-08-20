@@ -1,4 +1,4 @@
-.cropper .handle {
+.jcrop-widget .jcrop-handle {
   display: none;
   position: absolute;
   border: 1px rgba(127, 127, 127, 0.8) solid;
@@ -6,47 +6,47 @@
   height: 10px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.8); }
-  .cropper .handle.nw {
+  .jcrop-widget .jcrop-handle.nw {
     top: -3px;
     left: -3px;
     cursor: nwse-resize; }
-  .cropper .handle.w {
+  .jcrop-widget .jcrop-handle.w {
     top: 50%;
     transform: translateY(-50%);
     left: -3px;
     cursor: ew-resize; }
-  .cropper .handle.sw {
+  .jcrop-widget .jcrop-handle.sw {
     bottom: -3px;
     left: -3px;
     cursor: nesw-resize; }
-  .cropper .handle.ne {
+  .jcrop-widget .jcrop-handle.ne {
     top: -3px;
     right: -3px;
     cursor: nesw-resize; }
-  .cropper .handle.e {
+  .jcrop-widget .jcrop-handle.e {
     top: 50%;
     transform: translateY(-50%);
     right: -3px;
     cursor: ew-resize; }
-  .cropper .handle.se {
+  .jcrop-widget .jcrop-handle.se {
     bottom: -3px;
     right: -3px;
     cursor: nwse-resize; }
-  .cropper .handle.n {
+  .jcrop-widget .jcrop-handle.n {
     left: 50%;
     transform: translateX(-50%);
     top: -3px;
     cursor: ns-resize; }
-  .cropper .handle.s {
+  .jcrop-widget .jcrop-handle.s {
     left: 50%;
     transform: translateX(-50%);
     bottom: -3px;
     cursor: ns-resize; }
 
-.cropper.active .handle {
+.jcrop-widget.active .jcrop-handle {
   display: block; }
 
-.cropper {
+.jcrop-widget {
   position: absolute;
   box-sizing: border-box;
   border: 1px white dashed;
@@ -56,31 +56,31 @@
   padding: 0;
   margin: 0;
   cursor: move; }
-  .cropper:hover {
+  .jcrop-widget:hover {
     transition: opacity 0.8s;
     opacity: 0.65; }
-  .cropper:focus {
+  .jcrop-widget:focus {
     transition: opacity 0.5s;
     opacity: 1;
     outline-style: auto;
     outline-width: 3px;
     outline-color: rgba(0, 0, 0, 0.3); }
 
-.shade {
+.jcrop-shade {
   background: rgba(0, 0, 0, 0.5);
   transition: opacity 0.5s, background-color 0.5s;
   position: absolute; }
-  .shade.l {
+  .jcrop-shade.l {
     top: 0px;
     left: 0px;
     height: 100%; }
-  .shade.r {
+  .jcrop-shade.r {
     top: 0px;
     right: 0px;
     height: 100%; }
-  .shade.t {
+  .jcrop-shade.t {
     top: 0px; }
-  .shade.b {
+  .jcrop-shade.b {
     bottom: 0px; }
 
 .jcrop-stage {
@@ -93,5 +93,5 @@
   height: auto;
   z-index: -1; }
 
-.jcrop-ux-inactive-handles .cropper .handle {
+.jcrop-ux-inactive-handles .jcrop-widget .jcrop-handle {
   display: block; }
