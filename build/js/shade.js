@@ -86,7 +86,7 @@ class Shade extends DomObj {
 
 Shade.create = function(o,key) {
   const el = document.createElement('div');
-  const clname = o.shadeClass || 'shade';
+  const clname = o.shadeClass || 'jcrop-shade';
   el.className = `${clname} ${key}`;
   const obj = new Shade(el);
   return obj.color(o.shadeColor).opacity(o.shadeOpacity);

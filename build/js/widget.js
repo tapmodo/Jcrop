@@ -87,7 +87,7 @@ class Widget extends ConfObj {
 
   createHandles() {
     this.options.handles.forEach(c => {
-      const handle = Handle.create('handle '+c);
+      const handle = Handle.create('jcrop-handle '+c);
       handle.appendTo(this.el);
 
       var stick;
@@ -134,8 +134,8 @@ Widget.create = function(options={}){
   const el = document.createElement('div');
   const opts = extend({},Defaults,options);
   el.setAttribute('tabindex','0');
-  el.className = opts.cropperClass || 'cropper';
-  return new Widget(el,opts);
+  el.className = opts.cropperClass || 'jcrop-widget';
+  return new (options.widgetConstructor || Widget)(el,opts);
 };
 
 export default Widget;

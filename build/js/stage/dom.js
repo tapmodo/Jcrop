@@ -61,7 +61,7 @@ class Stage extends ConfObj {
     Dragger(this.el,
       (x,y,e) => {
         if (!this.canCreate()) return false;
-        crop = Widget.create(this.options);
+        crop = (this.options.widgetConstructor || Widget).create(this.options);
         pos = crop.pos;
         pos.x = e.pageX - this.el.offsetParent.offsetLeft - this.el.offsetLeft;
         pos.y = e.pageY - this.el.offsetParent.offsetTop - this.el.offsetTop;
@@ -114,14 +114,13 @@ class Stage extends ConfObj {
   addWidget(widget) {
     widget.attachToStage(this);
     widget.appendTo(this.el);
-    widget.init();
     this.activate(widget);
     return this;
   }
 
   newWidget(rect,options={}) {
-    options = extend({},options,this.options);
-    const crop = Widget.create(options);
+    options = extend({},this.options,options);
+    const crop = (this.options.widgetConstructor || Widget).create(options);
     crop.render(rect);
     this.addWidget(crop);
     crop.el.focus();

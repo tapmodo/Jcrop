@@ -5,7 +5,7 @@ $handleBackground: rgba(255,255,255,0.8);
 
 @import 'handles-mixin';
 
-.cropper .handle {
+.jcrop-widget .jcrop-handle {
   display: none;
   @include jcrop-handles(
     $handleSize,
@@ -15,11 +15,11 @@ $handleBackground: rgba(255,255,255,0.8);
   );
 }
 
-.cropper.active .handle {
+.jcrop-widget.active .jcrop-handle {
   display: block;
 }
 
-.cropper {
+.jcrop-widget {
   position: absolute;
   box-sizing: border-box;
   border: 1px white dashed;
@@ -44,7 +44,7 @@ $handleBackground: rgba(255,255,255,0.8);
   }
 }
 
-.shade {
+.jcrop-shade {
   background: rgba(0,0,0,0.5);
   transition: opacity 0.5s, background-color 0.5s;
   position: absolute;
@@ -66,7 +66,7 @@ $handleBackground: rgba(255,255,255,0.8);
   z-index: -1;
 }
 
-.jcrop-ux-inactive-handles .cropper .handle {
+.jcrop-ux-inactive-handles .jcrop-widget .jcrop-handle {
   display: block;
 }
 
