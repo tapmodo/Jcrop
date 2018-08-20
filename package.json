@@ -1,6 +1,6 @@
 {
   "name": "jcrop",
-  "version": "0.9.12",
+  "version": "0.9.13",
   "description": "Jcrop Javascript Image Cropper",
   "main": "js/jquery.Jcrop.js",
   "dependencies": {},
