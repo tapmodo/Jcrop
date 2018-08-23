@@ -1562,6 +1562,12 @@
       getWidgetSize: function () {
         return [boundx, boundy];
       },
+      
+      setWidgetSize: function (width,height) {
+        boundx = width;
+        boundy = height;
+      },
+      
       getScaleFactor: function () {
         return [xscale, yscale];
       },
