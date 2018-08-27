@@ -22,3 +22,5 @@ export function attach(el,options={}) {
 }
 
 export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load };
+
+export default { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, attach };
