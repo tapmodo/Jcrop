@@ -10,21 +10,21 @@ import Animate from './animate';
 
 class Widget extends ConfObj {
 
-  constructor(el,options={}) {
+  constructor (el,options={}) {
     super(el,options);
     this.pos = Rect.from(this.el);
     this.init();
   }
 
-  init() {
+  init () {
     this.createHandles();
     this.createMover();
     this.attachFocus();
-    new Keyboard(this);
+    Keyboard.attach(this);
     return this;
   }
 
-  initOptions(){
+  initOptions () {
     this._optconf['aspectRatio'] = ar => {
       const p = this.pos;
       this.aspect = ar || null;
@@ -35,26 +35,26 @@ class Widget extends ConfObj {
     };
   }
 
-  attachToStage(stage) {
+  attachToStage (stage) {
     this.stage = stage;
     this.emit('crop.attach');
   }
 
-  attachFocus() {
+  attachFocus () {
     this.el.addEventListener('focus',(e) => {
       this.emit('crop.activate');
       this.emit('crop.update');
     },false);
   }
 
-  animate(rect,frames,efunc){
+  animate (rect,frames,efunc) {
     const t = this;
     efunc = efunc || t.options.animateEasingFunction || 'swing';
     frames = frames || t.options.animateFrames || 30;
     return Animate(t.el,t.pos,rect,r => t.render(r.normalize()),frames,efunc);
   }
 
-  createMover() {
+  createMover () {
     var w,h;
     this.pos = Rect.from(this.el);
     var stick;
@@ -74,10 +74,10 @@ class Widget extends ConfObj {
         this.render(this.pos.rebound(w,h));
       },
       () => { }
-    )
+    );
   }
 
-  nudge(x=0,y=0) {
+  nudge (x=0,y=0) {
     const pe = this.el.parentElement;
     const [w,h] = [ pe.offsetWidth, pe.offsetHeight ];
     if (x) this.pos.x += x;
@@ -85,7 +85,7 @@ class Widget extends ConfObj {
     this.render(this.pos.rebound(w,h));
   }
 
-  createHandles() {
+  createHandles () {
     this.options.handles.forEach(c => {
       const handle = Handle.create('jcrop-handle '+c);
       handle.appendTo(this.el);
@@ -109,11 +109,11 @@ class Widget extends ConfObj {
     return this;
   }
 
-  isActive() {
+  isActive () {
     return (this.stage && (this.stage.active === this));
   }
 
-  render(r) {
+  render (r) {
     r = r || this.pos;
     this.el.style.top = Math.round(r.y) + 'px';
     this.el.style.left = Math.round(r.x) + 'px';
@@ -124,13 +124,13 @@ class Widget extends ConfObj {
     return this;
   }
 
-  doneDragging() {
+  doneDragging () {
     this.pos = Rect.from(this.el);
   }
 
 }
 
-Widget.create = function(options={}){
+Widget.create = function (options={}) {
   const el = document.createElement('div');
   const opts = extend({},Defaults,options);
   el.setAttribute('tabindex','0');

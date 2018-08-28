@@ -1,8 +1,8 @@
-import { wrap, replace, div } from '../util/dom';
+import { div } from '../util/dom';
 import Stage from './dom';
 
 class ImageStage extends Stage {
-  constructor(el,options) {
+  constructor (el,options) {
     const wrapper = div('jcrop-stage jcrop-image-stage');
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
@@ -12,7 +12,7 @@ class ImageStage extends Stage {
     this.resizeToImage();
   }
 
-  resizeToImage() {
+  resizeToImage () {
     const w = this.srcEl.width;
     const h = this.srcEl.height;
     this.el.style.width = w+'px';

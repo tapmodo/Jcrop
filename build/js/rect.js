@@ -10,44 +10,44 @@
 */
 class Rect {
 
-  constructor() {
+  constructor () {
     this.x = 0;
     this.y = 0;
     this.w = 0;
     this.h = 0;
   }
 
-  set x1(v) {
+  set x1 (v) {
     this.w = this.x2 - v;
     this.x = v;
   }
 
-  set y1(v) {
+  set y1 (v) {
     this.h = this.y2 - v;
     this.y = v;
   }
 
-  get x2() {
+  get x2 () {
     return this.x + this.w;
   }
 
-  set x2(x) {
+  set x2 (x) {
     this.w = x - this.x;
   }
 
-  get y2() {
+  get y2 () {
     return this.y + this.h;
   }
 
-  get aspect() {
+  get aspect () {
     return this.w/this.h;
   }
 
-  set y2(y) {
+  set y2 (y) {
     this.h = y - this.y;
   }
 
-  normalize() {
+  normalize () {
     const [x1,y1,x2,y2] = [
       Math.min(this.x,this.x2),
       Math.min(this.y,this.y2),
@@ -57,7 +57,7 @@ class Rect {
     return Rect.create(x1,y1,x2-x1,y2-y1);
   }
 
-  rebound(w,h) {
+  rebound (w,h) {
     const rect = this.normalize();
     if (rect.x<0) rect.x = 0;
     if (rect.y<0) rect.y = 0;
@@ -66,12 +66,12 @@ class Rect {
     return rect;
   }
 
-  scale(x,y) {
+  scale (x,y) {
     y = y || x;
     return Rect.create(this.x,this.y,this.w*x,this.h*y);
   }
-  
-  center(w,h) {
+
+  center (w,h) {
     return Rect.create(
       (w - this.w)/2,
       (h - this.h)/2,
@@ -80,7 +80,7 @@ class Rect {
   }
 }
 
-Rect.fromCoords = function(p1,p2){
+Rect.fromCoords = function (p1,p2) {
   const [x1,y1,x2,y2] = [
     Math.min(p1[0],p2[0]),
     Math.min(p1[1],p2[1]),
@@ -90,8 +90,8 @@ Rect.fromCoords = function(p1,p2){
   return Rect.create(x1,y1,x2-x1,y2-y1);
 };
 
-Rect.create = function(x=0,y=0,w=0,h=0) {
-  const c = new Rect;
+Rect.create = function (x=0,y=0,w=0,h=0) {
+  const c = new Rect();
   c.x = x;
   c.y = y;
   c.w = w;
@@ -99,8 +99,8 @@ Rect.create = function(x=0,y=0,w=0,h=0) {
   return c;
 };
 
-Rect.from = function(el){
-  const c = new Rect;
+Rect.from = function (el) {
+  const c = new Rect();
   c.x = el.offsetLeft;
   c.y = el.offsetTop;
   c.w = el.offsetWidth;
@@ -108,23 +108,23 @@ Rect.from = function(el){
   return c;
 };
 
-Rect.sizeOf = function(el){
-  const c = new Rect;
+Rect.sizeOf = function (el) {
+  const c = new Rect();
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
   return c;
 };
 
-Rect.getMax = function(w,h,aspect) {
+Rect.getMax = function (w,h,aspect) {
   if ((w/h) > aspect) return [ h*aspect, h ];
-    else return [ w, w/aspect ];
+  else return [ w, w/aspect ];
 };
 
-Rect.fromPoint = function(point,w,h,quad='br'){
-  const c = new Rect;
+Rect.fromPoint = function (point,w,h,quad='br') {
+  const c = new Rect();
   c.x = point[0];
   c.y = point[1];
-  switch(quad){
+  switch (quad) {
     case 'br':
       c.x2 = c.x + w;
       c.y2 = c.y + h;

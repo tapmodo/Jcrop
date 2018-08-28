@@ -9,40 +9,36 @@ import Easing from './easing';
 // efunc - name of easing function to use
 // returns a Promise that resolves when the animation is complete
 
-function Animate(el,from,to,cb,frames=30,efunc='swing') {
+function Animate (el,from,to,cb,frames=30,efunc='swing') {
   // Set the keys to update, in this case it is our Rect's properties
   // Normalize the initial state as a Rect named "cur"
   const p = ['x','y','w','h'];
   const cur = from.normalize();
 
   // Lookup the easing function if it is a string
-  efunc = (typeof efunc == 'string')? Easing[efunc] : efunc;
+  efunc = (typeof efunc === 'string')? Easing[efunc] : efunc;
 
-  var cur_frame = 0;
+  var curFrame = 0;
 
   // Return a promise that will resolve when the animation is complete
   return new Promise((resolve,reject) => {
-    function step(){
-
-      if (cur_frame < frames) {
-
+    function step () {
+      if (curFrame < frames) {
         // Update each key for this frame
-        p.forEach(key => 
-          cur[key] = Math.round(
-            efunc(cur_frame, from[key], to[key] - from[key], frames)
-          )
-        );
+        p.forEach(key => {
+          cur[key] = Math.round(efunc(curFrame,from[key],to[key]-from[key],frames));
+        });
 
         // Send it to the callback function
         // update the current frame counter
         // and request the next animation frame
         cb(cur);
-        cur_frame++;
+        curFrame++;
         requestAnimationFrame(step);
+      } else {
+        // We've reached the end of the animation frames
+        resolve();
       }
-
-      // We've reached the end of the animation frames
-      else resolve();
     }
 
     requestAnimationFrame(step);

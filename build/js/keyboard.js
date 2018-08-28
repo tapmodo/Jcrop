@@ -1,14 +1,14 @@
 class Keyboard {
-  constructor(widget) {
+  constructor (widget) {
     this.widget = widget;
     this.attach();
   }
 
-  attach() {
+  attach () {
     const c = this.widget;
     c.el.addEventListener('keydown',(e) => {
-      const d = e.shiftKey ? 10: 1;
-      switch(e.key) {
+      const d = e.shiftKey ? 10 : 1;
+      switch (e.key) {
         case 'ArrowRight': c.nudge(d); break;
         case 'ArrowLeft': c.nudge(-d); break;
         case 'ArrowUp': c.nudge(0,-d); break;
@@ -25,5 +25,9 @@ class Keyboard {
     });
   }
 }
+
+Keyboard.attach = function (widget) {
+  return new Keyboard(widget);
+};
 
 export default Keyboard;

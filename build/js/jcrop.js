@@ -12,15 +12,15 @@ import DomObj from './domobj';
 import Easing from './easing';
 import load from './loader';
 
-export function attach(el,options={}) {
+export function attach (el,options={}) {
   options = extend({},defaults,options);
 
-  if (typeof el == 'string') el = document.getElementById(el);
-  if (el.tagName == 'IMG') return new ImageStage(el,options);
+  if (typeof el === 'string') el = document.getElementById(el);
+  if (el.tagName === 'IMG') return new ImageStage(el,options);
 
   return new Stage(el,options);
 }
 
-export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load };
+export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, Shade, DomObj };
 
-export default { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, attach };
+export default { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, attach, Shade, DomObj };

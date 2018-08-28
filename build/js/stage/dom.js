@@ -7,40 +7,37 @@ import Sticker from '../sticker';
 
 class Stage extends ConfObj {
 
-  constructor(el,options) {
+  constructor (el,options) {
     super(el,options);
-    this.crops = new Set;
+    this.crops = new Set();
     this.active = null;
     this.init();
   }
 
-  init() {
+  init () {
     this.initListeners();
     this.initStageDrag();
     Shade.Manager.attach(this);
   }
 
-  initOptions(){
-    this._optconf['multi'] = v => { if (!v) this.limitWidgets() };
+  initOptions () {
+    this._optconf['multi'] = v => { if (!v) this.limitWidgets(); };
   }
 
-  focus() {
+  focus () {
     if (this.active) this.active.el.focus();
     else this.el.focus();
     return this;
   }
 
-  limitWidgets(n=1) {
+  limitWidgets (n=1) {
     if (!this.crops || (n<1)) return false;
     const crops = Array.from(this.crops);
-
-    while(crops.length > n)
-      this.removeWidget(crops.shift());
-
+    while (crops.length > n) this.removeWidget(crops.shift());
     return this;
   }
 
-  canCreate() {
+  canCreate () {
     const n = this.crops.size;
     const o = this.options;
     if ((o.multiMax!==null) && (n >= o.multiMax)) return false;
@@ -48,7 +45,7 @@ class Stage extends ConfObj {
     return true;
   }
 
-  canRemove() {
+  canRemove () {
     const n = this.crops.size;
     const o = this.options;
     if (this.active && !this.active.options.canRemove) return false;
@@ -56,7 +53,7 @@ class Stage extends ConfObj {
     return true;
   }
 
-  initStageDrag() {
+  initStageDrag () {
     var crop, pos, w, h, stick;
     Dragger(this.el,
       (x,y,e) => {
@@ -75,29 +72,29 @@ class Stage extends ConfObj {
         return true;
       },
       (x,y) => {
-        crop.render(stick.move(x,y))
+        crop.render(stick.move(x,y));
       },
       () => { }
     );
   }
 
-  initListeners() {
+  initListeners () {
     this.listen('crop.activate',c => this.activate(c),false);
     this.listen('crop.attach',c => console.info('Cropper attached'));
     this.listen('crop.remove',c => this.removeWidget(c));
   }
 
-  reorderWidgets() {
+  reorderWidgets () {
     var z = 1000;
     this.crops.forEach(crop => {
       crop.el.style.zIndex = z++;
       if (this.active === crop) crop.addClass('active');
-        else crop.removeClass('active');
+      else crop.removeClass('active');
     });
     this.refresh();
   }
 
-  activate(widget) {
+  activate (widget) {
     widget = widget || Array.from(this.crops).pop();
     if (widget) {
       this.active = widget;
@@ -111,14 +108,14 @@ class Stage extends ConfObj {
     return this;
   }
 
-  addWidget(widget) {
+  addWidget (widget) {
     widget.attachToStage(this);
     widget.appendTo(this.el);
     this.activate(widget);
     return this;
   }
 
-  newWidget(rect,options={}) {
+  newWidget (rect,options={}) {
     options = extend({},this.options,options);
     const crop = (this.options.widgetConstructor || Widget).create(options);
     crop.render(rect);
@@ -127,23 +124,23 @@ class Stage extends ConfObj {
     return crop;
   }
 
-  removeWidget(widget) {
+  removeWidget (widget) {
     if (!this.canRemove()) return false;
     widget.el.remove();
     this.crops.delete(widget);
     this.activate();
   }
 
-  refresh() {
+  refresh () {
     this.options.shade && this.active &&
       this.shades.adjust(this.active.pos);
   }
 
-  updateShades() {
+  updateShades () {
     if (!this.shades) return;
 
     if (this.options.shade) this.shades.enable();
-      else this.shades.disable();
+    else this.shades.disable();
 
     this.options.shade && this.active &&
       this.shades.adjust(this.active.pos);
@@ -151,12 +148,9 @@ class Stage extends ConfObj {
     return this;
   }
 
-  setOptions(options={}){
+  setOptions (options={}) {
     super.setOptions(options);
-
-    if (this.crops)
-      Array.from(this.crops)
-        .forEach(i => i.setOptions(options));
+    if (this.crops) Array.from(this.crops).forEach(i => i.setOptions(options));
   }
 }
 

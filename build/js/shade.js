@@ -2,28 +2,29 @@ import Rect from './rect';
 import DomObj from './domobj';
 
 class Manager {
-  constructor(el) {
-    if (typeof el == 'string') el = document.getElementById(el);
+  constructor (el) {
+    if (typeof el === 'string') el = document.getElementById(el);
     this.el = el;
     this.shades = {};
   }
 
-  init(options={}) {
+  init (options={}) {
     this.active = (options.shade!==undefined)? options.shade: true;
 
     this.keys().forEach(
-      key => this.shades[key] = Shade.create(options,key)
+      key => { this.shades[key] = Shade.create(options,key); }
     );
 
     this.el.addEventListener('crop.update',(e) => {
-      if (e.cropTarget.isActive() && e.cropTarget.options.shade)
+      if (e.cropTarget.isActive() && e.cropTarget.options.shade) {
         this.adjust(e.cropTarget.pos);
+      }
     },false);
 
     this.enable();
   }
-  
-  adjust(rect){
+
+  adjust (rect) {
     const f = Rect.from(this.el);
     const s = this.shades;
     s.t.h = rect.y;
@@ -33,28 +34,28 @@ class Manager {
     s.l.w = s.t.x = s.b.x = Math.floor(rect.x);
   }
 
-  keys(){
+  keys () {
     return [ 't', 'l', 'r', 'b' ];
   }
 
-  enable(){
+  enable () {
     const s = this.shades;
     this.keys().forEach(key => s[key].insert(this.el));
   }
 
-  disable(){
+  disable () {
     const s = this.shades;
     this.keys().forEach(key => s[key].remove());
   }
 
-  setStyle(color,opacity){
+  setStyle (color,opacity) {
     const s = this.shades;
     this.keys().forEach(key => s[key].color(color).opacity(opacity));
   }
 
 }
 
-Manager.attach = function(i){
+Manager.attach = function (i) {
   const el = i.el;
   const m = new Manager(el);
   m.init(i.options);
@@ -66,25 +67,25 @@ Manager.attach = function(i){
 };
 
 class Shade extends DomObj {
-  insert(el){ el.appendChild(this.el); }
-  remove(){ this.el.remove(); }
+  insert (el) { el.appendChild(this.el); }
+  remove () { this.el.remove(); }
 
-  set w(w) { this.el.style.width = w + 'px'; }
-  set h(h) { this.el.style.height = h + 'px'; }
-  set x(l) { this.el.style.left = l + 'px'; }
+  set w (w) { this.el.style.width = w + 'px'; }
+  set h (h) { this.el.style.height = h + 'px'; }
+  set x (l) { this.el.style.left = l + 'px'; }
 
-  color(c) {
+  color (c) {
     if (c) this.el.style.backgroundColor = c;
     return this;
   }
 
-  opacity(o) {
+  opacity (o) {
     if (o) this.el.style.opacity = o;
     return this;
   }
 }
 
-Shade.create = function(o,key) {
+Shade.create = function (o,key) {
   const el = document.createElement('div');
   const clname = o.shadeClass || 'jcrop-shade';
   el.className = `${clname} ${key}`;

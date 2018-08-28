@@ -5,6 +5,7 @@
  * Copyright © 2008 George McGinley Smith
  * All rights reserved.
  * ======================================================== */
+/* eslint-disable */
 
 const m = module.exports = {
   // t: current time, b: begInnIng value, c: change In value, d: duration
