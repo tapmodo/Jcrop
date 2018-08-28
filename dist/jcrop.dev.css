@@ -89,8 +89,6 @@
 
 .jcrop-image-stage img {
   position: absolute;
-  width: 100%;
-  height: auto;
   z-index: -1; }
 
 .jcrop-ux-inactive-handles .jcrop-widget .jcrop-handle {

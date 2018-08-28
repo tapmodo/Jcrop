@@ -764,6 +764,7 @@ exports.Handle = _handle2.default;
 exports.Sticker = _sticker2.default;
 exports.Easing = _easing2.default;
 exports.load = _loader2.default;
+exports.default = { Stage: _dom2.default, defaults: _defaults2.default, Dragger: _dragger2.default, Widget: _widget2.default, Rect: _rect2.default, Handle: _handle2.default, Sticker: _sticker2.default, Easing: _easing2.default, load: _loader2.default, attach: attach };
 
 /***/ }),
 
