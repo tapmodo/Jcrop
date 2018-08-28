@@ -126,31 +126,29 @@ function Animate(el, from, to, cb) {
   var cur = from.normalize();
 
   // Lookup the easing function if it is a string
-  efunc = typeof efunc == 'string' ? _easing2.default[efunc] : efunc;
+  efunc = typeof efunc === 'string' ? _easing2.default[efunc] : efunc;
 
-  var cur_frame = 0;
+  var curFrame = 0;
 
   // Return a promise that will resolve when the animation is complete
   return new Promise(function (resolve, reject) {
     function step() {
-
-      if (cur_frame < frames) {
-
+      if (curFrame < frames) {
         // Update each key for this frame
         p.forEach(function (key) {
-          return cur[key] = Math.round(efunc(cur_frame, from[key], to[key] - from[key], frames));
+          cur[key] = Math.round(efunc(curFrame, from[key], to[key] - from[key], frames));
         });
 
         // Send it to the callback function
         // update the current frame counter
         // and request the next animation frame
         cb(cur);
-        cur_frame++;
+        curFrame++;
         requestAnimationFrame(step);
+      } else {
+        // We've reached the end of the animation frames
+        resolve();
       }
-
-      // We've reached the end of the animation frames
-      else resolve();
     }
 
     requestAnimationFrame(step);
@@ -307,14 +305,14 @@ var DomObj = function () {
   function DomObj(el) {
     _classCallCheck(this, DomObj);
 
-    if (typeof el == 'string') el = document.getElementById(el);
+    if (typeof el === 'string') el = document.getElementById(el);
     this.el = el;
   }
 
   _createClass(DomObj, [{
     key: 'appendTo',
     value: function appendTo(el) {
-      if (typeof el == 'string') el = document.getElementById(el);
+      if (typeof el === 'string') el = document.getElementById(el);
       el.appendChild(this.el);
       return this;
     }
@@ -330,7 +328,7 @@ var DomObj = function () {
     key: 'removeClass',
     value: function removeClass(cl) {
       this.el.className = this.el.className.split(' ').filter(function (i) {
-        return cl != i;
+        return cl !== i;
       }).join(' ');
       return this;
     }
@@ -338,7 +336,7 @@ var DomObj = function () {
     key: 'hasClass',
     value: function hasClass(cl) {
       return this.el.className.split(' ').filter(function (i) {
-        return cl == i;
+        return cl === i;
       }).length;
     }
   }, {
@@ -382,13 +380,13 @@ Object.defineProperty(exports, "__esModule", {
 
 var Dragger = function Dragger(el, startcb, movecb, donecb) {
   var ox, oy;
-  if (typeof el == 'string') el = document.getElementById(el);
+  if (typeof el === 'string') el = document.getElementById(el);
 
   el.addEventListener('mousedown', start);
   el.addEventListener('touchstart', start);
 
   function start(e) {
-    var obj = e.type == 'touchstart' ? e.touches[0] : e;
+    var obj = e.type === 'touchstart' ? e.touches[0] : e;
 
     ox = obj.pageX;
     oy = obj.pageY;
@@ -398,23 +396,23 @@ var Dragger = function Dragger(el, startcb, movecb, donecb) {
 
     if (!startcb(ox, oy, obj)) return;
 
-    if (e.type == 'mousedown') {
+    if (e.type === 'mousedown') {
       window.addEventListener('mousemove', move);
       document.addEventListener('mouseup', done);
-    } else if (e.type == 'touchstart') {
+    } else if (e.type === 'touchstart') {
       document.addEventListener('touchmove', move);
       document.addEventListener('touchend', done);
     }
   }
 
   function move(e) {
-    var obj = e.type == 'touchmove' ? e.changedTouches[0] : e;
+    var obj = e.type === 'touchmove' ? e.changedTouches[0] : e;
     e.stopPropagation();
     movecb(obj.pageX - ox, obj.pageY - oy);
   }
 
   function done(e) {
-    var obj = e.type == 'touchend' ? e.changedTouches[0] : e;
+    var obj = e.type === 'touchend' ? e.changedTouches[0] : e;
 
     if (obj.pageX && obj.pageY) movecb(obj.pageX - ox, obj.pageY - oy);
 
@@ -455,6 +453,7 @@ exports.default = Dragger;
  * Copyright © 2008 George McGinley Smith
  * All rights reserved.
  * ======================================================== */
+/* eslint-disable */
 
 var m = module.exports = {
   // t: current time, b: begInnIng value, c: change In value, d: duration
@@ -687,7 +686,7 @@ exports.default = Handle;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.load = exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Widget = exports.Dragger = exports.defaults = exports.Stage = undefined;
+exports.DomObj = exports.Shade = exports.load = exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Widget = exports.Dragger = exports.defaults = exports.Stage = undefined;
 exports.attach = attach;
 
 var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
@@ -749,8 +748,8 @@ function attach(el) {
 
   options = (0, _extend2.default)({}, _defaults2.default, options);
 
-  if (typeof el == 'string') el = document.getElementById(el);
-  if (el.tagName == 'IMG') return new _image2.default(el, options);
+  if (typeof el === 'string') el = document.getElementById(el);
+  if (el.tagName === 'IMG') return new _image2.default(el, options);
 
   return new _dom2.default(el, options);
 }
@@ -764,7 +763,9 @@ exports.Handle = _handle2.default;
 exports.Sticker = _sticker2.default;
 exports.Easing = _easing2.default;
 exports.load = _loader2.default;
-exports.default = { Stage: _dom2.default, defaults: _defaults2.default, Dragger: _dragger2.default, Widget: _widget2.default, Rect: _rect2.default, Handle: _handle2.default, Sticker: _sticker2.default, Easing: _easing2.default, load: _loader2.default, attach: attach };
+exports.Shade = _shade2.default;
+exports.DomObj = _domobj2.default;
+exports.default = { Stage: _dom2.default, defaults: _defaults2.default, Dragger: _dragger2.default, Widget: _widget2.default, Rect: _rect2.default, Handle: _handle2.default, Sticker: _sticker2.default, Easing: _easing2.default, load: _loader2.default, attach: attach, Shade: _shade2.default, DomObj: _domobj2.default };
 
 /***/ }),
 
@@ -826,6 +827,10 @@ var Keyboard = function () {
   return Keyboard;
 }();
 
+Keyboard.attach = function (widget) {
+  return new Keyboard(widget);
+};
+
 exports.default = Keyboard;
 
 /***/ }),
@@ -847,7 +852,7 @@ Object.defineProperty(exports, "__esModule", {
 // returns a promise that resolves when image is loaded
 // if it's already loaded, the promise will resolve immediately
 function Loader(img) {
-  if (typeof img == 'string') img = document.getElementById(img);
+  if (typeof img === 'string') img = document.getElementById(img);
 
   return new Promise(function (resolve, reject) {
     if (Loader.check(img)) return resolve(img);
@@ -855,7 +860,7 @@ function Loader(img) {
     function handler(e) {
       img.removeEventListener('load', handler);
       img.removeEventListener('error', handler);
-      e.type == 'load' ? resolve(img) : reject(img);
+      e.type === 'load' ? resolve(img) : reject(img);
     }
 
     img.addEventListener('load', handler);
@@ -1093,7 +1098,7 @@ var Manager = function () {
   function Manager(el) {
     _classCallCheck(this, Manager);
 
-    if (typeof el == 'string') el = document.getElementById(el);
+    if (typeof el === 'string') el = document.getElementById(el);
     this.el = el;
     this.shades = {};
   }
@@ -1108,11 +1113,13 @@ var Manager = function () {
       this.active = options.shade !== undefined ? options.shade : true;
 
       this.keys().forEach(function (key) {
-        return _this.shades[key] = Shade.create(options, key);
+        _this.shades[key] = Shade.create(options, key);
       });
 
       this.el.addEventListener('crop.update', function (e) {
-        if (e.cropTarget.isActive() && e.cropTarget.options.shade) _this.adjust(e.cropTarget.pos);
+        if (e.cropTarget.isActive() && e.cropTarget.options.shade) {
+          _this.adjust(e.cropTarget.pos);
+        }
       }, false);
 
       this.enable();
@@ -1339,7 +1346,6 @@ var Stage = function (_ConfObj) {
 
       if (!this.crops || n < 1) return false;
       var crops = Array.from(this.crops);
-
       while (crops.length > n) {
         this.removeWidget(crops.shift());
       }return this;
@@ -1478,7 +1484,6 @@ var Stage = function (_ConfObj) {
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       _get(Stage.prototype.__proto__ || Object.getPrototypeOf(Stage.prototype), 'setOptions', this).call(this, options);
-
       if (this.crops) Array.from(this.crops).forEach(function (i) {
         return i.setOptions(options);
       });
@@ -1865,7 +1870,7 @@ var Widget = function (_ConfObj) {
       this.createHandles();
       this.createMover();
       this.attachFocus();
-      new _keyboard2.default(this);
+      _keyboard2.default.attach(this);
       return this;
     }
   }, {
