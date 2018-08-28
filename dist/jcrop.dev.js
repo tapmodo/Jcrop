@@ -272,7 +272,7 @@ exports.default = {
   autoFront: true,
   active: true,
   handles: ['n', 's', 'e', 'w', 'sw', 'nw', 'ne', 'se'],
-  shading: true,
+  shade: true,
   shadeClass: 'jcrop-shade',
   shadeColor: 'black',
   shadeOpacity: 0.5,
@@ -1105,14 +1105,14 @@ var Manager = function () {
 
       var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      this.active = options.shading !== undefined ? options.shading : true;
+      this.active = options.shade !== undefined ? options.shade : true;
 
       this.keys().forEach(function (key) {
         return _this.shades[key] = Shade.create(options, key);
       });
 
       this.el.addEventListener('crop.update', function (e) {
-        if (e.cropTarget.isActive() && e.cropTarget.options.shading) _this.adjust(e.cropTarget.pos);
+        if (e.cropTarget.isActive() && e.cropTarget.options.shade) _this.adjust(e.cropTarget.pos);
       }, false);
 
       this.enable();
@@ -1169,7 +1169,7 @@ Manager.attach = function (i) {
   var m = new Manager(el);
   m.init(i.options);
   i.shades = m;
-  i._optconf['shading'] = function (v) {
+  i._optconf['shade'] = function (v) {
     return i.updateShades();
   };
   i._optconf['shadeColor'] = function (v) {
@@ -1459,16 +1459,16 @@ var Stage = function (_ConfObj) {
   }, {
     key: 'refresh',
     value: function refresh() {
-      this.options.shading && this.active && this.shades.adjust(this.active.pos);
+      this.options.shade && this.active && this.shades.adjust(this.active.pos);
     }
   }, {
     key: 'updateShades',
     value: function updateShades() {
       if (!this.shades) return;
 
-      if (this.options.shading) this.shades.enable();else this.shades.disable();
+      if (this.options.shade) this.shades.enable();else this.shades.disable();
 
-      this.options.shading && this.active && this.shades.adjust(this.active.pos);
+      this.options.shade && this.active && this.shades.adjust(this.active.pos);
 
       return this;
     }
