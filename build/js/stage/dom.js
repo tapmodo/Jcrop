@@ -135,17 +135,17 @@ class Stage extends ConfObj {
   }
 
   refresh() {
-    this.options.shading && this.active &&
+    this.options.shade && this.active &&
       this.shades.adjust(this.active.pos);
   }
 
   updateShades() {
     if (!this.shades) return;
 
-    if (this.options.shading) this.shades.enable();
+    if (this.options.shade) this.shades.enable();
       else this.shades.disable();
 
-    this.options.shading && this.active &&
+    this.options.shade && this.active &&
       this.shades.adjust(this.active.pos);
 
     return this;

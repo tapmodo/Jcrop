@@ -9,14 +9,14 @@ class Manager {
   }
 
   init(options={}) {
-    this.active = (options.shading!==undefined)? options.shading: true;
+    this.active = (options.shade!==undefined)? options.shade: true;
 
     this.keys().forEach(
       key => this.shades[key] = Shade.create(options,key)
     );
 
     this.el.addEventListener('crop.update',(e) => {
-      if (e.cropTarget.isActive() && e.cropTarget.options.shading)
+      if (e.cropTarget.isActive() && e.cropTarget.options.shade)
         this.adjust(e.cropTarget.pos);
     },false);
 
@@ -59,7 +59,7 @@ Manager.attach = function(i){
   const m = new Manager(el);
   m.init(i.options);
   i.shades = m;
-  i._optconf['shading'] = v => i.updateShades();
+  i._optconf['shade'] = v => i.updateShades();
   i._optconf['shadeColor'] = v => m.setStyle(v);
   i._optconf['shadeOpacity'] = v => m.setStyle(null,v);
   return m;

@@ -13,7 +13,7 @@ export default {
   autoFront: true,
   active: true,
   handles: ['n','s','e','w','sw','nw','ne','se'],
-  shading: true,
+  shade: true,
   shadeClass: 'jcrop-shade',
   shadeColor: 'black',
   shadeOpacity: 0.5,
