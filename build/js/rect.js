@@ -109,12 +109,17 @@ Rect.create = function (x=0,y=0,w=0,h=0) {
 };
 
 Rect.from = function (el) {
+  if (Array.isArray(el)) return Rect.fromArray(el);
   const c = new Rect();
   c.x = el.offsetLeft;
   c.y = el.offsetTop;
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
   return c;
+};
+
+Rect.fromArray = function (args) {
+  return Rect.create.apply(this,args);
 };
 
 Rect.sizeOf = function (el) {
