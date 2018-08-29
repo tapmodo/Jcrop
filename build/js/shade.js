@@ -28,10 +28,10 @@ class Manager {
     const f = Rect.from(this.el);
     const s = this.shades;
     s.t.h = rect.y;
-    s.r.w = Math.ceil(f.w - rect.x2);
     s.b.h = f.h - rect.y2;
     s.t.w = s.b.w = Math.floor(rect.w);
-    s.l.w = s.t.x = s.b.x = Math.floor(rect.x);
+    s.l.w = s.t.x = s.b.x = Math.ceil(rect.x);
+    s.r.w = f.w - (Math.ceil(rect.x) + Math.floor(rect.w));
   }
 
   keys () {
