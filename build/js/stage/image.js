@@ -1,5 +1,9 @@
-import { div } from '../util/dom';
 import Stage from './dom';
+
+function div (clname,el = document.createElement('div')) {
+  el.className = clname;
+  return el;
+}
 
 class ImageStage extends Stage {
   constructor (el,options) {

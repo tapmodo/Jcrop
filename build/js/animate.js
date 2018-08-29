@@ -37,6 +37,7 @@ function Animate (el,from,to,cb,frames=30,efunc='swing') {
         requestAnimationFrame(step);
       } else {
         // We've reached the end of the animation frames
+        cb(to);
         resolve();
       }
     }
