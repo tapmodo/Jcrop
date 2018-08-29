@@ -147,6 +147,7 @@ function Animate(el, from, to, cb) {
         requestAnimationFrame(step);
       } else {
         // We've reached the end of the animation frames
+        cb(to);
         resolve();
       }
     }
@@ -918,6 +919,11 @@ var Rect = function () {
   }
 
   _createClass(Rect, [{
+    key: 'round',
+    value: function round() {
+      return Rect.create(Math.round(this.x), Math.round(this.y), Math.round(this.w), Math.round(this.h));
+    }
+  }, {
     key: 'normalize',
     value: function normalize() {
       var _ref = [Math.min(this.x, this.x2), Math.min(this.y, this.y2), Math.max(this.x, this.x2), Math.max(this.y, this.y2)],
@@ -1012,12 +1018,17 @@ Rect.create = function () {
 };
 
 Rect.from = function (el) {
+  if (Array.isArray(el)) return Rect.fromArray(el);
   var c = new Rect();
   c.x = el.offsetLeft;
   c.y = el.offsetTop;
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
   return c;
+};
+
+Rect.fromArray = function (args) {
+  return Rect.create.apply(this, args);
 };
 
 Rect.sizeOf = function (el) {
@@ -1130,10 +1141,10 @@ var Manager = function () {
       var f = _rect2.default.from(this.el);
       var s = this.shades;
       s.t.h = rect.y;
-      s.r.w = Math.ceil(f.w - rect.x2);
       s.b.h = f.h - rect.y2;
       s.t.w = s.b.w = Math.floor(rect.w);
-      s.l.w = s.t.x = s.b.x = Math.floor(rect.x);
+      s.l.w = s.t.x = s.b.x = Math.ceil(rect.x);
+      s.r.w = f.w - (Math.ceil(rect.x) + Math.floor(rect.w));
     }
   }, {
     key: 'keys',
@@ -1513,11 +1524,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _dom = __webpack_require__(/*! ../util/dom */ "./build/js/util/dom.js");
+var _dom = __webpack_require__(/*! ./dom */ "./build/js/stage/dom.js");
 
-var _dom2 = __webpack_require__(/*! ./dom */ "./build/js/stage/dom.js");
-
-var _dom3 = _interopRequireDefault(_dom2);
+var _dom2 = _interopRequireDefault(_dom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1527,13 +1536,20 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function div(clname) {
+  var el = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
+
+  el.className = clname;
+  return el;
+}
+
 var ImageStage = function (_Stage) {
   _inherits(ImageStage, _Stage);
 
   function ImageStage(el, options) {
     _classCallCheck(this, ImageStage);
 
-    var wrapper = (0, _dom.div)('jcrop-stage jcrop-image-stage');
+    var wrapper = div('jcrop-stage jcrop-image-stage');
     el.parentNode.insertBefore(wrapper, el);
     wrapper.appendChild(el);
 
@@ -1557,7 +1573,7 @@ var ImageStage = function (_Stage) {
   }]);
 
   return ImageStage;
-}(_dom3.default);
+}(_dom2.default);
 
 exports.default = ImageStage;
 
@@ -1713,46 +1729,6 @@ Sticker.create = function (rect, w, h, ord) {
 };
 
 exports.default = Sticker;
-
-/***/ }),
-
-/***/ "./build/js/util/dom.js":
-/*!******************************!*\
-  !*** ./build/js/util/dom.js ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-var wrap = exports.wrap = function wrap(target) {
-  var wrapper = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
-
-  [].concat(_toConsumableArray(target.childNodes)).forEach(function (child) {
-    return wrapper.appendChild(child);
-  });
-  target.appendChild(wrapper);
-  return wrapper;
-};
-
-var div = exports.div = function div(clname) {
-  var el = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : document.createElement('div');
-
-  el.className = clname;
-  return el;
-};
-
-var replace = exports.replace = function replace(orig, target) {
-  orig.parentElement.replaceChild(target, orig);
-  return target;
-};
 
 /***/ }),
 
