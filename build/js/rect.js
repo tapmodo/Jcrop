@@ -47,6 +47,15 @@ class Rect {
     this.h = y - this.y;
   }
 
+  round() {
+    return Rect.create(
+      Math.round(this.x),
+      Math.round(this.y),
+      Math.round(this.w),
+      Math.round(this.h)
+    );
+  }
+
   normalize () {
     const [x1,y1,x2,y2] = [
       Math.min(this.x,this.x2),
