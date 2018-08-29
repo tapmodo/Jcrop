@@ -47,7 +47,7 @@ class Rect {
     this.h = y - this.y;
   }
 
-  round() {
+  round () {
     return Rect.create(
       Math.round(this.x),
       Math.round(this.y),
