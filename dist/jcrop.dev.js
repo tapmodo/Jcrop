@@ -687,7 +687,7 @@ exports.default = Handle;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DomObj = exports.Shade = exports.load = exports.Easing = exports.Sticker = exports.Handle = exports.Rect = exports.Widget = exports.Dragger = exports.defaults = exports.Stage = undefined;
+exports.DomObj = exports.Shade = exports.load = exports.easing = exports.Sticker = exports.Handle = exports.Rect = exports.Widget = exports.Dragger = exports.defaults = exports.Stage = undefined;
 exports.attach = attach;
 
 var _extend = __webpack_require__(/*! ./util/extend */ "./build/js/util/extend.js");
@@ -762,11 +762,11 @@ exports.Widget = _widget2.default;
 exports.Rect = _rect2.default;
 exports.Handle = _handle2.default;
 exports.Sticker = _sticker2.default;
-exports.Easing = _easing2.default;
+exports.easing = _easing2.default;
 exports.load = _loader2.default;
 exports.Shade = _shade2.default;
 exports.DomObj = _domobj2.default;
-exports.default = { Stage: _dom2.default, defaults: _defaults2.default, Dragger: _dragger2.default, Widget: _widget2.default, Rect: _rect2.default, Handle: _handle2.default, Sticker: _sticker2.default, Easing: _easing2.default, load: _loader2.default, attach: attach, Shade: _shade2.default, DomObj: _domobj2.default };
+exports.default = { Stage: _dom2.default, defaults: _defaults2.default, Dragger: _dragger2.default, Widget: _widget2.default, Rect: _rect2.default, Handle: _handle2.default, Sticker: _sticker2.default, easing: _easing2.default, load: _loader2.default, attach: attach, Shade: _shade2.default, DomObj: _domobj2.default };
 
 /***/ }),
 
@@ -956,6 +956,11 @@ var Rect = function () {
       return Rect.create((w - this.w) / 2, (h - this.h) / 2, this.w, this.h);
     }
   }, {
+    key: 'toArray',
+    value: function toArray() {
+      return [this.x, this.y, this.w, this.h];
+    }
+  }, {
     key: 'x1',
     set: function set(v) {
       this.w = this.x2 - v;
@@ -993,7 +998,7 @@ var Rect = function () {
   return Rect;
 }();
 
-Rect.fromCoords = function (p1, p2) {
+Rect.fromPoints = function (p1, p2) {
   var _ref2 = [Math.min(p1[0], p2[0]), Math.min(p1[1], p2[1]), Math.max(p1[0], p2[0]), Math.max(p1[1], p2[1])],
       x1 = _ref2[0],
       y1 = _ref2[1],
@@ -1401,7 +1406,9 @@ var Stage = function (_ConfObj) {
         return true;
       }, function (x, y) {
         crop.render(stick.move(x, y));
-      }, function () {});
+      }, function () {
+        crop.emit('crop.change');
+      });
     }
   }, {
     key: 'initListeners',
@@ -1423,7 +1430,7 @@ var Stage = function (_ConfObj) {
     value: function reorderWidgets() {
       var _this5 = this;
 
-      var z = 1000;
+      var z = 10;
       this.crops.forEach(function (crop) {
         crop.el.style.zIndex = z++;
         if (_this5.active === crop) crop.addClass('active');else crop.removeClass('active');
@@ -1499,6 +1506,9 @@ var Stage = function (_ConfObj) {
         return i.setOptions(options);
       });
     }
+  }, {
+    key: 'destroy',
+    value: function destroy() {}
   }]);
 
   return Stage;
@@ -1570,6 +1580,12 @@ var ImageStage = function (_Stage) {
       this.el.style.height = h + 'px';
       this.refresh();
     }
+  }, {
+    key: 'destroy',
+    value: function destroy() {
+      this.el.parentNode.insertBefore(this.srcEl, this.el);
+      this.el.remove();
+    }
   }]);
 
   return ImageStage;
@@ -1620,7 +1636,7 @@ var Sticker = function () {
   _createClass(Sticker, [{
     key: 'move',
     value: function move(x, y) {
-      return _rect2.default.fromCoords(this.locked, this.translateStuckPoint(x, y));
+      return _rect2.default.fromPoints(this.locked, this.translateStuckPoint(x, y));
     }
 
     // Determine "quadrant" of handle drag relative to locked point
@@ -1886,36 +1902,42 @@ var Widget = function (_ConfObj) {
   }, {
     key: 'animate',
     value: function animate(rect, frames, efunc) {
+      var _this4 = this;
+
       var t = this;
       efunc = efunc || t.options.animateEasingFunction || 'swing';
       frames = frames || t.options.animateFrames || 30;
       return (0, _animate2.default)(t.el, t.pos, rect, function (r) {
         return t.render(r.normalize());
-      }, frames, efunc);
+      }, frames, efunc).then(function () {
+        return _this4.emit('crop.change');
+      });
     }
   }, {
     key: 'createMover',
     value: function createMover() {
-      var _this4 = this;
+      var _this5 = this;
 
       var w, h;
       this.pos = _rect2.default.from(this.el);
       var stick;
       (0, _dragger2.default)(this.el, function () {
-        var pe = _this4.el.parentElement;
+        var pe = _this5.el.parentElement;
         var _ref = [pe.offsetWidth, pe.offsetHeight];
         w = _ref[0];
         h = _ref[1];
 
-        stick = _rect2.default.from(_this4.el);
-        _this4.el.focus();
-        _this4.emit('crop.activate');
+        stick = _rect2.default.from(_this5.el);
+        _this5.el.focus();
+        _this5.emit('crop.activate');
         return true;
       }, function (x, y) {
-        _this4.pos.x = stick.x + x;
-        _this4.pos.y = stick.y + y;
-        _this4.render(_this4.pos.rebound(w, h));
-      }, function () {});
+        _this5.pos.x = stick.x + x;
+        _this5.pos.y = stick.y + y;
+        _this5.render(_this5.pos.rebound(w, h));
+      }, function () {
+        _this5.emit('crop.change');
+      });
     }
   }, {
     key: 'nudge',
@@ -1931,29 +1953,32 @@ var Widget = function (_ConfObj) {
       if (x) this.pos.x += x;
       if (y) this.pos.y += y;
       this.render(this.pos.rebound(w, h));
+      this.emit('crop.change');
     }
   }, {
     key: 'createHandles',
     value: function createHandles() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.options.handles.forEach(function (c) {
         var handle = _handle2.default.create('jcrop-handle ' + c);
-        handle.appendTo(_this5.el);
+        handle.appendTo(_this6.el);
 
         var stick;
         (0, _dragger2.default)(handle.el, function () {
-          var pe = _this5.el.parentElement;
+          var pe = _this6.el.parentElement;
           var w = pe.offsetWidth;
           var h = pe.offsetHeight;
-          stick = _sticker2.default.create(_rect2.default.from(_this5.el), w, h, c);
-          if (_this5.aspect) stick.aspect = _this5.aspect;
-          _this5.el.focus();
-          _this5.emit('crop.active');
+          stick = _sticker2.default.create(_rect2.default.from(_this6.el), w, h, c);
+          if (_this6.aspect) stick.aspect = _this6.aspect;
+          _this6.el.focus();
+          _this6.emit('crop.active');
           return true;
         }, function (x, y) {
-          return _this5.render(stick.move(x, y));
-        }, function () {});
+          return _this6.render(stick.move(x, y));
+        }, function () {
+          _this6.emit('crop.change');
+        });
       });
       return this;
     }
