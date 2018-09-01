@@ -32,7 +32,7 @@
     <script>
       const jcp = Jcrop.attach('target',{multi:false});
 
-      const rect = Jcrop.Rect.fromCoords([100,100],[300,300]);
+      const rect = Jcrop.Rect.fromPoints([100,100],[300,300]);
 
       const crop = jcp.newWidget(rect,{
         aspectRatio: rect.aspect,
