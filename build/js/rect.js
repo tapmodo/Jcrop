@@ -87,6 +87,10 @@ class Rect {
       this.w, this.h
     );
   }
+
+  toArray () {
+    return [ this.x, this.y, this.w, this.h ];
+  }
 }
 
 Rect.fromCoords = function (p1,p2) {
