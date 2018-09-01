@@ -14,7 +14,7 @@ class Sticker {
   }
 
   move (x,y) {
-    return Rect.fromCoords(this.locked, this.translateStuckPoint(x,y));
+    return Rect.fromPoints(this.locked, this.translateStuckPoint(x,y));
   }
 
   // Determine "quadrant" of handle drag relative to locked point
