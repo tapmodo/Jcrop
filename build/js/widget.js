@@ -73,7 +73,9 @@ class Widget extends ConfObj {
         this.pos.y = stick.y + y;
         this.render(this.pos.rebound(w,h));
       },
-      () => { }
+      () => {
+        this.emit('crop.change');
+      }
     );
   }
 
@@ -83,6 +85,7 @@ class Widget extends ConfObj {
     if (x) this.pos.x += x;
     if (y) this.pos.y += y;
     this.render(this.pos.rebound(w,h));
+    this.emit('crop.change');
   }
 
   createHandles () {
@@ -103,7 +106,9 @@ class Widget extends ConfObj {
           return true;
         },
         (x,y) => this.render(stick.move(x,y)),
-        () => { }
+        () => {
+          this.emit('crop.change');
+        }
       );
     });
     return this;

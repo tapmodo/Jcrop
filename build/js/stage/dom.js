@@ -74,7 +74,9 @@ class Stage extends ConfObj {
       (x,y) => {
         crop.render(stick.move(x,y));
       },
-      () => { }
+      () => {
+        crop.emit('crop.change');
+      }
     );
   }
 
