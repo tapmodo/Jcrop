@@ -154,6 +154,10 @@ class Stage extends ConfObj {
     super.setOptions(options);
     if (this.crops) Array.from(this.crops).forEach(i => i.setOptions(options));
   }
+
+  destroy () {
+  }
+
 }
 
 export default Stage;

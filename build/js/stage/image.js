@@ -23,6 +23,11 @@ class ImageStage extends Stage {
     this.el.style.height = h+'px';
     this.refresh();
   }
+
+  destroy () {
+    this.el.parentNode.insertBefore(this.srcEl,this.el);
+    this.el.remove();
+  }
 }
 
 export default ImageStage;
