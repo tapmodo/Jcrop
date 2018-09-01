@@ -51,7 +51,8 @@ class Widget extends ConfObj {
     const t = this;
     efunc = efunc || t.options.animateEasingFunction || 'swing';
     frames = frames || t.options.animateFrames || 30;
-    return Animate(t.el,t.pos,rect,r => t.render(r.normalize()),frames,efunc);
+    return Animate(t.el,t.pos,rect,r => t.render(r.normalize()),frames,efunc)
+      .then(() => this.emit('crop.change'));
   }
 
   createMover () {
