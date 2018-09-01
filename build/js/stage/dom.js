@@ -85,7 +85,7 @@ class Stage extends ConfObj {
   }
 
   reorderWidgets () {
-    var z = 1000;
+    var z = 10;
     this.crops.forEach(crop => {
       crop.el.style.zIndex = z++;
       if (this.active === crop) crop.addClass('active');
