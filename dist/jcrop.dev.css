@@ -93,3 +93,7 @@
 
 .jcrop-ux-inactive-handles .jcrop-widget .jcrop-handle {
   display: block; }
+
+.jcrop-widget img {
+  width: 100%;
+  height: auto; }
