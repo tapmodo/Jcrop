@@ -3,6 +3,7 @@
   "version": "3.0.0",
   "description": "The Javascript cropping widget",
   "main": "build/js/jcrop.js",
+  "unpkg": "dist/jcrop.js",
   "scripts": {
     "build": "npx webpack --mode production build/js/jcrop.js --output dist/jcrop.js && npx webpack --mode development build/js/jcrop.js --output dist/jcrop.dev.js && npm run css",
     "start": "npx http-server",
