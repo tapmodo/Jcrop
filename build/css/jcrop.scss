@@ -68,3 +68,7 @@ $handleBackground: rgba(255,255,255,0.8);
   display: block;
 }
 
+.jcrop-widget img {
+  width: 100%;
+  height: auto;
+}
