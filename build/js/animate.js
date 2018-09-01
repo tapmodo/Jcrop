@@ -1,4 +1,4 @@
-import Easing from './easing';
+import easing from './easing';
 
 // Animate function uses requestAnimationFrame to sequence events
 // Easing functions adapted from jQuery-ui and Robert Penner's equations
@@ -16,7 +16,7 @@ function Animate (el,from,to,cb,frames=30,efunc='swing') {
   const cur = from.normalize();
 
   // Lookup the easing function if it is a string
-  efunc = (typeof efunc === 'string')? Easing[efunc] : efunc;
+  efunc = (typeof efunc === 'string')? easing[efunc] : efunc;
 
   var curFrame = 0;
 

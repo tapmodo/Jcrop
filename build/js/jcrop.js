@@ -9,7 +9,7 @@ import Dragger from './dragger';
 import Rect from './rect';
 import Sticker from './sticker';
 import DomObj from './domobj';
-import Easing from './easing';
+import easing from './easing';
 import load from './loader';
 
 export function attach (el,options={}) {
@@ -21,6 +21,6 @@ export function attach (el,options={}) {
   return new Stage(el,options);
 }
 
-export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, Shade, DomObj };
+export { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, easing, load, Shade, DomObj };
 
-export default { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, Easing, load, attach, Shade, DomObj };
+export default { Stage, defaults, Dragger, Widget, Rect, Handle, Sticker, easing, load, attach, Shade, DomObj };
