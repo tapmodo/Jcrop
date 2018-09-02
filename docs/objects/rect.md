@@ -5,13 +5,13 @@ lang: en-US
 
 # `Rect` Object
 
-The `Rect` class is the heart of the Jcrop engine. While it may appear to
-be a plain old Javascript object, it has some unique behavior that makes
-it easy to work with coordinates and crop selections. A `Rect` object
-instance represents coordinates for an arbitrary rectangle, usually
-top left and bottom right. Internally the class is used to set or
-describe an existing crop selection. You may use `Rect` objects when
-using the Jcrop API or to describe rectangles within your own application.
+> The `Rect` class is the heart of the Jcrop engine. While it may appear to
+> be a plain old Javascript object, it has some unique behavior that makes
+> it easy to work with coordinates and crop selections. A `Rect` object
+> instance represents coordinates for an arbitrary rectangle, usually
+> top left and bottom right. Internally the class is used to set or
+> describe an existing crop selection. You may use `Rect` objects when
+> using the Jcrop API or to describe rectangles within your own application.
 
 ## Properties
 

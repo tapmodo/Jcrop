@@ -16,6 +16,13 @@ lang: en-US
 
 ## Built-in `listen()` method
 
+```js
+const jcrop = Jcrop.attach('target');
+
+jcrop.listen('crop.move',(widget,e) => {
+  console.log(widget.pos);
+});
+```
 
 ## Native Events
 
@@ -30,7 +37,7 @@ const jcrop = Jcrop.attach('target');
 
 document.getElementById('target').addEventListener('crop.move',(e) => {
   const crop = e.cropTarget;
-  consol.log(crop.pos);
+  console.log(crop.pos);
 });
 ```
 

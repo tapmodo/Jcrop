@@ -24,7 +24,7 @@ document. Basic understanding of HTML and CSS is a
 pre-requisite so this should need little explanation.
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/jcrop/dist/vue-jcrop.css">
+<link rel="stylesheet" href="https://unpkg.com/jcrop/dist/jcrop.css">
 <script src="https://unpkg.com/jcrop"></script>
 ```
 
