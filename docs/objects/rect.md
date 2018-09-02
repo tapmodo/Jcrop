@@ -7,11 +7,13 @@ lang: en-US
 
 > The `Rect` class is the heart of the Jcrop engine. While it may appear to
 > be a plain old Javascript object, it has some unique behavior that makes
-> it easy to work with coordinates and crop selections. A `Rect` object
-> instance represents coordinates for an arbitrary rectangle, usually
-> top left and bottom right. Internally the class is used to set or
-> describe an existing crop selection. You may use `Rect` objects when
-> using the Jcrop API or to describe rectangles within your own application.
+> it easy to work with coordinates and crop selections.
+
+A `Rect` object instance represents coordinates for an arbitrary
+rectangle, usually top left and bottom right. Internally the class
+is used to set or describe an existing crop selection. You may
+use `Rect` objects when using the Jcrop API or to describe rectangles
+within your own application.
 
 ## Properties
 
@@ -66,6 +68,23 @@ const s = r.rebound(200,200);
 console.log(r.x,r.y); // --> -15, -20
 console.log(s.x,s.y); // --> 0, 0
 ```
+
+### rect.scale(x,y)
+
+Scales the width and height based on `x,y` scaling values,
+usually somewhere between 1 and 0 for a percentage. Returns a
+fresh `Rect` object with the width and height scaled.
+
+### rect.center(w,h)
+
+Returns a new `Rect` object with `x,y` producing a region
+centered within the space defined by `w,h`.
+
+### rect.round()
+
+Especially when using aspect ratios, fractional values are very
+possible, but not always desirable. Call the `round()` method and
+get a totally new `Rect` with rounded values.
 
 ## Static Methods
 

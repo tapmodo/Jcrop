@@ -6,4 +6,3 @@
 reactive coordinates display. This is the most common use case,
 usually used to select the crop area of an image.
 
-<<< @/docs/.vuepress/components/example1.vue{3-7,13-18}
