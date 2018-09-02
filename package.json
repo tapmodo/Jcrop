@@ -11,6 +11,8 @@
     "watch": "npx webpack --watch --mode development build/js/jcrop.js --output dist/jcrop.js",
     "prod": "npx webpack --mode production",
     "css": "npx node-sass --output-style=extended build/css/jcrop.scss dist/jcrop.dev.css && npx node-sass --output-style=compressed --source-map dist/jcrop.css.map build/css/jcrop.scss dist/jcrop.css",
+    "docs": "vuepress build docs",
+    "docs:build": "sh build/docs-deploy.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
