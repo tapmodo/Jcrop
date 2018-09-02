@@ -16,7 +16,7 @@ class Keyboard {
 
         case 'Delete':
         case 'Backspace':
-          c.emit('crop.remove');
+          c.stage.removeWidget(c);
           break;
 
         default: return;

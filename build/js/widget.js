@@ -42,7 +42,7 @@ class Widget extends ConfObj {
 
   attachFocus () {
     this.el.addEventListener('focus',(e) => {
-      this.emit('crop.activate');
+      this.stage.activate(this);
       this.emit('crop.update');
     },false);
   }
@@ -66,7 +66,7 @@ class Widget extends ConfObj {
         [w,h] = [ pe.offsetWidth, pe.offsetHeight ];
         stick = Rect.from(this.el);
         this.el.focus();
-        this.emit('crop.activate');
+        this.stage.activate(this);
         return true;
       },
       (x,y) => {

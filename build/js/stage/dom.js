@@ -15,7 +15,6 @@ class Stage extends ConfObj {
   }
 
   init () {
-    this.initListeners();
     this.initStageDrag();
     Shade.Manager.attach(this);
   }
@@ -80,12 +79,6 @@ class Stage extends ConfObj {
     );
   }
 
-  initListeners () {
-    this.listen('crop.activate',c => this.activate(c),false);
-    this.listen('crop.attach',c => console.info('Cropper attached'));
-    this.listen('crop.remove',c => this.removeWidget(c));
-  }
-
   reorderWidgets () {
     var z = 10;
     this.crops.forEach(crop => {
@@ -99,11 +92,13 @@ class Stage extends ConfObj {
   activate (widget) {
     widget = widget || Array.from(this.crops).pop();
     if (widget) {
+      if (this.active === widget) return;
       this.active = widget;
       this.crops.delete(widget);
       this.crops.add(widget);
       this.reorderWidgets();
       this.active.el.focus();
+      widget.emit('crop.activate');
     } else {
       this.shades.disable();
     }
@@ -128,6 +123,7 @@ class Stage extends ConfObj {
 
   removeWidget (widget) {
     if (!this.canRemove()) return false;
+    widget.emit('crop.remove');
     widget.el.remove();
     this.crops.delete(widget);
     this.activate();
