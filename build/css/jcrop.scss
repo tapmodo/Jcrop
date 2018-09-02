@@ -23,7 +23,7 @@ $handleBackground: rgba(255,255,255,0.8);
   position: absolute;
   box-sizing: border-box;
   border: 1px white dashed;
-  opacity: 0.25;
+  opacity: 0.7;
   background: transparent;
   transition: opacity 1s;
   padding:0;
@@ -32,7 +32,7 @@ $handleBackground: rgba(255,255,255,0.8);
 
   &:hover {
     transition: opacity 0.8s;
-    opacity: 0.65;
+    opacity: 0.8;
   }
 
   &:focus {
@@ -46,7 +46,7 @@ $handleBackground: rgba(255,255,255,0.8);
 
 .jcrop-shade {
   background: rgba(0,0,0,0.5);
-  transition: opacity 0.5s, background-color 0.5s;
+  transition: opacity 0.4s, background-color 0.7s;
   position: absolute;
   &.l { top: 0px; left: 0px; height: 100%; }
   &.r { top: 0px; right: 0px; height: 100%; }
@@ -71,4 +71,43 @@ $handleBackground: rgba(255,255,255,0.8);
 .jcrop-widget img {
   width: 100%;
   height: auto;
+}
+
+.jcrop-ux-fade-more {
+  .jcrop-widget {
+    opacity: 0.25;
+
+    &:hover {
+      transition: opacity 0.4s;
+      opacity: 0.8;
+    }
+
+    &:focus {
+      transition: opacity 0.5s;
+      opacity: 1;
+      outline-style: auto;
+      outline-width: 3px;
+      outline-color: rgba(0,0,0,0.3);
+    }
+  }
+}
+
+.jcrop-ux-fade-more {
+  .jcrop-widget {
+    opacity: 0.25;
+    &:hover { opacity: 0.65; }
+  }
+}
+
+.jcrop-ux-keep-current {
+  .jcrop-widget.active {
+    opacity: 1;
+    outline-style: auto;
+    outline-width: 3px;
+    outline-color: rgba(0,0,0,0.3);
+  }
+}
+
+.jcrop-ux-no-outline {
+  .jcrop-widget { outline: none !important; }
 }
