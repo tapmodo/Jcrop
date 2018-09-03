@@ -5,6 +5,7 @@ export default {
   multiMax: null,
   multiMin: 1,
   cropperClass: 'jcrop-widget',
+  disabledClass: 'jcrop-disable',
   canDrag: true,
   canResize: true,
   canSelect: true,
