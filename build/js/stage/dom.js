@@ -9,6 +9,8 @@ class Stage extends ConfObj {
 
   constructor (el,options) {
     super(el,options);
+    this.scalex = 1;
+    this.scaley = 1;
     this.crops = new Set();
     this.active = null;
     this.enabled = true;
