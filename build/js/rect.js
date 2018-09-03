@@ -80,6 +80,11 @@ class Rect {
     return Rect.create(this.x*x,this.y*y,this.w*x,this.h*y);
   }
 
+  unscale (x,y) {
+    y = y || x;
+    return Rect.create(this.x/x,this.y/y,this.w/x,this.h/y);
+  }
+
   center (w,h) {
     return Rect.create(
       (w - this.w)/2,
