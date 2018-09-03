@@ -27,10 +27,13 @@ class ImageStage extends Stage {
   }
 
   resizeToImage () {
-    const w = this.srcEl.width;
-    const h = this.srcEl.height;
+    const [w,h] = this.getImageDimensions();
+    const [nw,nh] = this.getNaturalDimensions();
     this.el.style.width = w+'px';
     this.el.style.height = h+'px';
+    this.rescaleWidgets(w/nw,h/nh);
+    this.scalex = nw/w;
+    this.scaley = nh/h;
     this.refresh();
   }
 
