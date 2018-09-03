@@ -9,7 +9,8 @@ class ImageStage extends Stage {
   constructor (el,options) {
     const wrapper = div('jcrop-stage jcrop-image-stage');
     el.parentNode.insertBefore(wrapper, el);
-    wrapper.appendChild(el);
+    // CSS positioning changed
+    // wrapper.appendChild(el);
     super(wrapper,options);
     this.srcEl = el;
     el.onload = this.resizeToImage.bind(this);
@@ -25,7 +26,6 @@ class ImageStage extends Stage {
   }
 
   destroy () {
-    this.el.parentNode.insertBefore(this.srcEl,this.el);
     this.el.remove();
   }
 }
