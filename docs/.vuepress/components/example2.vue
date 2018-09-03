@@ -2,7 +2,7 @@
   <div>
     <Jcrop
       src="https://d3o1694hluedf9.cloudfront.net/sierra-750.jpg"
-      @update="pos = $event.pos.round()"
+      @update="pos = $event.sel.round()"
       :rect="rect"
       :options="options"
     />
