@@ -94,10 +94,16 @@ the "stage") which can contain one or more cropping widgets.
 
 ### Creating widgets
 
-Widgets can be created several ways.
+Widgets can be created:
 
   * Widgets can be user-drawn on the stage with a mouse or touch
   * Using `newWidget()` or `addWidget()` stage methods
+
+```js
+const rect = Jcrop.Rect.create(x,y,w,h);
+const options = {};
+jcrop.newWidget(rect,options);
+```
 
 ### Active widget
 
@@ -111,7 +117,14 @@ A widget is usually made active when:
 
 ### Removing widgets
 
+Widgets can be removed:
 
+  * By the user through the UI (usually pressing delete or backspace)
+  * Programatically by calling `stage.removeWidget(widget)`
+
+```js
+jcrop.removeWidget(jcrop.active);
+```
 
 ### User drawn
 

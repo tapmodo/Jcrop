@@ -14,30 +14,24 @@ lang: en-US
   * Use the built-in `listen()` method to attach a handler function
   * Use the DOM `addEventListener()` method to listen for native events
 
-## Built-in `listen()` method
+## Events
+
+Use these event names with `stage.listen()` or `widget.listen()`
+
+| Event Name              | Description                                      |
+|:----------------------- |:------------------------------------------------ |
+| `crop.activate`         | Active widget has changed                        |
+| `crop.update`           | Widget dragging or resizing (frequent!)          |
+| `crop.change`           | Widget dragging or resizing finished             |
+| `crop.remove`           | Widget removed from stage                        |
+
+## Listen for events 
 
 ```js
-const jcrop = Jcrop.attach('target');
+const stage = Jcrop.attach('target');
 
-jcrop.listen('crop.move',(widget,e) => {
+stage.listen('crop.move',(widget,e) => {
   console.log(widget.pos);
-});
-```
-
-## Native Events
-
-When the state of the Jcrop instance changes, native DOM events
-are fired on its container that will bubble up through the DOM
-the same way other events do. They can be treated the same way
-built-in events are normally handled, using the `addEventListener()`
-method to attach a listener.
-
-```js{3-6}
-const jcrop = Jcrop.attach('target');
-
-document.getElementById('target').addEventListener('crop.move',(e) => {
-  const crop = e.cropTarget;
-  console.log(crop.pos);
 });
 ```
 
