@@ -111,3 +111,8 @@ $handleBackground: rgba(255,255,255,0.8);
 .jcrop-ux-no-outline {
   .jcrop-widget { outline: none !important; }
 }
+
+.jcrop-disable.jcrop-stage {
+  opacity: .8;
+  .jcrop-widget { outline: none !important; }
+}
