@@ -11,6 +11,7 @@ class Stage extends ConfObj {
     super(el,options);
     this.crops = new Set();
     this.active = null;
+    this.enabled = true;
     this.init();
   }
 
@@ -23,7 +24,15 @@ class Stage extends ConfObj {
     this._optconf['multi'] = v => { if (!v) this.limitWidgets(); };
   }
 
+  setEnabled (v=true) {
+    const clname = this.options.disabledClass || 'jcrop-disable';
+    this[v?'removeClass':'addClass'](clname);
+    this.enabled = !!v;
+    return this;
+  }
+
   focus () {
+    if (!this.enabled) return false;
     if (this.active) this.active.el.focus();
     else this.el.focus();
     return this;
@@ -39,6 +48,7 @@ class Stage extends ConfObj {
   canCreate () {
     const n = this.crops.size;
     const o = this.options;
+    if (!this.enabled) return false;
     if ((o.multiMax!==null) && (n >= o.multiMax)) return false;
     if (!o.multi && (n >= o.multiMin)) return false;
     return true;
@@ -47,6 +57,7 @@ class Stage extends ConfObj {
   canRemove () {
     const n = this.crops.size;
     const o = this.options;
+    if (!this.enabled) return false;
     if (this.active && !this.active.options.canRemove) return false;
     if (!o.canRemove || (n <= o.multiMin)) return false;
     return true;
@@ -90,6 +101,7 @@ class Stage extends ConfObj {
   }
 
   activate (widget) {
+    if (!this.enabled) return this;
     widget = widget || Array.from(this.crops).pop();
     if (widget) {
       if (this.active === widget) return;

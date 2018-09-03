@@ -63,6 +63,7 @@ class Widget extends ConfObj {
       this.el,
       () => {
         const pe = this.el.parentElement;
+        if (!this.stage.enabled) return false;
         [w,h] = [ pe.offsetWidth, pe.offsetHeight ];
         stick = Rect.from(this.el);
         this.el.focus();
@@ -97,6 +98,7 @@ class Widget extends ConfObj {
       var stick;
       Dragger(handle.el,
         () => {
+          if (!this.stage.enabled) return false;
           const pe = this.el.parentElement;
           const w = pe.offsetWidth;
           const h = pe.offsetHeight;
