@@ -128,7 +128,8 @@ Rect.fromArray = function (args) {
   else throw "fromArray method problem";
 };
 
-Rect.sizeOf = function (el) {
+Rect.sizeOf = function (el,y) {
+  if (y) return Rect.create(0,0,el,y);
   const c = new Rect();
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
