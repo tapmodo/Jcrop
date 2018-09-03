@@ -130,7 +130,7 @@ class Stage extends ConfObj {
   newWidget (rect,options={}) {
     options = extend({},this.options,options);
     const crop = (this.options.widgetConstructor || Widget).create(options);
-    crop.render(rect);
+    crop.render(rect.unscale(this.scalex,this.scaley));
     this.addWidget(crop);
     crop.el.focus();
     return crop;
