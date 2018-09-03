@@ -145,6 +145,7 @@ class Stage extends ConfObj {
   }
 
   refresh () {
+    this.crops.forEach(crop => { crop.render(); });
     this.options.shade && this.active &&
       this.shades.adjust(this.active.pos);
   }
