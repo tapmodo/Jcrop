@@ -953,6 +953,12 @@ var Rect = function () {
       return Rect.create(this.x * x, this.y * y, this.w * x, this.h * y);
     }
   }, {
+    key: 'unscale',
+    value: function unscale(x, y) {
+      y = y || x;
+      return Rect.create(this.x / x, this.y / y, this.w / x, this.h / y);
+    }
+  }, {
     key: 'center',
     value: function center(w, h) {
       return Rect.create((w - this.w) / 2, (h - this.h) / 2, this.w, this.h);
@@ -1474,7 +1480,7 @@ var Stage = function (_ConfObj) {
 
       options = (0, _extend2.default)({}, this.options, options);
       var crop = (this.options.widgetConstructor || _widget2.default).create(options);
-      crop.render(rect);
+      crop.render(rect.unscale(this.scalex, this.scaley));
       this.addWidget(crop);
       crop.el.focus();
       return crop;
