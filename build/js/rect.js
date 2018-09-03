@@ -125,7 +125,7 @@ Rect.from = function (el) {
 Rect.fromArray = function (args) {
   if (args.length === 4) return Rect.create.apply(this,args);
   else if (args.length === 2) return Rect.fromPoints(args[0],args[1]);
-  else throw "fromArray method problem";
+  else throw new Error('fromArray method problem');
 };
 
 Rect.sizeOf = function (el,y) {
