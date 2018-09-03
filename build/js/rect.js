@@ -77,7 +77,7 @@ class Rect {
 
   scale (x,y) {
     y = y || x;
-    return Rect.create(this.x,this.y,this.w*x,this.h*y);
+    return Rect.create(this.x*x,this.y*y,this.w*x,this.h*y);
   }
 
   center (w,h) {
