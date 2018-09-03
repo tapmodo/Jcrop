@@ -30,6 +30,7 @@ class DomObj {
 
   addClass (cl) {
     if (!this.hasClass(cl)) this.el.className += ' ' + cl;
+    return this;
   }
 
   listen (evname,handler) {
