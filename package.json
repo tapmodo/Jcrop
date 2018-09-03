@@ -1,6 +1,6 @@
 {
   "name": "jcrop",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "The Javascript cropping widget",
   "main": "build/js/jcrop.js",
   "unpkg": "dist/jcrop.js",
