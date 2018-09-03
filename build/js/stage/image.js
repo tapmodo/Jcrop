@@ -25,6 +25,23 @@ class ImageStage extends Stage {
     this.refresh();
   }
 
+  rescaleWidgets (x,y) {
+    this.crops.forEach(crop => {
+      crop.pos = crop.sel.scale(x,y);
+    });
+  }
+
+  getImageDimensions () {
+    return [ this.srcEl.width, this.srcEl.height ];
+  }
+
+  getNaturalDimensions () {
+    return [
+      this.srcEl.naturalWidth || this.srcEl.width,
+      this.srcEl.naturalHeight || this.srcEl.height
+    ];
+  }
+
   destroy () {
     this.el.remove();
   }
