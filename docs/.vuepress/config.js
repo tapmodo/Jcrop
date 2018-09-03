@@ -10,6 +10,7 @@ module.exports = {
         children: [
           '/guide/',
           '/guide/instance',
+          '/guide/widgets',
           '/guide/options',
           '/guide/styling',
           '/guide/events'

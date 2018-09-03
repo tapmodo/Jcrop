@@ -76,6 +76,31 @@ sized to the size of the image element in the DOM. Also note that an
 `onload` handler is attached to the image, so that the container size
 can be updated when/if an image becomes loaded.
 
+### Preloading Images
+
+The most common use case for Jcrop is cropping an image. For Jcrop to
+properly initialize in such a case, **the image must already be loaded**
+in the DOM (at least enough to have width and height available).
+Jcrop provides a convenient static method to ensure that an image is
+pre-loaded before Jcrop is attached:
+
+```html
+<img src="https://d3o1694hluedf9.cloudfront.net/sierra-750.jpg" id="target">
+```
+```js
+Jcrop.load('target').then(img => Jcrop.attach(img,options));
+```
+
+Of course, the `Jcrop.load()` static method can take an element as well.
+If you wanted to create the `Image` element programatically, just make
+sure you add it to the DOM.
+
+```js
+const myImage = new Image();
+myImage.src = 'https://d3o1694hluedf9.cloudfront.net/sierra-750.jpg';
+document.getElementById('container').appendChild(myImage);
+Jcrop.load(myImage).then(img => Jcrop.attach(img,options));
+```
 
 ## Instance Methods
 
@@ -85,7 +110,7 @@ Jcrop options can be changed on-the-fly using the setOptions() method.
 The instance will react to any changed options immediately.
 
 ```js
-jcrop.setOptions({ shading: false });
+jcrop.setOptions({ shade: false });
 ```
 
 ::: tip Instance options vs. Widget options
@@ -166,6 +191,10 @@ It contains a reference to the original source image after wrapping.
 
 ## Removing an Instance
 
-Removing an instance is not currently documented. This feature will
-be fully supported and documented soon.
+Jcrop instances provide a `destroy()` method to remove the instance.
 
+```js
+jcrop.destroy();
+```
+
+This feature is not well defined currently. No guarantees are made. :)
