@@ -110,6 +110,7 @@ class Stage extends ConfObj {
       this.crops.add(widget);
       this.reorderWidgets();
       this.active.el.focus();
+      this.options.shade && this.shades.enable();
       widget.emit('crop.activate');
     } else {
       this.shades.disable();
