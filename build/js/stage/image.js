@@ -1,4 +1,5 @@
 import Stage from './dom';
+import ResizeObserver from 'resize-observer-polyfill';
 
 function div (clname,el = document.createElement('div')) {
   el.className = clname;
@@ -15,6 +16,14 @@ class ImageStage extends Stage {
     this.srcEl = el;
     el.onload = this.resizeToImage.bind(this);
     this.resizeToImage();
+    this.initResizeObserver();
+  }
+
+  initResizeObserver () {
+    const ro = new ResizeObserver((entries, observer) => {
+      this.resizeToImage();
+    });
+    ro.observe(this.srcEl);
   }
 
   resizeToImage () {
