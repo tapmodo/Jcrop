@@ -84,7 +84,7 @@
     bottom: 0px; }
 
 .jcrop-stage {
-  position: relative;
+  position: absolute;
   width: 100%; }
 
 .jcrop-image-stage img {
