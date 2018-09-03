@@ -121,6 +121,11 @@ class Widget extends ConfObj {
     return (this.stage && (this.stage.active === this));
   }
 
+  get sel () {
+    const s = this.stage;
+    return this.pos.scale(s.scalex,s.scaley);
+  }
+
   render (r) {
     r = r || this.pos;
     this.el.style.top = Math.round(r.y) + 'px';
