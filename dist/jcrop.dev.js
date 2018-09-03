@@ -263,6 +263,7 @@ exports.default = {
   multiMax: null,
   multiMin: 1,
   cropperClass: 'jcrop-widget',
+  disabledClass: 'jcrop-disable',
   canDrag: true,
   canResize: true,
   canSelect: true,
@@ -344,6 +345,7 @@ var DomObj = function () {
     key: 'addClass',
     value: function addClass(cl) {
       if (!this.hasClass(cl)) this.el.className += ' ' + cl;
+      return this;
     }
   }, {
     key: 'listen',
@@ -814,7 +816,7 @@ var Keyboard = function () {
 
           case 'Delete':
           case 'Backspace':
-            c.emit('crop.remove');
+            c.stage.removeWidget(c);
             break;
 
           default:
@@ -1036,7 +1038,8 @@ Rect.fromArray = function (args) {
   if (args.length === 4) return Rect.create.apply(this, args);else if (args.length === 2) return Rect.fromPoints(args[0], args[1]);else throw "fromArray method problem";
 };
 
-Rect.sizeOf = function (el) {
+Rect.sizeOf = function (el, y) {
+  if (y) return Rect.create(0, 0, el, y);
   var c = new Rect();
   c.w = el.offsetWidth;
   c.h = el.offsetHeight;
@@ -1329,6 +1332,7 @@ var Stage = function (_ConfObj) {
 
     _this.crops = new Set();
     _this.active = null;
+    _this.enabled = true;
     _this.init();
     return _this;
   }
@@ -1336,7 +1340,6 @@ var Stage = function (_ConfObj) {
   _createClass(Stage, [{
     key: 'init',
     value: function init() {
-      this.initListeners();
       this.initStageDrag();
       _shade2.default.Manager.attach(this);
     }
@@ -1350,8 +1353,19 @@ var Stage = function (_ConfObj) {
       };
     }
   }, {
+    key: 'setEnabled',
+    value: function setEnabled() {
+      var v = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
+      var clname = this.options.disabledClass || 'jcrop-disable';
+      this[v ? 'removeClass' : 'addClass'](clname);
+      this.enabled = !!v;
+      return this;
+    }
+  }, {
     key: 'focus',
     value: function focus() {
+      if (!this.enabled) return false;
       if (this.active) this.active.el.focus();else this.el.focus();
       return this;
     }
@@ -1371,6 +1385,7 @@ var Stage = function (_ConfObj) {
     value: function canCreate() {
       var n = this.crops.size;
       var o = this.options;
+      if (!this.enabled) return false;
       if (o.multiMax !== null && n >= o.multiMax) return false;
       if (!o.multi && n >= o.multiMin) return false;
       return true;
@@ -1380,6 +1395,7 @@ var Stage = function (_ConfObj) {
     value: function canRemove() {
       var n = this.crops.size;
       var o = this.options;
+      if (!this.enabled) return false;
       if (this.active && !this.active.options.canRemove) return false;
       if (!o.canRemove || n <= o.multiMin) return false;
       return true;
@@ -1411,42 +1427,31 @@ var Stage = function (_ConfObj) {
       });
     }
   }, {
-    key: 'initListeners',
-    value: function initListeners() {
-      var _this4 = this;
-
-      this.listen('crop.activate', function (c) {
-        return _this4.activate(c);
-      }, false);
-      this.listen('crop.attach', function (c) {
-        return console.info('Cropper attached');
-      });
-      this.listen('crop.remove', function (c) {
-        return _this4.removeWidget(c);
-      });
-    }
-  }, {
     key: 'reorderWidgets',
     value: function reorderWidgets() {
-      var _this5 = this;
+      var _this4 = this;
 
       var z = 10;
       this.crops.forEach(function (crop) {
         crop.el.style.zIndex = z++;
-        if (_this5.active === crop) crop.addClass('active');else crop.removeClass('active');
+        if (_this4.active === crop) crop.addClass('active');else crop.removeClass('active');
       });
       this.refresh();
     }
   }, {
     key: 'activate',
     value: function activate(widget) {
+      if (!this.enabled) return this;
       widget = widget || Array.from(this.crops).pop();
       if (widget) {
+        if (this.active === widget) return;
         this.active = widget;
         this.crops.delete(widget);
         this.crops.add(widget);
         this.reorderWidgets();
         this.active.el.focus();
+        this.options.shade && this.shades.enable();
+        widget.emit('crop.activate');
       } else {
         this.shades.disable();
       }
@@ -1476,6 +1481,7 @@ var Stage = function (_ConfObj) {
     key: 'removeWidget',
     value: function removeWidget(widget) {
       if (!this.canRemove()) return false;
+      widget.emit('crop.remove');
       widget.el.remove();
       this.crops.delete(widget);
       this.activate();
@@ -1895,7 +1901,7 @@ var Widget = function (_ConfObj) {
       var _this3 = this;
 
       this.el.addEventListener('focus', function (e) {
-        _this3.emit('crop.activate');
+        _this3.stage.activate(_this3);
         _this3.emit('crop.update');
       }, false);
     }
@@ -1923,13 +1929,14 @@ var Widget = function (_ConfObj) {
       var stick;
       (0, _dragger2.default)(this.el, function () {
         var pe = _this5.el.parentElement;
+        if (!_this5.stage.enabled) return false;
         var _ref = [pe.offsetWidth, pe.offsetHeight];
         w = _ref[0];
         h = _ref[1];
 
         stick = _rect2.default.from(_this5.el);
         _this5.el.focus();
-        _this5.emit('crop.activate');
+        _this5.stage.activate(_this5);
         return true;
       }, function (x, y) {
         _this5.pos.x = stick.x + x;
@@ -1966,6 +1973,7 @@ var Widget = function (_ConfObj) {
 
         var stick;
         (0, _dragger2.default)(handle.el, function () {
+          if (!_this6.stage.enabled) return false;
           var pe = _this6.el.parentElement;
           var w = pe.offsetWidth;
           var h = pe.offsetHeight;

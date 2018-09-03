@@ -123,3 +123,8 @@
 
 .jcrop-ux-no-outline .jcrop-widget {
   outline: none !important; }
+
+.jcrop-disable.jcrop-stage {
+  opacity: .8; }
+  .jcrop-disable.jcrop-stage .jcrop-widget {
+    outline: none !important; }
