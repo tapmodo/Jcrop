@@ -12,7 +12,7 @@
 </template>
 
 <script>
-  const origin = [210,170,540,270];
+  const origin = [150,160,540,270];
 
   export default {
     data: () => ({

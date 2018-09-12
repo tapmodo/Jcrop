@@ -6,21 +6,21 @@ features:
 - title: 100% Pure Javascript
   details: All vanilla with no dependencies, or use official wrappers
    for the component framework of your choice
-- title: Clean open source
-  details: Webpack'd for your convenience, the full source code is
-   open, easy to develop with, and MIT licensed
-- title: Advanced Control
-  details: Create complex interactivity that transcends mere
-    cropping using the well-documented API
+- title: Responsive
+  details: Interface will automatically resize if the image size changes
+   because of responsive CSS rules.
 - title: Touch Support
-  details: Native touch support tested with Android, iOS, and Chromebook. Mouse and
-   touch support are simultaneous and automatic.
+  details: Touch support tested with Android, iOS, and Chromebook. Mouse and
+   touch are simultaneous and automatic.
 - title: Multiple Crops
   details: Single cropping widgets are so boring
    widgets on the same stage are the doorway to advanced interfaces.
-- title: Modern Browsers
-  details: There's lots of documentation to dive right into, so why
-   not do it now?
+- title: Clean open source
+  details: Webpack'd for your convenience, the full source code is
+   open, easy to develop with, and MIT licensed.
+- title: Advanced Control
+  details: Create complex interactivity that transcends mere
+   cropping using the well-documented API.
 footer: MIT Licensed | Copyright © 2008-2018 Tapmodo Interactive LLC
 ---
 

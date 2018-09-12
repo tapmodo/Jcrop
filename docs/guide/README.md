@@ -9,13 +9,12 @@ lang: en-US
 > overview of most common topics and concepts to help you get going.
 > Links are provided to more detailed documentation where relevant.
 
-**Read through this guide first.** If you already have an
-HTML document, it shouldn't take more than a couple minutes
-to get Jcrop working on your page.
-
-  * Include the Jcrop library and CSS files in your HTML
-  * Programatically attach Jcrop to an element in the DOM
-  * Start cropping!
+::: tip Pick your version
+This documentation covers the vanilla Javascript version of Jcrop.
+While it is very worthwhile to read and understand how Jcrop works,
+you may be more interested in using Jcrop wrappers for [Vue](/vue/)
+or [jQuery](/jquery/) which have their own quickstart docs.
+:::
 
 ## Including files
 
