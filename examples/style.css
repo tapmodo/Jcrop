@@ -1,0 +1,23 @@
+body {
+  margin: 0px;
+  padding: 0px;
+  background-color: #ededed;
+}
+
+.cropapp {
+  position: absolute;
+  width: 90%;
+  height: 80%;
+  left: 5%;
+  background: lightgray;
+}
+
+.cropbox {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+img#target { max-width: 780px; }

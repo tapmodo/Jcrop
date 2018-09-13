@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Jcrop Example</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="../dist/jcrop.css" />
+  </head>
+  <body>
+
+    <div style="padding:0 5%;">
+    <h1 style="font-family:Helvetica,sans-serif;">
+      Jcrop Example <span style="color:lightgray;">- draw some crops!</span>
+    </h1>
+
+    <img id="target" src="https://d3o1694hluedf9.cloudfront.net/market-750.jpg">
+
+    <div style="margin-top:0.5em;">
+      <select id="animtype">
+        <option>swing</option>
+        <option>inQuad</option>
+        <option>outQuad</option>
+        <option>inOutQuad</option>
+        <option>inCubic</option>
+        <option>outCubic</option>
+        <option>inOutCubic</option>
+        <option>inQuart</option>
+        <option>outQuart</option>
+        <option>inOutQuart</option>
+        <option>inQuint</option>
+        <option>outQuint</option>
+        <option>inOutQuint</option>
+        <option>inSine</option>
+        <option>outSine</option>
+        <option>inOutSine</option>
+        <option>inExpo</option>
+        <option>outExpo</option>
+        <option selected>inOutExpo</option>
+        <option>inCirc</option>
+        <option>outCirc</option>
+        <option>inOutCirc</option>
+        <option>inElastic</option>
+        <option>outElastic</option>
+        <option>inOutElastic</option>
+        <option>inBack</option>
+        <option>outBack</option>
+        <option>inOutBack</option>
+        <option>inBounce</option>
+        <option>outBounce</option>
+        <option>inOutBounce</option>
+      </select>
+      <button onclick="anim()">Animate</button>
+    </div>
+
+    <div style="margin-top:0.5em;">
+      <button onclick="setImage('market-750.jpg')">Market</button>
+      <button onclick="setImage('sierra-750.jpg')">Sierra</button>
+      <button onclick="setImage('img/sierra.jpg')">Sierra2</button>
+      <button onclick="setImage('img/lake.jpg')">Lake</button>
+      <br>
+      <button onclick="jcp.setOptions({shadeColor:'red'});">Red</button>
+      <button onclick="jcp.setOptions({shadeColor:'blue'});">Blue</button>
+      <button onclick="jcp.setOptions({shadeColor:'yellow'});">Yellow</button>
+      <button onclick="jcp.setOptions({shadeColor:'black'});">Black</button>
+      <br>
+      <button onclick="jcp.setOptions({shadeOpacity:0.2});">Low</button>
+      <button onclick="jcp.setOptions({shadeOpacity:0.55});">Medium</button>
+      <button onclick="jcp.setOptions({shadeOpacity:0.8});">High</button>
+      <button onclick="jcp.setOptions({shadeOpacity:0.95});">Full</button>
+    </div>
+
+    </div>
+
+    <script src="../dist/jcrop.js"></script>
+    <script>
+      var jcp;
+      Jcrop.load('target').then(img => {
+        jcp = Jcrop.attach(img,{multi:true});
+        const rect = Jcrop.Rect.sizeOf(jcp.el);
+        jcp.newWidget(rect.scale(.7,.5).center(rect.w,rect.h));
+        jcp.focus();
+      });
+
+      function setImage(tag){
+        document.getElementById('target').src =
+          'https://d3o1694hluedf9.cloudfront.net/'+tag;
+      }
+
+      function rcoord() {
+        const w = jcp.el.offsetWidth;
+        const h = jcp.el.offsetHeight;
+        return [Math.round(Math.random()*w), Math.round(Math.random()*h)];
+      }
+
+      function rrect() {
+        return Jcrop.Rect.fromCoords(rcoord(),rcoord());
+      }
+
+      function anim(){
+        if (!jcp.active) return false;
+        const animtype = document.getElementById('animtype').value;
+        jcp.active.animate(rrect(),null,animtype);
+        jcp.focus();
+      }
+    </script>
+  </body>
+</html>

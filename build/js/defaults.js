@@ -1,0 +1,27 @@
+export default {
+  animateEasingFunction: 'swing',
+  animateFrames: 30,
+  multi: false,
+  multiMax: null,
+  multiMin: 1,
+  cropperClass: 'jcrop-widget',
+  disabledClass: 'jcrop-disable',
+  canDrag: true,
+  canResize: true,
+  canSelect: true,
+  canRemove: true,
+  multiple: false,
+  autoFront: true,
+  active: true,
+  handles: ['n','s','e','w','sw','nw','ne','se'],
+  shade: true,
+  shadeClass: 'jcrop-shade',
+  shadeColor: 'black',
+  shadeOpacity: 0.5,
+  widgetConstructor: null,
+  x: 0,
+  y: 0,
+  w: 100,
+  h: 100
+};
+

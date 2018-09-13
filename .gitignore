@@ -1,3 +1,7 @@
-demos/test*
 node_modules
 npm-debug.log
+package-lock.json
+
+.*.sw?
+
+docs/.vuepress/dist
