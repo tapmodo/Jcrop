@@ -10,7 +10,7 @@ npm run docs
 cd docs/.vuepress/dist
 
 # if you are deploying to a custom domain
-echo 'docs.jcrop.com' > CNAME
+echo 'jcrop.com' > CNAME
 
 git init
 git add -A

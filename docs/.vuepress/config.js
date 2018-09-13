@@ -1,6 +1,7 @@
 module.exports = {
   title: 'Jcrop',
   description: 'Javascript cropping engine',
+  ga: 'UA-52538749-3',
   themeConfig: {
     displayAllHeaders: false,
     sidebarDepth: 3,
