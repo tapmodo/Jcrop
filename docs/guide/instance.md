@@ -143,7 +143,7 @@ Add a new cropping widget using a [`Rect`](/objects/rect.html) object.
 
 ```js{2}
 const rect = Jcrop.Rect.fromPoints([100,100],[200,200]);
-jcrop.newCropper(rect,{ aspectRatio: rect.aspect });
+jcrop.newWidget(rect,{ aspectRatio: rect.aspect });
 ```
 
 ### CSS class management
